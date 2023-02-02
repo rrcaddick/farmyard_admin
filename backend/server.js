@@ -8,6 +8,8 @@ const { ApolloServer } = require("apollo-server-express");
 const { graphqlApplication, executor, schema, context, dataSources, formatError, injector } = require("./graphql");
 const { ikhokhaService } = require("./services/ikhokha");
 const { quicketService } = require("./services/quicket");
+const { createCronSchedules } = require("./schedule");
+
 const PORT = process.env.port || 5000;
 
 // Express app and middleware
@@ -34,8 +36,10 @@ const apolloServer = new ApolloServer({
   await quicketService.start();
 
   // Update the tickets
-  // await quicketService.updateData();
-  await ikhokhaService.writeDailyData();
+  await quicketService.updateData();
+
+  // Create cron schedules
+  createCronSchedules();
 
   // Start graphql server
   await apolloServer.start();

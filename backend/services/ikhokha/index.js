@@ -2,7 +2,9 @@ const { firefox } = require("playwright");
 const { createIkhokhaDate, formatIkhokhaData } = require("../../utils/ikhokha");
 const { IkhokhaSale } = require("../../models/ikhokha-sale");
 
-const ikhokhaService = {};
+const ikhokhaService = {
+  running: false,
+};
 const setGetData = (getDataFn) => (ikhokhaService.getData = getDataFn);
 const setStopService = (stopServiceFn) => (ikhokhaService.stop = stopServiceFn);
 
@@ -36,9 +38,11 @@ ikhokhaService.start = async () => {
 
   setStopService(async () => {
     await browser.close();
+    ikhokhaService.running = false;
     console.log(`Ikhoka Service Stopped`.bgBlue.white);
   });
 
+  ikhokhaService.running = true;
   console.log(`Ikhoka Service Started`.bgBlue.white);
 };
 

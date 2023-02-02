@@ -3,7 +3,9 @@ const papa = require("papaparse");
 const { groupTickets, getTicketType } = require("../../utils/quicket");
 const { QuicketSale } = require("../../models/quicket-sale");
 
-const quicketService = {};
+const quicketService = {
+  running: false,
+};
 const setUpdateData = (updateDataFn) => (quicketService.updateData = updateDataFn);
 const setStopService = (stopServiceFn) => (quicketService.stop = stopServiceFn);
 
@@ -83,21 +85,14 @@ quicketService.start = async () => {
                 const eventDate = new Date(`${year}/${month}/${day} ${time}`);
                 const today = new Date(new Date().setHours(0, 0, 0, 0));
 
-                // if (eventDate >= today) {
-                //   tickets.push({
-                //     orderNumber,
-                //     purchaserEmail,
-                //     ticketType,
-                //     eventDate,
-                //   });
-                // }
-
-                tickets.push({
-                  orderNumber,
-                  purchaserEmail,
-                  ticketType,
-                  eventDate,
-                });
+                if (eventDate >= today) {
+                  tickets.push({
+                    orderNumber,
+                    purchaserEmail,
+                    ticketType,
+                    eventDate,
+                  });
+                }
 
                 return tickets;
               }, []);
@@ -127,9 +122,11 @@ quicketService.start = async () => {
 
   setStopService(async () => {
     await browser.close();
+    quicketService.running = false;
     console.log(`Quicket Service Stopped`.bgGreen.black);
   });
 
+  quicketService.running = true;
   console.log(`Quicket Service Started`.bgGreen.black);
 };
 
