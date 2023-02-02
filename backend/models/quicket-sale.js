@@ -6,7 +6,7 @@ const quicketSaleSchema = new mongoose.Schema({
     required: "Order Numbers are required",
   },
   eventDate: {
-    type: Date,
+    type: String,
     required: "Event Date is required",
   },
   purchaserEmail: {

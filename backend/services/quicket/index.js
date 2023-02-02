@@ -15,14 +15,18 @@ quicketService.start = async () => {
 
   await Promise.all([
     page.goto("https://www.quicket.co.za/account/authentication/login.aspx"),
-    page.waitForLoadState("domcontentloaded"),
+    page.waitForSelector("#BodyContent_BodyContent_UserName"),
+    page.waitForSelector("#BodyContent_BodyContent_Password"),
   ]);
 
   // Login
   await page.type("#BodyContent_BodyContent_UserName", process.env.QUICKET_USER);
   await page.type("#BodyContent_BodyContent_Password", process.env.QUICKET_PASSWORD);
 
-  await Promise.all([page.click("#BodyContent_BodyContent_LoginButton"), page.waitForLoadState("domcontentloaded")]);
+  await Promise.all([
+    page.click("#BodyContent_BodyContent_LoginButton"),
+    page.waitForURL("https://www.quicket.co.za/account/users/profile.aspx"),
+  ]);
 
   // Go To Organiser Hub
   await Promise.all([
@@ -47,7 +51,7 @@ quicketService.start = async () => {
       // Go to Events Page
       await Promise.all([
         page.goto(`https://www.quicket.co.za/account/events/manage/guests/guestlist.aspx?y=${activeEventId}`),
-        page.waitForLoadState("domcontentloaded"),
+        page.waitForSelector("#placeHolderContent_BodyContent_lnkCSV"),
       ]);
 
       // Start download process
@@ -90,7 +94,11 @@ quicketService.start = async () => {
                     orderNumber,
                     purchaserEmail,
                     ticketType,
-                    eventDate,
+                    eventDate: eventDate.toLocaleString("en-ZA", {
+                      year: "numeric",
+                      month: "2-digit",
+                      day: "2-digit",
+                    }),
                   });
                 }
 

@@ -5,7 +5,7 @@ const { quicketService } = require("./services/quicket");
 const createCronSchedules = () => {
   // Start services and update quicket tickets
   cron.schedule(
-    "15 12 * * *",
+    "0 6 * * *",
     async () => {
       // Start Ikhokha Service
       !ikhokhaService.running && (await ikhokhaService.start());
@@ -24,7 +24,7 @@ const createCronSchedules = () => {
 
   // Stop services and update ikhokha sales
   cron.schedule(
-    "17 12 * * *",
+    "0 19 * * *",
     async () => {
       // Update ikhokha sales
       await ikhokhaService.writeDailyData();

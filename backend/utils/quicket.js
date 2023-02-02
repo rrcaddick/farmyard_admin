@@ -31,9 +31,7 @@ const groupTickets = (ticketData) => {
   const groupedTickets = ticketData.reduce((tickets, ticket) => {
     const { orderNumber, purchaserEmail, ticketType, eventDate } = ticket;
 
-    const existingTicket = tickets.find(
-      (t) => t.purchaserEmail === purchaserEmail && t.eventDate.getTime() === eventDate.getTime()
-    );
+    const existingTicket = tickets.find((t) => t.purchaserEmail === purchaserEmail && t.eventDate === eventDate);
 
     const isVisitorTicket = ticketType === "visitor";
 
