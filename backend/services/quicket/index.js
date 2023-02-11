@@ -117,7 +117,7 @@ quicketService.start = async () => {
 
     const groupedTickets = groupTickets(ticketData);
 
-    await QuicketSale.bulkWrite(
+    const { upsertedCount } = await QuicketSale.bulkWrite(
       groupedTickets.map((ticket) => ({
         updateOne: {
           filter: { purchaserEmail: ticket.purchaserEmail, eventDate: ticket.eventDate },
@@ -126,6 +126,9 @@ quicketService.start = async () => {
         },
       }))
     );
+    ``;
+    console.log(`${upsertedCount} tickets updated`.bgBlue.white);
+    return upsertedCount;
   });
 
   setStopService(async () => {
