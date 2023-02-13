@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const { validate } = require("../middleware/validate");
 const { loginSchema } = require("../validators/auth.validators");
+const { validateRefreshToken } = require("../middleware/authenticate");
 const {
   loginController,
   logoutController,
@@ -15,7 +16,7 @@ router.post("/login", validate(loginSchema), loginController);
 router.get("/logout", logoutController);
 
 // Refresh Token
-router.post("/refreshToken", refreshTokenController);
+router.get("/refreshToken", validateRefreshToken, refreshTokenController);
 
 // Forgot Password
 router.get("/forgotPassword", forgotPasswordController);

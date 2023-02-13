@@ -33,7 +33,23 @@ const logoutController = asyncHandler(async (req, res) => {
   });
 });
 
-const refreshTokenController = asyncHandler((req, res) => {});
+const refreshTokenController = asyncHandler(async (req, res) => {
+  const { user } = req;
+
+  try {
+    const refreshToken = await generateRefreshToken(user);
+    res
+      .status(200)
+      .clearCookie("refreshToken", refreshCookieOptions)
+      .cookie("refreshToken", refreshToken, refreshCookieOptions)
+      .json({
+        token: generateAccessToken(user),
+      });
+  } catch (error) {
+    res.status(403);
+    throw new Error("Unable to generate refresh token");
+  }
+});
 
 const forgotPasswordController = asyncHandler((req, res) => {});
 
