@@ -19,6 +19,6 @@ router.get("/logout", logoutController);
 router.get("/refreshToken", validateRefreshToken, refreshTokenController);
 
 // Forgot Password
-router.get("/forgotPassword", forgotPasswordController);
+router.post("/forgotPassword", forgotPasswordController);
 
 module.exports = router;

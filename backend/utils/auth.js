@@ -25,8 +25,15 @@ const generateRefreshToken = async (user) => {
   return newRefreshToken;
 };
 
+const generateResetToken = (email) => {
+  const resetSecret = process.env.JWT_RESET_SECRET;
+  const resetExpiry = process.env.JWT_RESET_EXPIRY;
+  return jwt.sign({ email }, resetSecret, { expiresIn: resetExpiry });
+};
+
 module.exports = {
   hashPassword,
   generateAccessToken,
   generateRefreshToken,
+  generateResetToken,
 };

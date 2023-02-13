@@ -1,7 +1,9 @@
 const asyncHandler = require("express-async-handler");
-const { generateAccessToken, generateRefreshToken } = require("../utils/auth");
-const { refreshCookieOptions } = require("../config/refreshCookieOptions");
+const { generateAccessToken, generateRefreshToken, generateResetToken } = require("../utils/auth");
+const { refreshCookieOptions } = require("../config/refresh-cookie-options");
 const { User } = require("../models/user");
+const { createMailerTransporter } = require("../utils/node-mailer");
+const { resetEmail } = require("../mail/email-templates");
 
 const loginController = asyncHandler(async (req, res) => {
   const { user } = req;
@@ -51,7 +53,23 @@ const refreshTokenController = asyncHandler(async (req, res) => {
   }
 });
 
-const forgotPasswordController = asyncHandler((req, res) => {});
+const forgotPasswordController = asyncHandler((req, res) => {
+  const { email } = req.body;
+
+  const token = generateResetToken(email);
+
+  const mailTransport = createMailerTransporter();
+  mailTransport.sendMail({
+    to: [{ email: "farmyard.park@gmail.com" }],
+    from: { name: "Farmyard Admin", email: "reset-password@farmyard-admin.co.za" },
+    subject: "Password Reset",
+    html: resetEmail`${token}`,
+  });
+
+  res.status(200).json({
+    message: "Password reset mail sent",
+  });
+});
 
 module.exports = {
   loginController,
