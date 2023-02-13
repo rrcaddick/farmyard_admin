@@ -9,12 +9,17 @@ const { graphqlApplication, executor, schema, context, dataSources, formatError,
 const { ikhokhaService } = require("./services/ikhokha");
 const { quicketService } = require("./services/quicket");
 const { createCronSchedules } = require("./schedule");
-
 const PORT = process.env.port || 5000;
 
 // Express app and middleware
 const app = express();
-app.use(express.urlencoded({ extended: false }), express.json(), cookieParser());
+app.use(express.urlencoded({ extended: false }), express.json(), cookieParser(), require("./middleware/authenticate"));
+
+// Auth Routes
+app.use(require("./routes/auth.routes"));
+
+// REST Error Handler
+app.use(require("./controllers/error.controller"));
 
 // Create Apollo server
 const apolloServer = new ApolloServer({
@@ -30,16 +35,16 @@ const apolloServer = new ApolloServer({
   await connectMongoDb();
 
   // Start Ikhokha service
-  await ikhokhaService.start();
+  // await ikhokhaService.start();
 
   // Start Quicket Service
-  await quicketService.start();
+  // await quicketService.start();
 
   // Update the tickets
-  await quicketService.updateData();
+  // await quicketService.updateData();
 
   // Create cron schedules
-  createCronSchedules();
+  // createCronSchedules();
 
   // Start graphql server
   await apolloServer.start();
