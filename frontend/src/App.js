@@ -1,6 +1,12 @@
 import { ThemeModeContext, useThemeMode } from "./theme";
-import { ThemeProvider, CssBaseline, GlobalStyles, Typography } from "@mui/material";
+import { ThemeProvider, CssBaseline, GlobalStyles } from "@mui/material";
+import { Routes, Route } from "react-router-dom";
+import Login from "./features/auth/login";
+import ResetPassword from "./features/auth/reset-password";
+import Booking from "./features/booking";
+import Dashboard from "./features/dashboard";
 import Layout from "./components/layout";
+import ProtectedRoutes from "./features/auth/protected-routes";
 
 const App = () => {
   const [theme, themeMode] = useThemeMode();
@@ -25,9 +31,18 @@ const App = () => {
       <ThemeProvider theme={theme}>
         <GlobalStyles styles={globalStyles} />
         <CssBaseline />
-        <Layout>
-          <Typography variant="h1">Test</Typography>
-        </Layout>
+        <Routes>
+          {/* Auth */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          {/* Main App */}
+          <Route element={<ProtectedRoutes />}>
+            <Route element={<Layout />}>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/booking" element={<Booking />} />
+            </Route>
+          </Route>
+        </Routes>
       </ThemeProvider>
     </ThemeModeContext.Provider>
   );

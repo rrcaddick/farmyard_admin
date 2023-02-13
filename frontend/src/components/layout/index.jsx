@@ -1,6 +1,6 @@
 import { useState } from "react";
+import { Outlet } from "react-router-dom";
 import {
-  AppBar,
   Box,
   Divider,
   Drawer,
@@ -18,7 +18,7 @@ import { getColors } from "../../theme";
 import InboxIcon from "@mui/icons-material/Inbox";
 import MailIcon from "@mui/icons-material/Mail";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import TopBar from "./TopBar";
+import TopBar from "./top-bar";
 
 const Layout = ({ children }) => {
   const theme = useTheme();
@@ -83,7 +83,7 @@ const Layout = ({ children }) => {
           ...(sidebarOpen && { width: `calc(100% - ${drawerWidth}px)`, marginLeft: `${drawerWidth}px` }),
         }}
       >
-        {children}
+        <Outlet />
       </Box>
     </>
   );
