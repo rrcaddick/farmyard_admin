@@ -5,6 +5,8 @@ import { useYupValidationResolver } from "../../../hooks/useYupValidationResolve
 import { forgotPasswordSchema } from "../schemas/forgot-password";
 import { useForm } from "react-hook-form";
 import { useFetch } from "../../../hooks/useFetch";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const ForgotPasswordForm = styled.form`
   display: flex;
@@ -19,16 +21,23 @@ const ForgotPassword = () => {
   const {
     handleSubmit,
     register,
-    reset,
+    getValues,
     formState: { isValid, errors },
   } = useForm({ resolver, mode: "all", defaultValues: { email: "rrcaddick@gmail.com" } });
+
+  const navigate = useNavigate();
 
   const { sendRequest, loading, serverError, success } = useFetch();
 
   const sendLinkHandler = (email) => {
     sendRequest("/forgot-password", email);
-    reset();
   };
+
+  useEffect(() => {
+    if (success) {
+      navigate("/login", { state: { forgotPassword: getValues("email") } });
+    }
+  }, [success, navigate, getValues]);
 
   return (
     <Box display="flex" justifyContent="center" padding="4rem 2rem">
@@ -45,11 +54,6 @@ const ForgotPassword = () => {
         {serverError && (
           <Alert severity="error" sx={{ marginBottom: "2rem", borderRadius: "8px" }}>
             {serverError}
-          </Alert>
-        )}
-        {success && (
-          <Alert severity="success" sx={{ marginBottom: "2rem", borderRadius: "8px" }}>
-            Password reset link sent
           </Alert>
         )}
         <ForgotPasswordForm onSubmit={handleSubmit(sendLinkHandler)} noValidate>

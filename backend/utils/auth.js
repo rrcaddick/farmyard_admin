@@ -1,5 +1,6 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const ms = require("ms");
 
 const hashPassword = async (password) => {
   const saltRounds = Number(process.env.HASH_SALT_ROUNDS);
@@ -20,6 +21,7 @@ const generateRefreshToken = async (user) => {
 
   // TODO: Check for persistant login
   const newRefreshToken = jwt.sign({ userId: user._id }, refreshSecret, { expiresIn: refreshExpiry });
+
   await user.rotateRefreshToken(newRefreshToken);
 
   return newRefreshToken;
@@ -31,9 +33,19 @@ const generateResetToken = (email) => {
   return jwt.sign({ email }, resetSecret, { expiresIn: resetExpiry });
 };
 
+const getCookieOptions = (rememberMe) => {
+  const developer = process.env.NODE_ENV === "development";
+  const refreshExpiry = ms(process.env.JWT_REFRESH_EXPIRY);
+
+  return developer
+    ? { ...(rememberMe && { maxAge: refreshExpiry }), httpOnly: true, sameSite: true }
+    : { ...(rememberMe && { maxAge: refreshExpiry }), httpOnly: true, sameSite: true, secure: true };
+};
+
 module.exports = {
   hashPassword,
   generateAccessToken,
   generateRefreshToken,
   generateResetToken,
+  getCookieOptions,
 };

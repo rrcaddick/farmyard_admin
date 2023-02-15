@@ -14,7 +14,7 @@ import {
   Checkbox,
 } from "@mui/material";
 import { useShowPassword } from "../hooks";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useYupValidationResolver } from "../../../hooks/useYupValidationResolver";
 import { loginSchema } from "../schemas/login";
 import { useForm } from "react-hook-form";
@@ -39,7 +39,9 @@ const Login = () => {
   } = useForm({ resolver, mode: "all", defaultValues: { email: "rrcaddick@gmail.com", password: "Whatever123" } });
 
   const { login, loading, serverError, success } = useLogin();
+
   const navigate = useNavigate();
+  const { state } = useLocation();
 
   const loginHandler = (data) => {
     login(data);
@@ -66,6 +68,16 @@ const Login = () => {
         {serverError && (
           <Alert severity="error" sx={{ marginBottom: "2rem", borderRadius: "8px" }}>
             {serverError}
+          </Alert>
+        )}
+        {state?.passwordReset && (
+          <Alert severity="success" sx={{ marginBottom: "2rem", borderRadius: "8px" }}>
+            Password updated
+          </Alert>
+        )}
+        {state?.forgotPassword && (
+          <Alert severity="success" sx={{ marginBottom: "2rem", borderRadius: "8px" }}>
+            A password reset link has been sent to {state.forgotPassword}
           </Alert>
         )}
         <Box marginBottom="4rem">
@@ -112,7 +124,7 @@ const Login = () => {
             {...register("password")}
           />
           <FormGroup>
-            <FormControlLabel control={<Checkbox />} label="Remember me" />
+            <FormControlLabel control={<Checkbox {...register("rememberMe")} />} label="Remember me" />
           </FormGroup>
 
           <Typography

@@ -1,19 +1,22 @@
 const path = require("path");
 const asyncHandler = require("express-async-handler");
-const { generateAccessToken, generateRefreshToken, generateResetToken } = require("../utils/auth");
-const { refreshCookieOptions } = require("../config/refresh-cookie-options");
+const { generateAccessToken, generateRefreshToken, generateResetToken, getCookieOptions } = require("../utils/auth");
 const { User } = require("../models/user");
 const { createMailerTransporter } = require("../utils/node-mailer");
 const { resetEmail, noUserEmail } = require("../mail/templates/email-templates");
 
 const loginController = asyncHandler(async (req, res) => {
-  const { user } = req;
+  const {
+    user,
+    body: { rememberMe },
+  } = req;
+
   try {
     const refreshToken = await generateRefreshToken(user);
     res
       .status(200)
-      .clearCookie("refreshToken", refreshCookieOptions)
-      .cookie("refreshToken", refreshToken, refreshCookieOptions)
+      .clearCookie("refreshToken", getCookieOptions(rememberMe))
+      .cookie("refreshToken", refreshToken, getCookieOptions(rememberMe))
       .json({
         token: generateAccessToken(user),
       });

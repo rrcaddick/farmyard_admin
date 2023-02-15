@@ -40,7 +40,7 @@ const ResetPassword = () => {
 
   useEffect(() => {
     if (success) {
-      navigate("/login");
+      navigate("/login", { state: { passwordReset: true } });
     }
   }, [success, navigate]);
 
