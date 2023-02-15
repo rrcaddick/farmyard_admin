@@ -1,17 +1,31 @@
 import { ThemeModeContext, useThemeMode } from "./theme";
 import { ThemeProvider, CssBaseline, GlobalStyles } from "@mui/material";
 import { Routes, Route } from "react-router-dom";
-import Login from "./features/auth/login";
-import ResetPassword from "./features/auth/reset-password";
+import { Login, ForgotPassword, ResetPassword, ProtectedRoutes } from "./features/auth/components";
 import Booking from "./features/booking";
 import Dashboard from "./features/dashboard";
 import Layout from "./components/layout";
-import ProtectedRoutes from "./features/auth/protected-routes";
 
 const App = () => {
   const [theme, themeMode] = useThemeMode();
 
   const globalStyles = (theme) => ({
+    html: {
+      height: "100%",
+      width: "100%",
+    },
+    body: {
+      height: "100%",
+      width: "100%",
+      backgroundColor: "red",
+    },
+    "#root": {
+      height: "100%",
+      width: "100%",
+      display: "flex",
+      flexDirection: "column",
+      flexGrow: 1,
+    },
     "::-webkit-scrollbar": {
       width: "10px",
     },
@@ -24,6 +38,19 @@ const App = () => {
     "::-webkit-scrollbar-thumb:hover": {
       background: "#555",
     },
+    a: {
+      textDecoration: "none",
+      color: "inherit",
+    },
+    "a:hover": {
+      textDecoration: "underline",
+    },
+    "a:visited": {
+      color: "inherit",
+    },
+    "a:active": {
+      color: "inherit",
+    },
   });
 
   return (
@@ -34,7 +61,8 @@ const App = () => {
         <Routes>
           {/* Auth */}
           <Route path="/login" element={<Login />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:userId/:token" element={<ResetPassword />} />
           {/* Main App */}
           <Route element={<ProtectedRoutes />}>
             <Route element={<Layout />}>

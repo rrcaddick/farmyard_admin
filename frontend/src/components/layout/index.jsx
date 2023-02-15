@@ -12,25 +12,24 @@ import {
   ListItemText,
   Toolbar,
   Typography,
-  useTheme,
 } from "@mui/material";
-import { getColors } from "../../theme";
+import { useColors } from "../../theme/hooks/useColors";
 import InboxIcon from "@mui/icons-material/Inbox";
 import MailIcon from "@mui/icons-material/Mail";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import TopBar from "./top-bar";
 
 const Layout = ({ children }) => {
-  const theme = useTheme();
-  const colors = getColors(theme.palette.mode);
+  const colors = useColors();
 
   const [sidebarOpen, setSideBarOpen] = useState(true);
   const drawerWidth = 260;
 
   return (
     <>
-      <Box component="header"></Box>
-      <TopBar sidebarOpen={sidebarOpen} drawerWidth={drawerWidth} openSideBar={setSideBarOpen} />
+      <Box component="header">
+        <TopBar sidebarOpen={sidebarOpen} drawerWidth={drawerWidth} openSideBar={setSideBarOpen} />
+      </Box>
       <Drawer
         sx={{
           width: drawerWidth,

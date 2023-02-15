@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { AppBar, Box, IconButton, Toolbar, useTheme } from "@mui/material";
-import { getColors } from "../../theme";
+import { useColors } from "../../theme/hooks/useColors";
 import { ThemeModeContext } from "../../theme";
 
 // Icons
@@ -13,7 +13,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 
 const TopBar = ({ sidebarOpen, drawerWidth, openSideBar }) => {
   const theme = useTheme();
-  const colors = getColors(theme.palette.mode);
+  const colors = useColors();
   const themeMode = useContext(ThemeModeContext);
 
   return (

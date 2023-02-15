@@ -41,6 +41,7 @@ const userSchema = new mongoose.Schema(
       default: ["EMPLOYEE"],
     },
     refreshToken: String,
+    resetToken: String,
   },
   { timestamps: true }
 );
