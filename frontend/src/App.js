@@ -1,5 +1,7 @@
+import { createApolloClient } from "./graphql";
 import { ThemeModeContext, useThemeMode } from "./theme";
 import { ThemeProvider, CssBaseline, GlobalStyles } from "@mui/material";
+import { ApolloProvider } from "@apollo/client";
 import { Routes, Route } from "react-router-dom";
 import { Login, ForgotPassword, ResetPassword, ProtectedRoutes } from "./features/auth/components";
 import Booking from "./features/booking";
@@ -8,6 +10,7 @@ import Layout from "./components/layout";
 
 const App = () => {
   const [theme, themeMode] = useThemeMode();
+  const client = createApolloClient();
 
   const globalStyles = (theme) => ({
     html: {
@@ -17,7 +20,6 @@ const App = () => {
     body: {
       height: "100%",
       width: "100%",
-      backgroundColor: "red",
     },
     "#root": {
       height: "100%",
@@ -56,21 +58,24 @@ const App = () => {
   return (
     <ThemeModeContext.Provider value={themeMode}>
       <ThemeProvider theme={theme}>
-        <GlobalStyles styles={globalStyles} />
         <CssBaseline />
-        <Routes>
-          {/* Auth */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password/:userId/:token" element={<ResetPassword />} />
-          {/* Main App */}
-          <Route element={<ProtectedRoutes />}>
-            <Route element={<Layout />}>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/booking" element={<Booking />} />
+        <GlobalStyles styles={globalStyles} />
+        <ApolloProvider client={client}>
+          {/* TODO: Refactor use routes object */}
+          <Routes>
+            {/* Auth */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password/:userId/:token" element={<ResetPassword />} />
+            {/* Main App */}
+            <Route element={<ProtectedRoutes />}>
+              <Route element={<Layout />}>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/booking" element={<Booking />} />
+              </Route>
             </Route>
-          </Route>
-        </Routes>
+          </Routes>
+        </ApolloProvider>
       </ThemeProvider>
     </ThemeModeContext.Provider>
   );

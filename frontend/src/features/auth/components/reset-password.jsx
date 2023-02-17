@@ -5,10 +5,10 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { Button, IconButton, TextField, Box, Alert } from "@mui/material";
 import { useShowPassword } from "../hooks";
 import { useNavigate, useParams } from "react-router-dom";
-import { useYupValidationResolver } from "../../../hooks/useYupValidationResolver";
+import { useYupValidationResolver } from "../../../hooks/use-yup-validation-resolver";
 import { resetPasswordSchema } from "../schemas/reset-password";
 import { useForm } from "react-hook-form";
-import { useFetch } from "../../../hooks/useFetch";
+import { useFetch } from "../../../hooks/use-fetch";
 import { useEffect } from "react";
 
 const ResetPasswordForm = styled.form`
@@ -35,7 +35,7 @@ const ResetPassword = () => {
   const navigate = useNavigate();
 
   const resetPasswordHandler = (data) => {
-    sendRequest("/reset-password", { userId, token, ...data });
+    sendRequest("POST", "/reset-password", { userId, token, ...data });
   };
 
   useEffect(() => {

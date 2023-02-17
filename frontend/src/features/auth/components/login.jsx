@@ -15,11 +15,13 @@ import {
 } from "@mui/material";
 import { useShowPassword } from "../hooks";
 import { useNavigate, Link, useLocation } from "react-router-dom";
-import { useYupValidationResolver } from "../../../hooks/useYupValidationResolver";
+import { useYupValidationResolver } from "../../../hooks/use-yup-validation-resolver";
 import { loginSchema } from "../schemas/login";
 import { useForm } from "react-hook-form";
-import { useLogin } from "../hooks/useLogin";
+import { useFetch } from "../../../hooks/use-fetch";
 import { useEffect } from "react";
+import { useApolloCache } from "../../../hooks/use-apollo-cache";
+import { getMe } from "../graphql/queries";
 
 const LoginForm = styled.form`
   display: flex;
@@ -38,13 +40,18 @@ const Login = () => {
     formState: { isValid, errors },
   } = useForm({ resolver, mode: "all", defaultValues: { email: "rrcaddick@gmail.com", password: "Whatever123" } });
 
-  const { login, loading, serverError, success } = useLogin();
+  const { sendRequest, loading, serverError, success } = useFetch();
 
   const navigate = useNavigate();
   const { state } = useLocation();
 
-  const loginHandler = (data) => {
-    login(data);
+  const cache = useApolloCache();
+
+  const loginHandler = async (loginData) => {
+    const userData = await sendRequest("POST", "/login", loginData);
+
+    // Write user to apollo cache
+    cache.write(getMe, "User", userData);
   };
 
   useEffect(() => {

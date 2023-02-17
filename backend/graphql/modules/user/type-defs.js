@@ -9,6 +9,9 @@ const typeDefs = gql`
     id: ID
     name: String!
     email: String!
+    position: String
+    mobile: String
+    roles: [String]!
   }
 `;
 

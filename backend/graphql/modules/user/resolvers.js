@@ -1,6 +1,6 @@
 const resolvers = {
   Query: {
-    me: () => ({ id: 1, name: "Ray Caddick", email: "rrcaddick@gmail.com" }),
+    me: (root, args, { userId, dataSources: { userSource } }) => userSource.getMe(userId),
   },
 };
 

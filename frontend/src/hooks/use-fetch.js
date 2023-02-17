@@ -1,11 +1,35 @@
-import { useState } from "react";
+import { useApolloClient } from "@apollo/client";
+import { useState, useEffect } from "react";
 
 const useFetch = (onComplete) => {
   const [loading, setLoading] = useState(false);
   const [serverError, setServerError] = useState(null);
   const [success, setSuccess] = useState(false);
 
-  const sendRequest = async (url, body) => {
+  const client = useApolloClient();
+
+  // Overrides fetch to retrieve response headers
+  useEffect(() => {
+    const { fetch: _fetch } = window;
+
+    window.fetch = async (...args) => {
+      const response = await _fetch(...args);
+
+      const accessToken = response.headers.get("x-access-token");
+
+      if (accessToken) {
+        client.setToken(accessToken);
+      }
+
+      return response;
+    };
+
+    return () => {
+      window.fetch = _fetch;
+    };
+  });
+
+  const sendRequest = async (method, url, body = null) => {
     try {
       setLoading(true);
       setServerError(null);
@@ -16,8 +40,8 @@ const useFetch = (onComplete) => {
           Accept: "application/json",
           "Content-Type": "application/json",
         },
-        method: "POST",
-        body: JSON.stringify(body),
+        method,
+        ...(body && { body: JSON.stringify(body) }),
       });
 
       if (!response.ok) {

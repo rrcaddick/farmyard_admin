@@ -12,7 +12,7 @@ const authenticate = asyncHandler((req, res, next) => {
     req.headers.authorization.split(" ")[1];
 
   // Either first login or public route. Also manages revoked access
-  if (!refreshToken) return next();
+  if (!refreshToken && process.env.NODE_ENV !== "development") return next();
 
   // Persistent login requiring new access token
   if (refreshToken && !token) {

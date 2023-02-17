@@ -1,10 +1,10 @@
 import styled from "@emotion/styled";
 import { useColors } from "../../../theme/hooks/useColors";
 import { Button, TextField, Box, Alert } from "@mui/material";
-import { useYupValidationResolver } from "../../../hooks/useYupValidationResolver";
+import { useYupValidationResolver } from "../../../hooks/use-yup-validation-resolver";
 import { forgotPasswordSchema } from "../schemas/forgot-password";
 import { useForm } from "react-hook-form";
-import { useFetch } from "../../../hooks/useFetch";
+import { useFetch } from "../../../hooks/use-fetch";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -30,7 +30,7 @@ const ForgotPassword = () => {
   const { sendRequest, loading, serverError, success } = useFetch();
 
   const sendLinkHandler = (email) => {
-    sendRequest("/forgot-password", email);
+    sendRequest("POST", "/forgot-password", email);
   };
 
   useEffect(() => {

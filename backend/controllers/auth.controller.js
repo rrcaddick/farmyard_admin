@@ -11,15 +11,17 @@ const loginController = asyncHandler(async (req, res) => {
     body: { rememberMe },
   } = req;
 
+  const { id, email, name, position, mobile, roles } = user;
+
   try {
     const refreshToken = await generateRefreshToken(user);
     res
       .status(200)
       .clearCookie("refreshToken", getCookieOptions(rememberMe))
+      // .setHeader("Access-Control-Allow-Headers", "X-Requested-With")
+      .setHeader("x-access-token", generateAccessToken(user))
       .cookie("refreshToken", refreshToken, getCookieOptions(rememberMe))
-      .json({
-        token: generateAccessToken(user),
-      });
+      .json({ id, email, name, position, mobile, roles });
   } catch (error) {
     res.status(403);
     throw new Error("Unable to generate refresh token");
