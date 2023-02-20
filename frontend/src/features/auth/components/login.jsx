@@ -13,6 +13,7 @@ import {
   FormGroup,
   FormControlLabel,
   Checkbox,
+  Modal,
 } from "@mui/material";
 import { useShowPassword } from "../hooks";
 import { useNavigate, Link, useLocation } from "react-router-dom";
@@ -31,11 +32,13 @@ const LoginForm = styled.form`
   border-radius: 10px;
 `;
 
-const _rememberMe = getRememberMe();
-
 const Login = () => {
   const colors = useColors();
-  const [rememberMe, setRememberMe] = useState(_rememberMe);
+  const navigate = useNavigate();
+  const { state: navigateState } = useLocation();
+
+  const [rememberMe, setRememberMe] = useState(getRememberMe());
+  const [modalOpen, setModalOpen] = useState(navigateState?.logoutError);
 
   const { showPassword, toggleShowPassword } = useShowPassword();
   const resolver = useYupValidationResolver(loginSchema);
@@ -46,9 +49,6 @@ const Login = () => {
   } = useForm({ resolver, mode: "all", defaultValues: { email: "rrcaddick@gmail.com", password: "Whatever123" } });
 
   const { sendRequest, loading, serverError, success } = useFetch();
-
-  const navigate = useNavigate();
-  const { state } = useLocation();
 
   const cache = useApolloCache();
 
@@ -87,14 +87,14 @@ const Login = () => {
             {serverError}
           </Alert>
         )}
-        {state?.passwordReset && (
+        {navigateState?.passwordReset && (
           <Alert severity="success" sx={{ marginBottom: "2rem", borderRadius: "8px" }}>
             Password updated
           </Alert>
         )}
-        {state?.forgotPassword && (
+        {navigateState?.forgotPassword && (
           <Alert severity="success" sx={{ marginBottom: "2rem", borderRadius: "8px" }}>
-            A password reset link has been sent to {state.forgotPassword}
+            A password reset link has been sent to {navigateState.forgotPassword}
           </Alert>
         )}
         <Box marginBottom="4rem">
@@ -166,6 +166,18 @@ const Login = () => {
           </Button>
         </LoginForm>
       </Box>
+      {/* TODO: Refactor modal to seperate component. Style using theme */}
+      <Modal open={modalOpen}>
+        <Box display="flex" justifyContent="space-around" alignItems="center" backgroundColor="red">
+          <Typography id="keep-mounted-modal-title" variant="h6" component="h2">
+            A logout error occurred. If you are on a public computer, we recommend clearing your browser cookies to keep
+            your data safe
+          </Typography>
+          <Button variant="contained" onClick={() => setModalOpen(false)}>
+            Okay
+          </Button>
+        </Box>
+      </Modal>
     </Box>
   );
 };

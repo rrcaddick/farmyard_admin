@@ -11,7 +11,12 @@ const getRememberMe = () => {
 
 const toggleRememberMe = () => {
   const rememberMe = localStorage.getItem("rememberMe");
+
   rememberMe === "true" ? localStorage.setItem("rememberMe", "false") : localStorage.setItem("rememberMe", "true");
 };
 
-export { getRememberMe, toggleRememberMe };
+const removeRememberMe = () => {
+  localStorage.removeItem("rememberMe");
+};
+
+export { getRememberMe, toggleRememberMe, removeRememberMe };

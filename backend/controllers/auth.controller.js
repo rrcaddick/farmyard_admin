@@ -30,14 +30,16 @@ const loginController = asyncHandler(async (req, res) => {
 const logoutController = asyncHandler(async (req, res) => {
   const { userId } = req;
 
-  // If revokeRefreshToken fails, swallow error and send clearCookie response
   try {
+    // TODO: Decide on keeping refresh tokens in the db
     if (userId) await User.revokeRefreshToken(userId);
-  } catch {}
-
-  res.status(200).clearCookie("refreshToken", refreshCookieOptions).json({
-    message: "Succesfully logged out",
-  });
+    res.status(200).clearCookie("refreshToken", getCookieOptions(false)).json({
+      message: "Succesfully logged out",
+    });
+  } catch (error) {
+    res.status(500).clearCookie("refreshToken", getCookieOptions(false));
+    throw error;
+  }
 });
 
 const forgotPasswordController = asyncHandler(async (req, res) => {

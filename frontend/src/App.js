@@ -89,11 +89,10 @@ const App = () => {
         {/* TODO: Refactor use routes object */}
         <Routes>
           {/* Auth */}
-          <Route element={<ProtectedRoutes auth={false} />}>
-            <Route path="/login" element={<Login />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password/:userId/:token" element={<ResetPassword />} />
-          </Route>
+          {/* TODO: Add redirect to / if user in cache */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:userId/:token" element={<ResetPassword />} />
           {/* Main App */}
           <Route element={<ProtectedRoutes />}>
             <Route element={<Layout />}>

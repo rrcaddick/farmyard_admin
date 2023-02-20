@@ -1,7 +1,9 @@
 import { useContext } from "react";
-import { AppBar, Box, IconButton, Toolbar, useTheme } from "@mui/material";
+import { AppBar, Box, IconButton, Menu, MenuItem, Toolbar, useTheme } from "@mui/material";
 import { useColors } from "../../theme/hooks/useColors";
 import { ThemeModeContext } from "../../theme";
+import { useMenu } from "../hooks/use-menu";
+import { useLogout } from "../../features/auth/hooks/use-logout";
 
 // Icons
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
@@ -15,6 +17,16 @@ const TopBar = ({ sidebarOpen, drawerWidth, openSideBar }) => {
   const theme = useTheme();
   const colors = useColors();
   const themeMode = useContext(ThemeModeContext);
+
+  const { anchorEl, open, handleOpen, handleClose } = useMenu();
+  const logout = useLogout();
+
+  const logoutHandler = () => {
+    logout();
+    handleClose();
+  };
+
+  // TODO: Add lottie loading screen
 
   return (
     <AppBar
@@ -53,9 +65,24 @@ const TopBar = ({ sidebarOpen, drawerWidth, openSideBar }) => {
           <IconButton type="button" sx={{ p: 1 }}>
             <SettingsOutlinedIcon sx={{ color: colors.grey[100] }} />
           </IconButton>
-          <IconButton type="button" sx={{ p: 1 }}>
+          <IconButton type="button" sx={{ p: 1 }} onClick={handleOpen}>
             <PersonOutlinedIcon sx={{ color: colors.grey[100] }} />
           </IconButton>
+          <Menu
+            anchorEl={anchorEl}
+            open={open}
+            onClose={handleClose}
+            anchorOrigin={{
+              vertical: "bottom",
+              horizontal: "left",
+            }}
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "left",
+            }}
+          >
+            <MenuItem onClick={logoutHandler}>Logout</MenuItem>
+          </Menu>
         </Box>
       </Toolbar>
     </AppBar>
