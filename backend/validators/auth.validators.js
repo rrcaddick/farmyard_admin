@@ -6,11 +6,12 @@ const loginSchema = yup.object().shape({
   body: yup.object().test("login-valid", "Invalid email or password", async function () {
     const { email, password } = this.originalValue;
     const req = this.parent;
+    const { userId } = req;
 
-    if (!email || !password) return false;
+    if (!userId && (!email || !password)) return false;
 
-    const user = await User.findOne({ email });
-    if (!user || !(await user.validatePassword(password))) return false;
+    const user = await User.findOne(userId ? { id: userId } : { email });
+    if (!user || (!userId && !(await user.validatePassword(password)))) return false;
 
     req.user = user;
     return true;

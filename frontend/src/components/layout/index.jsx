@@ -18,6 +18,7 @@ import InboxIcon from "@mui/icons-material/Inbox";
 import MailIcon from "@mui/icons-material/Mail";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import TopBar from "./top-bar";
+import { Link } from "react-router-dom";
 
 const Layout = ({ children }) => {
   const colors = useColors();
@@ -58,7 +59,9 @@ const Layout = ({ children }) => {
             <ListItem key={text} disablePadding>
               <ListItemButton>
                 <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-                <ListItemText primary={text} />
+                <ListItemText>
+                  <Link to={index % 2 === 0 ? "/" : "/booking"}>{text}</Link>
+                </ListItemText>
               </ListItemButton>
             </ListItem>
           ))}
@@ -69,7 +72,7 @@ const Layout = ({ children }) => {
             <ListItem key={text} disablePadding>
               <ListItemButton>
                 <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-                <ListItemText primary={text} />
+                <ListItemText primary={text}></ListItemText>
               </ListItemButton>
             </ListItem>
           ))}

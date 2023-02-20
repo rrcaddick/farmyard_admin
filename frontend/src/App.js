@@ -1,16 +1,37 @@
-import { createApolloClient } from "./graphql";
 import { ThemeModeContext, useThemeMode } from "./theme";
 import { ThemeProvider, CssBaseline, GlobalStyles } from "@mui/material";
-import { ApolloProvider } from "@apollo/client";
 import { Routes, Route } from "react-router-dom";
 import { Login, ForgotPassword, ResetPassword, ProtectedRoutes } from "./features/auth/components";
 import Booking from "./features/booking";
 import Dashboard from "./features/dashboard";
 import Layout from "./components/layout";
+import { useEffect, useState } from "react";
+import { getRememberMe } from "./utils/auth";
+import { useFetch } from "./hooks/use-fetch";
+import { useApolloCache } from "./hooks/use-apollo-cache";
+import { getMe } from "./features/auth/graphql/queries";
+
+const rememberMe = getRememberMe();
 
 const App = () => {
   const [theme, themeMode] = useThemeMode();
-  const client = createApolloClient();
+
+  const [rememberMeLoading, setRememberMeLoading] = useState(rememberMe);
+  const { sendRequest } = useFetch();
+  const cache = useApolloCache();
+
+  useEffect(() => {
+    if (rememberMe) {
+      (async () => {
+        // Attempt login with refresh token
+        const userData = await sendRequest("POST", "/login", { rememberMe });
+
+        // Write user to apollo cache
+        cache.write(getMe, "User", userData);
+        setRememberMeLoading(false);
+      })();
+    }
+  }, [sendRequest, cache]);
 
   const globalStyles = (theme) => ({
     html: {
@@ -55,27 +76,34 @@ const App = () => {
     },
   });
 
+  if (rememberMeLoading) {
+    // TODO: Add Lottie loading animation
+    return "loading";
+  }
+
   return (
     <ThemeModeContext.Provider value={themeMode}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <GlobalStyles styles={globalStyles} />
-        <ApolloProvider client={client}>
-          {/* TODO: Refactor use routes object */}
-          <Routes>
-            {/* Auth */}
+        {/* TODO: Refactor use routes object */}
+        <Routes>
+          {/* Auth */}
+          <Route element={<ProtectedRoutes auth={false} />}>
             <Route path="/login" element={<Login />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password/:userId/:token" element={<ResetPassword />} />
-            {/* Main App */}
-            <Route element={<ProtectedRoutes />}>
-              <Route element={<Layout />}>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/booking" element={<Booking />} />
-              </Route>
+          </Route>
+          {/* Main App */}
+          <Route element={<ProtectedRoutes />}>
+            <Route element={<Layout />}>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/booking" element={<Booking />} />
             </Route>
-          </Routes>
-        </ApolloProvider>
+          </Route>
+          {/* TODO: Add 404 not found with lottie sheep */}
+          <Route path="*" element={"Not found"} />
+        </Routes>
       </ThemeProvider>
     </ThemeModeContext.Provider>
   );

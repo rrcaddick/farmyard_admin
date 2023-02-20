@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import styled from "@emotion/styled";
 import { useColors } from "../../../theme/hooks/useColors";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -19,9 +20,9 @@ import { useYupValidationResolver } from "../../../hooks/use-yup-validation-reso
 import { loginSchema } from "../schemas/login";
 import { useForm } from "react-hook-form";
 import { useFetch } from "../../../hooks/use-fetch";
-import { useEffect } from "react";
 import { useApolloCache } from "../../../hooks/use-apollo-cache";
 import { getMe } from "../graphql/queries";
+import { getRememberMe, toggleRememberMe } from "../../../utils/auth";
 
 const LoginForm = styled.form`
   display: flex;
@@ -30,8 +31,12 @@ const LoginForm = styled.form`
   border-radius: 10px;
 `;
 
+const _rememberMe = getRememberMe();
+
 const Login = () => {
   const colors = useColors();
+  const [rememberMe, setRememberMe] = useState(_rememberMe);
+
   const { showPassword, toggleShowPassword } = useShowPassword();
   const resolver = useYupValidationResolver(loginSchema);
   const {
@@ -46,6 +51,11 @@ const Login = () => {
   const { state } = useLocation();
 
   const cache = useApolloCache();
+
+  const rememberMeHandler = () => {
+    toggleRememberMe();
+    setRememberMe((x) => !x);
+  };
 
   const loginHandler = async (loginData) => {
     const userData = await sendRequest("POST", "/login", loginData);
@@ -131,7 +141,10 @@ const Login = () => {
             {...register("password")}
           />
           <FormGroup>
-            <FormControlLabel control={<Checkbox {...register("rememberMe")} />} label="Remember me" />
+            <FormControlLabel
+              control={<Checkbox onClick={rememberMeHandler} checked={rememberMe} {...register("rememberMe")} />}
+              label="Remember me"
+            />
           </FormGroup>
 
           <Typography

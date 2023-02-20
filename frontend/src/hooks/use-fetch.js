@@ -1,5 +1,5 @@
 import { useApolloClient } from "@apollo/client";
-import { useState, useEffect } from "react";
+import { useState, useCallback } from "react";
 
 const useFetch = (onComplete) => {
   const [loading, setLoading] = useState(false);
@@ -8,57 +8,41 @@ const useFetch = (onComplete) => {
 
   const client = useApolloClient();
 
-  // Overrides fetch to retrieve response headers
-  useEffect(() => {
-    const { fetch: _fetch } = window;
+  const safeFetch = client.getFetch();
 
-    window.fetch = async (...args) => {
-      const response = await _fetch(...args);
+  const sendRequest = useCallback(
+    async (method, url, body = null) => {
+      try {
+        setLoading(true);
+        setServerError(null);
+        setSuccess(false);
 
-      const accessToken = response.headers.get("x-access-token");
+        const response = await safeFetch(url, {
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          method,
+          ...(body && { body: JSON.stringify(body) }),
+        });
 
-      if (accessToken) {
-        client.setToken(accessToken);
+        if (!response.ok) {
+          const { message } = await response.json();
+          setServerError(message);
+        } else {
+          const responseData = await response.json();
+          onComplete && onComplete(responseData);
+          setSuccess(true);
+          return responseData;
+        }
+      } catch (err) {
+        setServerError("Something went wrong. Please try again");
+      } finally {
+        setLoading(false);
       }
-
-      return response;
-    };
-
-    return () => {
-      window.fetch = _fetch;
-    };
-  });
-
-  const sendRequest = async (method, url, body = null) => {
-    try {
-      setLoading(true);
-      setServerError(null);
-      setSuccess(false);
-
-      const response = await fetch(url, {
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        method,
-        ...(body && { body: JSON.stringify(body) }),
-      });
-
-      if (!response.ok) {
-        const { message } = await response.json();
-        setServerError(message);
-      } else {
-        const responseData = await response.json();
-        onComplete && onComplete(responseData);
-        setSuccess(true);
-        return responseData;
-      }
-    } catch (err) {
-      setServerError("Something went wrong. Please try again");
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+    [onComplete, safeFetch]
+  );
 
   return { sendRequest, loading, serverError, success };
 };

@@ -1,9 +1,14 @@
 import { Outlet, Navigate } from "react-router-dom";
+import { useApolloCache } from "../../../hooks/use-apollo-cache";
+import { getMe } from "../graphql/queries";
 
-const ProtectedRoutes = () => {
-  const isAuthenticated = true;
+const ProtectedRoutes = ({ auth = true }) => {
+  const cache = useApolloCache();
+  const user = cache.read(getMe);
 
-  if (!isAuthenticated) return <Navigate to="/login" />;
+  if (!user) return <Navigate to="/login" />;
+
+  if (user && !auth) return <Navigate to="/" />;
 
   return <Outlet />;
 };

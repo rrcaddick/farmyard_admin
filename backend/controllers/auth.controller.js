@@ -18,13 +18,12 @@ const loginController = asyncHandler(async (req, res) => {
     res
       .status(200)
       .clearCookie("refreshToken", getCookieOptions(rememberMe))
-      // .setHeader("Access-Control-Allow-Headers", "X-Requested-With")
-      .setHeader("x-access-token", generateAccessToken(user))
       .cookie("refreshToken", refreshToken, getCookieOptions(rememberMe))
+      .setHeader("x-access-token", generateAccessToken(id))
       .json({ id, email, name, position, mobile, roles });
   } catch (error) {
     res.status(403);
-    throw new Error("Unable to generate refresh token");
+    throw new Error("Invalid email or password");
   }
 });
 
@@ -39,24 +38,6 @@ const logoutController = asyncHandler(async (req, res) => {
   res.status(200).clearCookie("refreshToken", refreshCookieOptions).json({
     message: "Succesfully logged out",
   });
-});
-
-const refreshTokenController = asyncHandler(async (req, res) => {
-  const { user } = req;
-
-  try {
-    const refreshToken = await generateRefreshToken(user);
-    res
-      .status(200)
-      .clearCookie("refreshToken", refreshCookieOptions)
-      .cookie("refreshToken", refreshToken, refreshCookieOptions)
-      .json({
-        token: generateAccessToken(user),
-      });
-  } catch (error) {
-    res.status(403);
-    throw new Error("Unable to generate refresh token");
-  }
 });
 
 const forgotPasswordController = asyncHandler(async (req, res) => {
@@ -108,7 +89,6 @@ const resetPasswordController = asyncHandler(async (req, res) => {
 module.exports = {
   loginController,
   logoutController,
-  refreshTokenController,
   forgotPasswordController,
   resetPasswordController,
 };

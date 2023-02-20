@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const jwt = require("jsonwebtoken");
 const { User } = require("../models/user");
+const { verifyToken, generateAccessToken } = require("../utils/auth");
 
 const authenticate = asyncHandler((req, res, next) => {
   // Retrieve tokens
@@ -14,52 +15,31 @@ const authenticate = asyncHandler((req, res, next) => {
   // Either first login or public route. Also manages revoked access
   if (!refreshToken && process.env.NODE_ENV !== "development") return next();
 
-  // Persistent login requiring new access token
-  if (refreshToken && !token) {
-    // TODO: Add refresh logic
-  }
+  // Test token
+  const { userId: accessTokenUserId } = verifyToken(token, process.env.JWT_ACCESS_SECRET);
 
-  // Normal authentication. Failed verification still proceeds to allow public routes
-  try {
-    const { userId } = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
-
-    // TODO: Could fetch the user here if it becomes required
-
-    req.userId = userId;
-
-    return next();
-  } catch {
+  // Valid access token
+  if (accessTokenUserId) {
+    req.userId = accessTokenUserId;
     return next();
   }
-});
 
-const validateRefreshToken = asyncHandler(async (req, res, next) => {
-  const {
-    cookies: { refreshToken },
-  } = req;
+  // Test refresh token, if access token not valid or present
+  const { userId: refreshTokenUserId } = verifyToken(refreshToken, process.env.JWT_REFRESH_SECRET);
 
-  const user = await User.findOne({ refreshToken });
-
-  if (!user) {
-    res.status(403);
-    throw new Error("Invalid token");
-  }
-
-  try {
-    const { userId } = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
-
-    if (user._id.toString() !== userId) throw new Error("Invalid token");
-
-    req.user = user;
-
+  // Valid refresh token
+  if (refreshTokenUserId) {
+    req.userId = refreshTokenUserId;
+    res.setHeader("x-access-token", generateAccessToken(refreshTokenUserId));
+    // CORS: Uncomment if client from different origin
+    // res.setHeader("Access-Control-Expose-Headers", "x-access-token");
     return next();
-  } catch {
-    res.status(403);
-    throw new Error("Invalid token");
   }
+
+  // No authentication
+  return next();
 });
 
 module.exports = {
   authenticate,
-  validateRefreshToken,
 };

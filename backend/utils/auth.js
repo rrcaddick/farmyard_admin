@@ -9,10 +9,10 @@ const hashPassword = async (password) => {
   return hash;
 };
 
-const generateAccessToken = ({ _id: userId, email, name, position, roles }) => {
+const generateAccessToken = (userId) => {
   const accessSecret = process.env.JWT_ACCESS_SECRET;
   const accessExpiry = process.env.JWT_ACCESS_EXPIRY;
-  return jwt.sign({ userId, email, name, position, roles }, accessSecret, { expiresIn: accessExpiry });
+  return jwt.sign({ userId }, accessSecret, { expiresIn: accessExpiry });
 };
 
 const generateRefreshToken = async (user) => {
@@ -33,6 +33,17 @@ const generateResetToken = (email) => {
   return jwt.sign({ email }, resetSecret, { expiresIn: resetExpiry });
 };
 
+const verifyToken = (token, secret) => {
+  let payload = {};
+
+  // Swallows verify error and returns null for bad token
+  try {
+    payload = jwt.verify(token, secret);
+  } finally {
+    return payload;
+  }
+};
+
 const getCookieOptions = (rememberMe) => {
   const developer = process.env.NODE_ENV === "development";
   const refreshExpiry = ms(process.env.JWT_REFRESH_EXPIRY);
@@ -47,5 +58,6 @@ module.exports = {
   generateAccessToken,
   generateRefreshToken,
   generateResetToken,
+  verifyToken,
   getCookieOptions,
 };
