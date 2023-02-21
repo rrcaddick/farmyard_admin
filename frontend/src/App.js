@@ -1,7 +1,7 @@
 import { ThemeModeContext, useThemeMode } from "./theme";
 import { ThemeProvider, CssBaseline, GlobalStyles } from "@mui/material";
 import { Routes, Route } from "react-router-dom";
-import { Login, ForgotPassword, ResetPassword, ProtectedRoutes } from "./features/auth/components";
+import { Login, ForgotPassword, ResetPassword, ProtectedRoutes, IsAuthRedirect } from "./features/auth/components";
 import Booking from "./features/booking";
 import Dashboard from "./features/dashboard";
 import Layout from "./components/layout";
@@ -89,10 +89,12 @@ const App = () => {
         {/* TODO: Refactor use routes object */}
         <Routes>
           {/* Auth */}
-          {/* TODO: Add redirect to / if user in cache */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password/:userId/:token" element={<ResetPassword />} />
+          <Route element={<IsAuthRedirect />}>
+            <Route path="/login" element={<Login />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password/:userId/:token" element={<ResetPassword />} />
+          </Route>
+
           {/* Main App */}
           <Route element={<ProtectedRoutes />}>
             <Route element={<Layout />}>
@@ -100,6 +102,8 @@ const App = () => {
               <Route path="/booking" element={<Booking />} />
             </Route>
           </Route>
+
+          {/* Not Found */}
           {/* TODO: Add 404 not found with lottie sheep */}
           <Route path="*" element={"Not found"} />
         </Routes>

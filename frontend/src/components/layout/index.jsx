@@ -1,93 +1,54 @@
-import { useState } from "react";
-import { Outlet } from "react-router-dom";
-import {
-  Box,
-  Divider,
-  Drawer,
-  IconButton,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Toolbar,
-  Typography,
-} from "@mui/material";
-import { useColors } from "../../theme/hooks/useColors";
-import InboxIcon from "@mui/icons-material/Inbox";
-import MailIcon from "@mui/icons-material/Mail";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import TopBar from "./top-bar";
-import { Link } from "react-router-dom";
+import SideBar from "./side-bar";
+import { styled, useTheme } from "@mui/material/styles";
+import Box from "@mui/material/Box";
+import { Outlet } from "react-router-dom";
+import { useState } from "react";
+import { IconButton } from "@mui/material";
+
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+
+const drawerWidth = 240;
+
+const DrawerHeader = styled("div")(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "flex-end",
+  padding: theme.spacing(0, 1),
+  // Keeps content under the app bar
+  ...theme.mixins.toolbar,
+}));
 
 const Layout = ({ children }) => {
-  const colors = useColors();
+  const theme = useTheme();
+  const [sidebarOpen, setSideBarOpen] = useState(false);
 
-  const [sidebarOpen, setSideBarOpen] = useState(true);
-  const drawerWidth = 260;
+  const toggleSideBar = () => {
+    setSideBarOpen((x) => !x);
+  };
 
   return (
-    <>
-      <Box component="header">
-        <TopBar sidebarOpen={sidebarOpen} drawerWidth={drawerWidth} openSideBar={setSideBarOpen} />
-      </Box>
-      <Drawer
-        sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          "& .MuiDrawer-paper": {
-            width: drawerWidth,
-            boxSizing: "border-box",
-            backgroundColor: colors.primary[400],
-          },
-        }}
-        variant="persistent"
-        anchor="left"
-        open={sidebarOpen}
-      >
-        <Toolbar sx={{ display: "flex", justifyContent: "space-between", backgroundColor: colors.primary[800] }}>
-          <Typography variant="h6" noWrap component="div">
-            Admin Yard
-          </Typography>
-          <IconButton onClick={() => setSideBarOpen(false)}>
-            <ArrowBackIcon />
-          </IconButton>
-        </Toolbar>
-        <Divider />
-        <List>
-          {["Bookings", "Capacity", "Payroll", "Invoices"].map((text, index) => (
-            <ListItem key={text} disablePadding>
-              <ListItemButton>
-                <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-                <ListItemText>
-                  <Link to={index % 2 === 0 ? "/" : "/booking"}>{text}</Link>
-                </ListItemText>
-              </ListItemButton>
-            </ListItem>
-          ))}
-        </List>
-        <Divider />
-        <List>
-          {["Absence Management", "To Do List", "Calendar"].map((text, index) => (
-            <ListItem key={text} disablePadding>
-              <ListItemButton>
-                <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-                <ListItemText primary={text}></ListItemText>
-              </ListItemButton>
-            </ListItem>
-          ))}
-        </List>
-      </Drawer>
+    <Box sx={{ display: "flex" }}>
+      <TopBar sidebarOpen={sidebarOpen} toggleSideBar={toggleSideBar} drawerWidth={drawerWidth} />
 
-      <Box
-        component="main"
-        sx={{
-          ...(sidebarOpen && { width: `calc(100% - ${drawerWidth}px)`, marginLeft: `${drawerWidth}px` }),
-        }}
-      >
+      <SideBar
+        sidebarOpen={sidebarOpen}
+        drawerWidth={drawerWidth}
+        header={
+          <DrawerHeader>
+            <IconButton onClick={toggleSideBar}>
+              {theme.direction === "rtl" ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+            </IconButton>
+          </DrawerHeader>
+        }
+      />
+
+      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+        <DrawerHeader />
         <Outlet />
       </Box>
-    </>
+    </Box>
   );
 };
 

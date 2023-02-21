@@ -38,7 +38,7 @@ const Login = () => {
   const { state: navigateState } = useLocation();
 
   const [rememberMe, setRememberMe] = useState(getRememberMe());
-  const [modalOpen, setModalOpen] = useState(navigateState?.logoutError);
+  const [modalOpen, setModalOpen] = useState(Boolean(navigateState?.logoutError));
 
   const { showPassword, toggleShowPassword } = useShowPassword();
   const resolver = useYupValidationResolver(loginSchema);

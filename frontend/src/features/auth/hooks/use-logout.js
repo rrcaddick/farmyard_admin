@@ -19,6 +19,7 @@ const useLogout = () => {
     }
 
     if (success || serverError) {
+      client.clearStore();
       client.setToken = undefined;
       removeRememberMe(true);
     }

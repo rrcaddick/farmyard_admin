@@ -1,19 +1,37 @@
 import { useContext } from "react";
-import { AppBar, Box, IconButton, Menu, MenuItem, Toolbar, useTheme } from "@mui/material";
+import { styled } from "@mui/material/styles";
+import { AppBar as MuiAppBar, Box, IconButton, Menu, MenuItem, Toolbar, useTheme } from "@mui/material";
 import { useColors } from "../../theme/hooks/useColors";
 import { ThemeModeContext } from "../../theme";
 import { useMenu } from "../hooks/use-menu";
 import { useLogout } from "../../features/auth/hooks/use-logout";
 
-// Icons
+import MenuIcon from "@mui/icons-material/Menu";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
-import MenuIcon from "@mui/icons-material/Menu";
 
-const TopBar = ({ sidebarOpen, drawerWidth, openSideBar }) => {
+const AppBar = styled(MuiAppBar, {
+  shouldForwardProp: (prop) => !["sidebarOpen", "drawerWidth"].includes(prop),
+})(({ theme, sidebarOpen, drawerWidth }) => ({
+  zIndex: theme.zIndex.drawer + 1,
+  transition: theme.transitions.create(["width", "margin"], {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  ...(sidebarOpen && {
+    marginLeft: drawerWidth,
+    width: `calc(100% - ${drawerWidth}px)`,
+    transition: theme.transitions.create(["width", "margin"], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  }),
+}));
+
+const TopBar = ({ sidebarOpen, toggleSideBar, drawerWidth }) => {
   const theme = useTheme();
   const colors = useColors();
   const themeMode = useContext(ThemeModeContext);
@@ -26,30 +44,24 @@ const TopBar = ({ sidebarOpen, drawerWidth, openSideBar }) => {
     handleClose();
   };
 
-  // TODO: Add lottie loading screen
-
   return (
-    <AppBar
-      position="sticky"
-      display="flex"
-      p="16px 16px 0 16px"
-      sx={{
-        ...(sidebarOpen && { width: `calc(100% - ${drawerWidth}px)`, marginLeft: `${drawerWidth}px` }),
-      }}
-    >
+    <AppBar position="fixed" sidebarOpen={sidebarOpen} drawerWidth={drawerWidth}>
       <Toolbar
         sx={{
           backgroundColor: colors.primary[800],
         }}
       >
-        {!sidebarOpen && (
-          <Box display="flex">
-            <IconButton type="button" sx={{ p: 1 }} onClick={openSideBar}>
-              <MenuIcon sx={{ color: colors.grey[100] }} />
-            </IconButton>
-          </Box>
-        )}
-
+        <IconButton
+          color="inherit"
+          onClick={toggleSideBar}
+          edge="start"
+          sx={{
+            marginRight: 5,
+            ...(sidebarOpen && { display: "none" }),
+          }}
+        >
+          <MenuIcon />
+        </IconButton>
         {/* Icons */}
         <Box display="flex" marginLeft="auto">
           <IconButton type="button" sx={{ p: 1 }} onClick={themeMode.toggleThemeMode}>

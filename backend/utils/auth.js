@@ -19,7 +19,6 @@ const generateRefreshToken = async (user) => {
   const refreshSecret = process.env.JWT_REFRESH_SECRET;
   const refreshExpiry = process.env.JWT_REFRESH_EXPIRY;
 
-  // TODO: Check for persistant login
   const newRefreshToken = jwt.sign({ userId: user._id }, refreshSecret, { expiresIn: refreshExpiry });
 
   await user.rotateRefreshToken(newRefreshToken);
