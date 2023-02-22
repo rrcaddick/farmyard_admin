@@ -1,12 +1,12 @@
 import styled from "@emotion/styled";
-import { useColors } from "../../../theme/hooks/useColors";
-import { Button, TextField, Box, Alert } from "@mui/material";
-import { useYupValidationResolver } from "../../../hooks/use-yup-validation-resolver";
-import { forgotPasswordSchema } from "../schemas/forgot-password";
-import { useForm } from "react-hook-form";
-import { useFetch } from "../../../hooks/use-fetch";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { Button, TextField, Box, Alert } from "@mui/material";
+import { useColors } from "@hooks/useColors";
+import { useYupValidationResolver } from "@hooks/use-yup-validation-resolver";
+import { forgotPasswordSchema } from "@auth/schemas/forgot-password";
+import { useFetch } from "@hooks/use-fetch";
 
 const ForgotPasswordForm = styled.form`
   display: flex;

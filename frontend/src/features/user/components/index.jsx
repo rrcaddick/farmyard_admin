@@ -1,7 +1,6 @@
 import { Button, List } from "@mui/material";
-import React from "react";
-import TabPanel from "../../../components/navigation/tab-panel";
-import { useLogout } from "../../auth/hooks/use-logout";
+import TabPanel from "@components/tabs/tab-panel";
+import { useLogout } from "@auth/hooks/use-logout";
 
 const User = ({ value, index }) => {
   const logout = useLogout();

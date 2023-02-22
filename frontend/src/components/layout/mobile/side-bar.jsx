@@ -1,19 +1,19 @@
+import { useState } from "react";
 import Box from "@mui/material/Box";
 import SwipeableDrawer from "@mui/material/SwipeableDrawer";
 
-import Tabs from "../../navigation/tabs";
-import Tab from "../../navigation/tab";
-
-import MobileNavigation from "../../navigation/mobile-navigation";
-import Notifications from "../../../features/notifications/components";
-import Settings from "../../../features/settings/components";
-import User from "../../../features/user/components";
-
+import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import NavigationIcon from "@mui/icons-material/Navigation";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
-import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
-import { useState } from "react";
+
+import Tabs from "@components/tabs/tabs";
+import Tab from "@components/tabs/tab";
+
+import MobileNavigation from "@navigation/components/mobile";
+import Notifications from "@notifications/components";
+import Settings from "@settings/components";
+import User from "@user/components";
 
 const SideBar = ({ sidebarOpen, toggleSideBar }) => {
   const [value, setValue] = useState(0);

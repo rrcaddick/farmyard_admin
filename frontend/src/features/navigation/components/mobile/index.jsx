@@ -1,5 +1,5 @@
 import { Divider, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
-import TabPanel from "./tab-panel";
+import TabPanel from "@components/tabs/tab-panel";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import MailIcon from "@mui/icons-material/Mail";
 

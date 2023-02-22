@@ -1,0 +1,23 @@
+{
+  "plugins": [
+    [
+      "module-resolver",
+      {
+        "root": ["./"],
+        "alias": {
+          "@components": "./src/components",
+          "@utils": "./src/utils",
+          "@hooks": "./src/hooks",
+          "@theme": "./src/theme",
+          "@auth": "./src/features/auth",
+          "@booking": "./src/features/booking",
+          "@dashboard": "./src/features/dashboard",
+          "@navigation": "./src/features/navigation",
+          "@notifications": "./src/features/notifications",
+          "@settings": "./src/features/settings",
+          "@user": "./src/features/user"
+        }
+      }
+    ]
+  ]
+}

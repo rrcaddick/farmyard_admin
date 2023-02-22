@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client";
-import { getMe } from "../auth/graphql/queries";
+import { getMe } from "@auth/graphql/queries";
 
 const Dashboad = () => {
   const { loading, error, data } = useQuery(getMe, { fetchPolicy: "network-only" });

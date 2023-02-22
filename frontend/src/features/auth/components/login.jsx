@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
 import styled from "@emotion/styled";
-import { useColors } from "../../../theme/hooks/useColors";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import { useEffect, useState } from "react";
+import { useNavigate, Link, useLocation } from "react-router-dom";
+import { useColors } from "@hooks/useColors";
 import {
   Button,
   IconButton,
@@ -15,15 +14,18 @@ import {
   Checkbox,
   Modal,
 } from "@mui/material";
-import { useShowPassword } from "../hooks";
-import { useNavigate, Link, useLocation } from "react-router-dom";
-import { useYupValidationResolver } from "../../../hooks/use-yup-validation-resolver";
-import { loginSchema } from "../schemas/login";
+
+import { useShowPassword } from "@auth/hooks";
+import { useYupValidationResolver } from "@hooks/use-yup-validation-resolver";
+import { loginSchema } from "@auth/schemas/login";
 import { useForm } from "react-hook-form";
-import { useFetch } from "../../../hooks/use-fetch";
-import { useApolloCache } from "../../../hooks/use-apollo-cache";
-import { getMe } from "../graphql/queries";
-import { getRememberMe, toggleRememberMe } from "../../../utils/auth";
+import { useFetch } from "@hooks/use-fetch";
+import { useApolloCache } from "@hooks/use-apollo-cache";
+import { getMe } from "@auth/graphql/queries";
+import { getRememberMe, toggleRememberMe } from "@utils/auth";
+
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 
 const LoginForm = styled.form`
   display: flex;

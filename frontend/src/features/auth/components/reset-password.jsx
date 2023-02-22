@@ -1,15 +1,16 @@
 import styled from "@emotion/styled";
-import { useColors } from "../../../theme/hooks/useColors";
+import { useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { Button, IconButton, TextField, Box, Alert } from "@mui/material";
+import { useColors } from "@hooks/useColors";
+import { useShowPassword } from "@auth/hooks";
+import { useYupValidationResolver } from "@hooks/use-yup-validation-resolver";
+import { resetPasswordSchema } from "@auth/schemas/reset-password";
+import { useFetch } from "@hooks/use-fetch";
+
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import { Button, IconButton, TextField, Box, Alert } from "@mui/material";
-import { useShowPassword } from "../hooks";
-import { useNavigate, useParams } from "react-router-dom";
-import { useYupValidationResolver } from "../../../hooks/use-yup-validation-resolver";
-import { resetPasswordSchema } from "../schemas/reset-password";
-import { useForm } from "react-hook-form";
-import { useFetch } from "../../../hooks/use-fetch";
-import { useEffect } from "react";
 
 const ResetPasswordForm = styled.form`
   display: flex;

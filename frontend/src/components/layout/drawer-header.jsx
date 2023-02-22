@@ -1,4 +1,4 @@
-import { styled } from "@mui/material/styles";
+import styled from "@mui/material/styles/styled";
 
 const SyledHeader = styled("div")(({ theme }) => ({
   display: "flex",

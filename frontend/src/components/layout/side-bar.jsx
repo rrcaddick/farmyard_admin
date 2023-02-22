@@ -1,4 +1,4 @@
-import { styled } from "@mui/material/styles";
+import styled from "@mui/material/styles/styled";
 import {
   Divider,
   Drawer as MuiDrawer,
@@ -11,9 +11,9 @@ import {
   useTheme,
 } from "@mui/material";
 
-import DrawerHeader from "./drawer-header";
+import DrawerHeader from "@components/layout/drawer-header";
 
-import { useColors } from "../../theme/hooks/useColors";
+import { useColors } from "@hooks/useColors";
 
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import MailIcon from "@mui/icons-material/Mail";

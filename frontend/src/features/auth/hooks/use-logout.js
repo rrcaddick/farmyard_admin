@@ -1,8 +1,8 @@
-import { useApolloClient } from "@apollo/client";
 import { useCallback, useEffect } from "react";
-import { useFetch } from "../../../hooks/use-fetch";
-import { removeRememberMe } from "../../../utils/auth";
+import { useApolloClient } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
+import { useFetch } from "@hooks/use-fetch";
+import { removeRememberMe } from "@utils/auth";
 
 const useLogout = () => {
   const client = useApolloClient();

@@ -1,11 +1,14 @@
-import TopBar from "./top-bar";
-import MobileTopBar from "./mobile/top-bar";
-import SideBar from "./side-bar";
-import MobileSideBar from "./mobile/side-bar";
-import DrawerHeader from "./drawer-header";
-import Box from "@mui/material/Box";
-import { Outlet } from "react-router-dom";
 import { useState } from "react";
+import { Outlet } from "react-router-dom";
+
+import Box from "@mui/material/Box";
+
+import TopBar from "@components/layout/top-bar";
+import MobileTopBar from "@components/layout/mobile/top-bar";
+import SideBar from "@components/layout/side-bar";
+import MobileSideBar from "@components/layout/mobile/side-bar";
+import DrawerHeader from "@components/layout/drawer-header";
+
 import { useMediaQuery, useTheme } from "@mui/material";
 
 const drawerWidth = 240;

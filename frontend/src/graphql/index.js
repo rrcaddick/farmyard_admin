@@ -1,5 +1,5 @@
 import { ApolloClient, ApolloLink, createHttpLink, from, InMemoryCache } from "@apollo/client";
-import { createSafeFetch } from "../utils/fetch";
+import { createSafeFetch } from "@utils/fetch";
 import { onError } from "@apollo/client/link/error";
 
 const createApolloClient = () => {

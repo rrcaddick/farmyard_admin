@@ -1,6 +1,6 @@
-import { useColors } from "../../../theme/hooks/useColors";
+import { useColors } from "@hooks/useColors";
 import { List, ListItem, ListItemButton, ListItemText } from "@mui/material";
-import TabPanel from "../../../components/navigation/tab-panel";
+import TabPanel from "@components/tabs/tab-panel";
 
 const Notifications = ({ value, index }) => {
   const colors = useColors();

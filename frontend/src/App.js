@@ -1,15 +1,15 @@
+import { useEffect, useState } from "react";
 import { ThemeModeContext, useThemeMode } from "./theme";
 import { ThemeProvider, CssBaseline, GlobalStyles, Box } from "@mui/material";
 import { Routes, Route } from "react-router-dom";
-import { Login, ForgotPassword, ResetPassword, ProtectedRoutes, IsAuthRedirect } from "./features/auth/components";
-import Booking from "./features/booking";
-import Dashboard from "./features/dashboard";
-import Layout from "./components/layout";
-import { useEffect, useState } from "react";
-import { getRememberMe } from "./utils/auth";
-import { useFetch } from "./hooks/use-fetch";
-import { useApolloCache } from "./hooks/use-apollo-cache";
-import { getMe } from "./features/auth/graphql/queries";
+import { Login, ForgotPassword, ResetPassword, ProtectedRoutes, IsAuthRedirect } from "@auth/components";
+import Booking from "@booking/components";
+import Dashboard from "@dashboard/components";
+import Layout from "@components/layout";
+import { getRememberMe } from "@utils/auth";
+import { useFetch } from "@hooks/use-fetch";
+import { useApolloCache } from "@hooks/use-apollo-cache";
+import { getMe } from "@auth/graphql/queries";
 
 const rememberMe = getRememberMe();
 

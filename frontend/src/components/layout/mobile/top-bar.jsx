@@ -1,6 +1,8 @@
-import { AppBar, IconButton, Toolbar } from "@mui/material";
-import { useColors } from "../../../theme/hooks/useColors";
+import { useColors } from "@hooks/useColors";
 
+import AppBar from "@mui/material/AppBar";
+import IconButton from "@mui/material/IconButton";
+import Toolbar from "@mui/material/Toolbar";
 import MenuIcon from "@mui/icons-material/Menu";
 
 const TopBar = ({ sidebarOpen, toggleSideBar }) => {

@@ -1,10 +1,10 @@
+import styled from "@mui/material/styles/styled";
 import { useContext } from "react";
-import { styled } from "@mui/material/styles";
 import { AppBar as MuiAppBar, Box, IconButton, Menu, MenuItem, Toolbar, useTheme } from "@mui/material";
-import { useColors } from "../../theme/hooks/useColors";
-import { ThemeModeContext } from "../../theme";
-import { useMenu } from "../hooks/use-menu";
-import { useLogout } from "../../features/auth/hooks/use-logout";
+import { useColors } from "@hooks/useColors";
+import { ThemeModeContext } from "@theme";
+import { useMenu } from "@components/hooks/use-menu";
+import { useLogout } from "@auth/hooks/use-logout";
 
 import MenuIcon from "@mui/icons-material/Menu";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";

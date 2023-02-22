@@ -1,4 +1,4 @@
-import TabPanel from "../../../components/navigation/tab-panel";
+import TabPanel from "@components/tabs/tab-panel";
 
 const Settings = ({ value, index }) => {
   return (
