@@ -2,17 +2,23 @@ import { styled } from "@mui/material/styles";
 import {
   Divider,
   Drawer as MuiDrawer,
+  IconButton,
   List,
   ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  useTheme,
 } from "@mui/material";
+
+import DrawerHeader from "./drawer-header";
 
 import { useColors } from "../../theme/hooks/useColors";
 
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import MailIcon from "@mui/icons-material/Mail";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
 const openedMixin = (theme, drawerWidth) => ({
   width: drawerWidth,
@@ -52,8 +58,10 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => !["sidebarOpen",
   })
 );
 
-const SideBar = ({ sidebarOpen, drawerWidth, header }) => {
+const SideBar = ({ sidebarOpen, drawerWidth, header, toggleSideBar }) => {
   const colors = useColors();
+  const theme = useTheme();
+
   return (
     <Drawer
       variant="permanent"
@@ -65,7 +73,12 @@ const SideBar = ({ sidebarOpen, drawerWidth, header }) => {
         },
       }}
     >
-      {header}
+      <DrawerHeader>
+        <IconButton onClick={toggleSideBar}>
+          {theme.direction === "rtl" ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+        </IconButton>
+      </DrawerHeader>
+
       <Divider />
       <List>
         {["Inbox", "Starred", "Send email", "Drafts"].map((text, index) => (

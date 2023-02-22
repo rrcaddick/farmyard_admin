@@ -46,7 +46,7 @@ const Login = () => {
     handleSubmit,
     register,
     formState: { isValid, errors },
-  } = useForm({ resolver, mode: "all", defaultValues: { email: "rrcaddick@gmail.com", password: "Whatever123" } });
+  } = useForm({ resolver, mode: "all", defaultValues: { email: "rrcaddick@gmail.com", password: "Fr33l0ader!@)(" } });
 
   const { sendRequest, loading, serverError, success } = useFetch();
 

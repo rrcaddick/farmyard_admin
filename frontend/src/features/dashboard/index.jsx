@@ -7,7 +7,7 @@ const Dashboad = () => {
   if (loading) return "Loading...";
   if (error) return `Error! ${error.message}`;
 
-  return <div>{JSON.stringify(data)}</div>;
+  return <div>User: Ray Caddick</div>;
 };
 
 export default Dashboad;

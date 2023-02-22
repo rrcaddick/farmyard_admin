@@ -1,27 +1,19 @@
 import TopBar from "./top-bar";
+import MobileTopBar from "./mobile/top-bar";
 import SideBar from "./side-bar";
-import { styled, useTheme } from "@mui/material/styles";
+import MobileSideBar from "./mobile/side-bar";
+import DrawerHeader from "./drawer-header";
 import Box from "@mui/material/Box";
 import { Outlet } from "react-router-dom";
 import { useState } from "react";
-import { IconButton } from "@mui/material";
-
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import { useMediaQuery, useTheme } from "@mui/material";
 
 const drawerWidth = 240;
 
-const DrawerHeader = styled("div")(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "flex-end",
-  padding: theme.spacing(0, 1),
-  // Keeps content under the app bar
-  ...theme.mixins.toolbar,
-}));
-
 const Layout = ({ children }) => {
   const theme = useTheme();
+  const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
+
   const [sidebarOpen, setSideBarOpen] = useState(false);
 
   const toggleSideBar = () => {
@@ -30,19 +22,17 @@ const Layout = ({ children }) => {
 
   return (
     <Box sx={{ display: "flex" }}>
-      <TopBar sidebarOpen={sidebarOpen} toggleSideBar={toggleSideBar} drawerWidth={drawerWidth} />
-
-      <SideBar
-        sidebarOpen={sidebarOpen}
-        drawerWidth={drawerWidth}
-        header={
-          <DrawerHeader>
-            <IconButton onClick={toggleSideBar}>
-              {theme.direction === "rtl" ? <ChevronRightIcon /> : <ChevronLeftIcon />}
-            </IconButton>
-          </DrawerHeader>
-        }
-      />
+      {isDesktop ? (
+        <>
+          <TopBar sidebarOpen={sidebarOpen} toggleSideBar={toggleSideBar} drawerWidth={drawerWidth} />
+          <SideBar sidebarOpen={sidebarOpen} drawerWidth={drawerWidth} toggleSideBar={toggleSideBar} />
+        </>
+      ) : (
+        <>
+          <MobileTopBar sidebarOpen={sidebarOpen} toggleSideBar={toggleSideBar} />
+          <MobileSideBar sidebarOpen={sidebarOpen} toggleSideBar={toggleSideBar} />
+        </>
+      )}
 
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
         <DrawerHeader />

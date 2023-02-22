@@ -1,5 +1,5 @@
 import { ThemeModeContext, useThemeMode } from "./theme";
-import { ThemeProvider, CssBaseline, GlobalStyles } from "@mui/material";
+import { ThemeProvider, CssBaseline, GlobalStyles, Box } from "@mui/material";
 import { Routes, Route } from "react-router-dom";
 import { Login, ForgotPassword, ResetPassword, ProtectedRoutes, IsAuthRedirect } from "./features/auth/components";
 import Booking from "./features/booking";
@@ -20,6 +20,7 @@ const App = () => {
   const { sendRequest } = useFetch();
   const cache = useApolloCache();
 
+  // Check for remember me and log in
   useEffect(() => {
     if (rememberMe) {
       (async () => {
@@ -76,37 +77,35 @@ const App = () => {
     },
   });
 
-  if (rememberMeLoading) {
-    // TODO: Add Lottie loading animation
-    return "loading";
-  }
-
   return (
     <ThemeModeContext.Provider value={themeMode}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <GlobalStyles styles={globalStyles} />
         {/* TODO: Refactor use routes object */}
-        <Routes>
-          {/* Auth */}
-          <Route element={<IsAuthRedirect />}>
-            <Route path="/login" element={<Login />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password/:userId/:token" element={<ResetPassword />} />
-          </Route>
-
-          {/* Main App */}
-          <Route element={<ProtectedRoutes />}>
-            <Route element={<Layout />}>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/booking" element={<Booking />} />
+        {rememberMeLoading && <Box>Loading...</Box>}
+        {!rememberMeLoading && (
+          <Routes>
+            {/* Auth */}
+            <Route element={<IsAuthRedirect />}>
+              <Route path="/login" element={<Login />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password/:userId/:token" element={<ResetPassword />} />
             </Route>
-          </Route>
 
-          {/* Not Found */}
-          {/* TODO: Add 404 not found with lottie sheep */}
-          <Route path="*" element={"Not found"} />
-        </Routes>
+            {/* Main App */}
+            <Route element={<ProtectedRoutes />}>
+              <Route element={<Layout />}>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/booking" element={<Booking />} />
+              </Route>
+            </Route>
+
+            {/* Not Found */}
+            {/* TODO: Add 404 not found with lottie sheep */}
+            <Route path="*" element={"Not found"} />
+          </Routes>
+        )}
       </ThemeProvider>
     </ThemeModeContext.Provider>
   );
