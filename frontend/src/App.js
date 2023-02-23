@@ -1,11 +1,8 @@
 import { useEffect, useState } from "react";
 import { ThemeModeContext, useThemeMode } from "./theme";
 import { ThemeProvider, CssBaseline, GlobalStyles, Box } from "@mui/material";
-import { Routes, Route } from "react-router-dom";
-import { Login, ForgotPassword, ResetPassword, ProtectedRoutes, IsAuthRedirect } from "@auth/components";
-import Booking from "@booking/components";
-import Dashboard from "@dashboard/components";
-import Layout from "@components/layout";
+import { useRoutes } from "react-router-dom";
+import RouteMap from "@routes";
 import { getRememberMe } from "@utils/auth";
 import { useFetch } from "@hooks/use-fetch";
 import { useApolloCache } from "@hooks/use-apollo-cache";
@@ -19,6 +16,8 @@ const App = () => {
   const [rememberMeLoading, setRememberMeLoading] = useState(rememberMe);
   const { sendRequest } = useFetch();
   const cache = useApolloCache();
+
+  const routes = useRoutes(RouteMap);
 
   // Check for remember me and log in
   useEffect(() => {
@@ -83,29 +82,7 @@ const App = () => {
         <CssBaseline />
         <GlobalStyles styles={globalStyles} />
         {/* TODO: Refactor use routes object */}
-        {rememberMeLoading && <Box>Loading...</Box>}
-        {!rememberMeLoading && (
-          <Routes>
-            {/* Auth */}
-            <Route element={<IsAuthRedirect />}>
-              <Route path="/login" element={<Login />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route path="/reset-password/:userId/:token" element={<ResetPassword />} />
-            </Route>
-
-            {/* Main App */}
-            <Route element={<ProtectedRoutes />}>
-              <Route element={<Layout />}>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/booking" element={<Booking />} />
-              </Route>
-            </Route>
-
-            {/* Not Found */}
-            {/* TODO: Add 404 not found with lottie sheep */}
-            <Route path="*" element={"Not found"} />
-          </Routes>
-        )}
+        {rememberMeLoading ? <Box>Loading...</Box> : routes}
       </ThemeProvider>
     </ThemeModeContext.Provider>
   );

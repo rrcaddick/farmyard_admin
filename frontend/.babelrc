@@ -8,6 +8,7 @@
           "@components": "./src/components",
           "@utils": "./src/utils",
           "@hooks": "./src/hooks",
+          "@routes": "./src/routes",
           "@theme": "./src/theme",
           "@auth": "./src/features/auth",
           "@booking": "./src/features/booking",
