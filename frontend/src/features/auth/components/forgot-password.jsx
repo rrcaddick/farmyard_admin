@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { Button, TextField, Box, Alert } from "@mui/material";
-import { useColors } from "@hooks/useColors";
+
 import { useYupValidationResolver } from "@hooks/use-yup-validation-resolver";
 import { forgotPasswordSchema } from "@auth/schemas/forgot-password";
 import { useFetch } from "@hooks/use-fetch";
@@ -16,7 +16,7 @@ const ForgotPasswordForm = styled.form`
 `;
 
 const ForgotPassword = () => {
-  const colors = useColors();
+
   const resolver = useYupValidationResolver(forgotPasswordSchema);
   const {
     handleSubmit,
@@ -45,7 +45,6 @@ const ForgotPassword = () => {
         padding="2rem"
         maxWidth="550px"
         width="100%"
-        backgroundColor={colors.primary[700]}
         borderRadius="10px"
         display="flex"
         flexDirection="column"

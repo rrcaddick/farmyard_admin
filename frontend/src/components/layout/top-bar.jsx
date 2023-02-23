@@ -1,7 +1,6 @@
 import styled from "@mui/material/styles/styled";
 import { useContext } from "react";
 import { AppBar as MuiAppBar, Box, IconButton, Menu, MenuItem, Toolbar, useTheme } from "@mui/material";
-import { useColors } from "@hooks/useColors";
 import { ThemeModeContext } from "@theme";
 import { useMenu } from "@components/hooks/use-menu";
 import { useLogout } from "@auth/hooks/use-logout";
@@ -33,7 +32,6 @@ const AppBar = styled(MuiAppBar, {
 
 const TopBar = ({ sidebarOpen, toggleSideBar, drawerWidth }) => {
   const theme = useTheme();
-  const colors = useColors();
   const themeMode = useContext(ThemeModeContext);
 
   const { anchorEl, open, handleOpen, handleClose } = useMenu();
@@ -46,15 +44,11 @@ const TopBar = ({ sidebarOpen, toggleSideBar, drawerWidth }) => {
 
   return (
     <AppBar position="fixed" sidebarOpen={sidebarOpen} drawerWidth={drawerWidth}>
-      <Toolbar
-        sx={{
-          backgroundColor: colors.primary[800],
-        }}
-      >
+      <Toolbar>
         <IconButton
-          color="inherit"
           onClick={toggleSideBar}
           edge="start"
+          color="inherit"
           sx={{
             marginRight: 5,
             ...(sidebarOpen && { display: "none" }),
@@ -64,21 +58,17 @@ const TopBar = ({ sidebarOpen, toggleSideBar, drawerWidth }) => {
         </IconButton>
         {/* Icons */}
         <Box display="flex" marginLeft="auto">
-          <IconButton type="button" sx={{ p: 1 }} onClick={themeMode.toggleThemeMode}>
-            {theme.palette.mode === "dark" ? (
-              <LightModeOutlinedIcon sx={{ color: colors.grey[100] }} />
-            ) : (
-              <DarkModeOutlinedIcon sx={{ color: colors.grey[100] }} />
-            )}
+          <IconButton type="button" color="inherit" sx={{ p: 1 }} onClick={themeMode.toggleThemeMode}>
+            {theme.palette.mode === "dark" ? <LightModeOutlinedIcon /> : <DarkModeOutlinedIcon />}
           </IconButton>
-          <IconButton type="button" sx={{ p: 1 }}>
-            <NotificationsOutlinedIcon sx={{ color: colors.grey[100] }} />
+          <IconButton type="button" color="inherit" sx={{ p: 1 }}>
+            <NotificationsOutlinedIcon />
           </IconButton>
-          <IconButton type="button" sx={{ p: 1 }}>
-            <SettingsOutlinedIcon sx={{ color: colors.grey[100] }} />
+          <IconButton type="button" color="inherit" sx={{ p: 1 }}>
+            <SettingsOutlinedIcon />
           </IconButton>
-          <IconButton type="button" sx={{ p: 1 }} onClick={handleOpen}>
-            <PersonOutlinedIcon sx={{ color: colors.grey[100] }} />
+          <IconButton type="button" color="inherit" sx={{ p: 1 }} onClick={handleOpen}>
+            <PersonOutlinedIcon />
           </IconButton>
           <Menu
             anchorEl={anchorEl}

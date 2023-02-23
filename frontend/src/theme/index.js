@@ -123,8 +123,6 @@ export const getColors = (mode) => {
 };
 
 export const themeSettings = (mode) => {
-  const colors = getColors(mode);
-
   const primaryFont = "Source Sans Pro";
 
   return {
@@ -133,96 +131,56 @@ export const themeSettings = (mode) => {
       ...(mode === "dark"
         ? {
             primary: {
-              main: colors.primary[500],
+              main: "#70d8bd",
             },
             secondary: {
-              main: colors.greenAccent[500],
+              main: "#70c0d8",
             },
-            neutral: {
-              main: colors.grey[500],
-              light: colors.grey[100],
-              dark: colors.grey[700],
+            error: {
+              main: "#d32f2f",
             },
             background: {
-              default: colors.primary[500],
+              default: "#141b2d",
+              paper: "#141b2d",
             },
+            text: {
+              primary: "#e0e0e0",
+            },
+            // components: {
+            //   MuiIconButton: {
+            //     styleOverrides: {
+            //       root: {
+            //         color: "#fff",
+            //       },
+            //     },
+            //   },
+            // },
           }
         : {
             primary: {
-              main: colors.primary[100],
+              main: "#00796B",
             },
             secondary: {
-              main: colors.greenAccent[500],
+              main: "#96000f",
             },
-            neutral: {
-              dark: colors.grey[700],
-              main: colors.grey[500],
-              light: colors.grey[100],
+            error: {
+              main: "#d32f2f",
             },
             background: {
-              default: "#fcfcfc",
+              default: "#ececec",
+              paper: "#ffffff",
+            },
+            components: {
+              MuiIconButton: {
+                styleOverrides: {
+                  root: {
+                    color: "#fff",
+                  },
+                },
+              },
             },
           }),
     },
-    components: {
-      MuiInputLabel: {
-        styleOverrides: {
-          root: {
-            color: colors.greenAccent[700],
-            "&.Mui-focused": {
-              color: colors.greenAccent[500],
-            },
-          },
-        },
-      },
-      MuiInput: {
-        styleOverrides: {
-          root: {
-            ":after": {
-              borderBottom: `2px solid ${colors.greenAccent[500]}`,
-            },
-          },
-        },
-      },
-      MuiCheckbox: {
-        styleOverrides: {
-          root: {
-            "&.Mui-checked": {
-              color: colors.greenAccent[500],
-            },
-          },
-        },
-      },
-    },
-    // TODO: Add Typography styles
-    // typography: {
-    //   fontFamily: [primaryFont, "sans-serif"].join(","),
-    //   fontSize: 12,
-    //   h1: {
-    //     fontFamily: [primaryFont, "sans-serif"].join(","),
-    //     fontSize: 40,
-    //   },
-    //   h2: {
-    //     fontFamily: [primaryFont, "sans-serif"].join(","),
-    //     fontSize: 32,
-    //   },
-    //   h3: {
-    //     fontFamily: [primaryFont, "sans-serif"].join(","),
-    //     fontSize: 24,
-    //   },
-    //   h4: {
-    //     fontFamily: [primaryFont, "sans-serif"].join(","),
-    //     fontSize: 20,
-    //   },
-    //   h5: {
-    //     fontFamily: [primaryFont, "sans-serif"].join(","),
-    //     fontSize: 16,
-    //   },
-    //   h6: {
-    //     fontFamily: [primaryFont, "sans-serif"].join(","),
-    //     fontSize: 14,
-    //   },
-    // },
   };
 };
 

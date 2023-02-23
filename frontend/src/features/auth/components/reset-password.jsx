@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { Button, IconButton, TextField, Box, Alert } from "@mui/material";
-import { useColors } from "@hooks/useColors";
+
 import { useShowPassword } from "@auth/hooks";
 import { useYupValidationResolver } from "@hooks/use-yup-validation-resolver";
 import { resetPasswordSchema } from "@auth/schemas/reset-password";
@@ -20,7 +20,6 @@ const ResetPasswordForm = styled.form`
 `;
 
 const ResetPassword = () => {
-  const colors = useColors();
   const { showPassword, toggleShowPassword, showConfirmPassword, toggleShowConfirmPassword } = useShowPassword();
   const resolver = useYupValidationResolver(resetPasswordSchema);
   const {
@@ -51,7 +50,6 @@ const ResetPassword = () => {
         padding="2rem"
         maxWidth="550px"
         width="100%"
-        backgroundColor={colors.primary[700]}
         borderRadius="10px"
         display="flex"
         flexDirection="column"

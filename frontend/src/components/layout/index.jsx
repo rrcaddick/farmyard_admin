@@ -9,9 +9,25 @@ import SideBar from "@components/layout/side-bar";
 import MobileSideBar from "@components/layout/mobile/side-bar";
 import DrawerHeader from "@components/layout/drawer-header";
 
-import { useMediaQuery, useTheme } from "@mui/material";
+import { Paper, useMediaQuery, useTheme } from "@mui/material";
 
 const drawerWidth = 240;
+
+// FIXME: Makes background color work
+const MainWrapper = ({ children, themeMode }) => {
+  if (themeMode === "dark")
+    return (
+      <Paper component="main" square={true} elevation={8} sx={{ flexGrow: 1, p: 3 }}>
+        {children}
+      </Paper>
+    );
+
+  return (
+    <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+      {children}
+    </Box>
+  );
+};
 
 const Layout = ({ children }) => {
   const theme = useTheme();
@@ -24,7 +40,7 @@ const Layout = ({ children }) => {
   };
 
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box sx={{ display: "flex", flexGrow: 1 }}>
       {isDesktop ? (
         <>
           <TopBar sidebarOpen={sidebarOpen} toggleSideBar={toggleSideBar} drawerWidth={drawerWidth} />
@@ -37,10 +53,10 @@ const Layout = ({ children }) => {
         </>
       )}
 
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+      <MainWrapper themeMode={theme.palette.mode}>
         <DrawerHeader />
         <Outlet />
-      </Box>
+      </MainWrapper>
     </Box>
   );
 };

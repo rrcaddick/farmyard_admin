@@ -12,7 +12,6 @@ import {
   useTheme,
 } from "@mui/material";
 import DrawerHeader from "@components/layout/drawer-header";
-import { useColors } from "@hooks/useColors";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import MailIcon from "@mui/icons-material/Mail";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
@@ -57,21 +56,11 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => !["sidebarOpen",
   })
 );
 
-const SideBar = ({ sidebarOpen, drawerWidth, header, toggleSideBar }) => {
-  const colors = useColors();
+const SideBar = ({ sidebarOpen, drawerWidth, toggleSideBar }) => {
   const theme = useTheme();
 
   return (
-    <Drawer
-      variant="permanent"
-      sidebarOpen={sidebarOpen}
-      drawerWidth={drawerWidth}
-      sx={{
-        "& .MuiDrawer-paper": {
-          backgroundColor: colors.primary[400],
-        },
-      }}
-    >
+    <Drawer variant="permanent" sidebarOpen={sidebarOpen} drawerWidth={drawerWidth}>
       <DrawerHeader>
         <IconButton onClick={toggleSideBar}>
           {theme.direction === "rtl" ? <ChevronRightIcon /> : <ChevronLeftIcon />}

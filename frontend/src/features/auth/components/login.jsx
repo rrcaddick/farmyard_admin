@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
 import { useEffect, useState } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
-import { useColors } from "@hooks/useColors";
+
 import {
   Button,
   IconButton,
@@ -13,6 +13,7 @@ import {
   FormControlLabel,
   Checkbox,
   Modal,
+  Paper,
 } from "@mui/material";
 
 import { useShowPassword } from "@auth/hooks";
@@ -35,7 +36,6 @@ const LoginForm = styled.form`
 `;
 
 const Login = () => {
-  const colors = useColors();
   const navigate = useNavigate();
   const { state: navigateState } = useLocation();
 
@@ -74,15 +74,16 @@ const Login = () => {
 
   return (
     <Box display="flex" justifyContent="center" flexGrow={1} padding="4rem 2rem">
-      <Box
-        padding="2rem"
-        maxWidth="550px"
-        flexGrow={1}
-        backgroundColor={colors.primary[700]}
-        borderRadius="10px"
-        display="flex"
-        flexDirection="column"
-        justifyContent="center"
+      <Paper
+        sx={{
+          padding: "2rem",
+          maxWidth: "550px",
+          flexGrow: 1,
+          borderRadius: "10px",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+        }}
       >
         {serverError && (
           <Alert severity="error" sx={{ marginBottom: "2rem", borderRadius: "8px" }}>
@@ -109,7 +110,6 @@ const Login = () => {
             })}
             textAlign="center"
             fontWeight={700}
-            color={colors.grey[300]}
           >
             FARMYARD ADMIN
           </Typography>
@@ -149,25 +149,15 @@ const Login = () => {
             />
           </FormGroup>
 
-          <Typography
-            textAlign="center"
-            sx={{
-              "&:hover": {
-                color: colors.greenAccent[400],
-              },
-              "&:active": {
-                color: colors.greenAccent[600],
-              },
-            }}
-          >
+          <Typography textAlign="center">
             <Link to="/forgot-password">Forgot Password?</Link>
           </Typography>
 
-          <Button variant="contained" color="secondary" type="submit" disabled={!isValid || loading}>
+          <Button variant="contained" type="submit" disabled={!isValid || loading}>
             {loading ? "Loading" : "Login"}
           </Button>
         </LoginForm>
-      </Box>
+      </Paper>
       {/* TODO: Refactor modal to seperate component. Style using theme */}
       <Modal open={modalOpen}>
         <Box display="flex" justifyContent="space-around" alignItems="center" backgroundColor="red">
