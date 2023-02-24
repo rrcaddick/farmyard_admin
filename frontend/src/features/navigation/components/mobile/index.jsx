@@ -1,28 +1,25 @@
-import { Divider, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
+import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
+import { useLinks } from "@navigation/hooks/use-links";
 import TabPanel from "@components/tabs/tab-panel";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
+import { useNavigate } from "react-router-dom";
 
-const MobileNavigation = ({ value, index }) => {
+const MobileNavigation = ({ value, index, toggleSideBar }) => {
+  const links = useLinks();
+  const navigate = useNavigate();
+
+  const navigateHandler = (url) => {
+    navigate(url);
+    toggleSideBar(false);
+  };
+
   return (
     <TabPanel value={value} index={index}>
       <List>
-        {["Inbox", "Starred", "Send email", "Drafts"].map((text, index) => (
-          <ListItem key={text} disablePadding>
-            <ListItemButton>
-              <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
-      <Divider />
-      <List>
-        {["All mail", "Trash", "Spam"].map((text, index) => (
-          <ListItem key={text} disablePadding>
-            <ListItemButton>
-              <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-              <ListItemText primary={text} />
+        {links.map(({ id, title, icon, url }) => (
+          <ListItem key={id} disablePadding>
+            <ListItemButton onClick={navigateHandler.bind(this, url)}>
+              <ListItemIcon>{icon}</ListItemIcon>
+              <ListItemText primary={title} />
             </ListItemButton>
           </ListItem>
         ))}

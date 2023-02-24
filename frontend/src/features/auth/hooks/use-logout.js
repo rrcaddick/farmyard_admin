@@ -31,7 +31,10 @@ const useLogout = () => {
 
     if (serverError) {
       // Modal warning to clear cookies
-      navigate("/login", { state: { logoutError: true } });
+      // FIXME - Setting timeout seems to be the only way to pass state on android chrome
+      setTimeout(() => {
+        navigate("/login", { state: { logoutError: true } });
+      }, 1);
     }
   }, [loading, success, serverError, client, navigate]);
 

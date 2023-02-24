@@ -12,9 +12,9 @@ import {
   FormGroup,
   FormControlLabel,
   Checkbox,
-  Modal,
-  Paper,
 } from "@mui/material";
+
+import LogoutError from "@auth/components/logout-error";
 
 import { useShowPassword } from "@auth/hooks";
 import { useYupValidationResolver } from "@hooks/use-yup-validation-resolver";
@@ -31,7 +31,7 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 const LoginForm = styled.form`
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1rem;
   border-radius: 10px;
 `;
 
@@ -73,104 +73,81 @@ const Login = () => {
   }, [success, navigate]);
 
   return (
-    <Box display="flex" justifyContent="center" flexGrow={1} padding="4rem 2rem">
-      <Paper
-        sx={{
-          padding: "2rem",
-          maxWidth: "550px",
-          flexGrow: 1,
-          borderRadius: "10px",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-        }}
-      >
-        {serverError && (
-          <Alert severity="error" sx={{ marginBottom: "2rem", borderRadius: "8px" }}>
-            {serverError}
-          </Alert>
-        )}
-        {navigateState?.passwordReset && (
-          <Alert severity="success" sx={{ marginBottom: "2rem", borderRadius: "8px" }}>
-            Password updated
-          </Alert>
-        )}
-        {navigateState?.forgotPassword && (
-          <Alert severity="success" sx={{ marginBottom: "2rem", borderRadius: "8px" }}>
-            A password reset link has been sent to {navigateState.forgotPassword}
-          </Alert>
-        )}
-        <Box marginBottom="4rem">
-          <Typography
-            variant="h2"
-            sx={(theme) => ({
-              [theme.breakpoints.down("md")]: {
-                fontSize: "48px",
-              },
-            })}
-            textAlign="center"
-            fontWeight={700}
-          >
-            FARMYARD ADMIN
-          </Typography>
-        </Box>
-        <LoginForm onSubmit={handleSubmit(loginHandler)} noValidate>
-          <TextField
-            variant="standard"
-            label="Email Address"
-            placeholder="example@example.com"
-            fullWidth
-            type="email"
-            helperText={errors?.email?.message}
-            error={Boolean(errors?.email)}
-            {...register("email")}
+    <>
+      {serverError && (
+        <Alert severity="error" sx={{ borderRadius: "8px" }}>
+          {serverError}
+        </Alert>
+      )}
+      {navigateState?.passwordReset && (
+        <Alert severity="success" sx={{ borderRadius: "8px" }}>
+          Password updated
+        </Alert>
+      )}
+      {navigateState?.forgotPassword && (
+        <Alert severity="success" sx={{ borderRadius: "8px" }}>
+          A password reset link has been sent to {navigateState.forgotPassword}
+        </Alert>
+      )}
+      <Box>
+        <Typography
+          variant="h2"
+          sx={(theme) => ({
+            [theme.breakpoints.down("md")]: {
+              fontSize: "48px",
+            },
+          })}
+          textAlign="center"
+          fontWeight={700}
+        >
+          FARMYARD ADMIN
+        </Typography>
+      </Box>
+      <LoginForm onSubmit={handleSubmit(loginHandler)} noValidate>
+        <TextField
+          variant="standard"
+          label="Email Address"
+          placeholder="example@example.com"
+          fullWidth
+          type="email"
+          helperText={errors?.email?.message}
+          error={Boolean(errors?.email)}
+          {...register("email")}
+        />
+        <TextField
+          variant="standard"
+          label="Password"
+          placeholder="P@ssw0rd!2$"
+          fullWidth
+          type={showPassword ? "text" : "password"}
+          InputProps={{
+            endAdornment: (
+              <IconButton onClick={toggleShowPassword}>
+                {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+              </IconButton>
+            ),
+          }}
+          helperText={errors?.password?.message}
+          error={Boolean(errors?.password)}
+          {...register("password")}
+        />
+        <FormGroup>
+          <FormControlLabel
+            control={<Checkbox onClick={rememberMeHandler} checked={rememberMe} {...register("rememberMe")} />}
+            label="Remember me"
           />
-          <TextField
-            variant="standard"
-            label="Password"
-            placeholder="P@ssw0rd!2$"
-            fullWidth
-            type={showPassword ? "text" : "password"}
-            InputProps={{
-              endAdornment: (
-                <IconButton onClick={toggleShowPassword}>
-                  {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                </IconButton>
-              ),
-            }}
-            helperText={errors?.password?.message}
-            error={Boolean(errors?.password)}
-            {...register("password")}
-          />
-          <FormGroup>
-            <FormControlLabel
-              control={<Checkbox onClick={rememberMeHandler} checked={rememberMe} {...register("rememberMe")} />}
-              label="Remember me"
-            />
-          </FormGroup>
+        </FormGroup>
 
-          <Typography textAlign="center">
-            <Link to="/forgot-password">Forgot Password?</Link>
-          </Typography>
+        <Typography textAlign="center">
+          <Link to="/forgot-password">Forgot Password?</Link>
+        </Typography>
 
-          <Button variant="contained" type="submit" disabled={!isValid || loading}>
-            {loading ? "Loading" : "Login"}
-          </Button>
-        </LoginForm>
-      </Paper>
-      {/* TODO: Refactor modal to seperate component. Style using theme */}
-      <Modal open={modalOpen}>
-        <Box display="flex" justifyContent="space-around" alignItems="center" backgroundColor="red">
-          <Typography id="keep-mounted-modal-title" variant="h6" component="h2">
-            A logout error occurred. If you are on a public computer, we recommend clearing your browser cookies to keep
-            your data safe
-          </Typography>
-          <Button variant="contained" onClick={() => setModalOpen(false)}>
-            Okay
-          </Button>
-        </Box>
-      </Modal>
-    </Box>
+        <Button variant="contained" type="submit" sx={{ mt: "1rem" }} disabled={!isValid || loading}>
+          {loading ? "Loading" : "Login"}
+        </Button>
+      </LoginForm>
+      <LogoutError modalOpen={modalOpen} setModalOpen={setModalOpen} />
+    </>
   );
 };
 

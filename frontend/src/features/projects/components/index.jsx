@@ -1,12 +1,12 @@
 import { Box } from "@mui/material";
 import Header from "@components/display/header";
 
-const Booking = () => {
+const Projects = () => {
   return (
     <Box>
-      <Header title="Bookings" subtitle="Manage your bookings" />
+      <Header title="Projects" subtitle="Never let a project fail again" />
     </Box>
   );
 };
 
-export default Booking;
+export default Projects;

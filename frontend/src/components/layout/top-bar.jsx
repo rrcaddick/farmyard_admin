@@ -48,7 +48,7 @@ const TopBar = ({ sidebarOpen, toggleSideBar, drawerWidth }) => {
         <IconButton
           onClick={toggleSideBar}
           edge="start"
-          color="inherit"
+          color="top-bar"
           sx={{
             marginRight: 5,
             ...(sidebarOpen && { display: "none" }),
@@ -58,16 +58,16 @@ const TopBar = ({ sidebarOpen, toggleSideBar, drawerWidth }) => {
         </IconButton>
         {/* Icons */}
         <Box display="flex" marginLeft="auto">
-          <IconButton type="button" color="inherit" sx={{ p: 1 }} onClick={themeMode.toggleThemeMode}>
+          <IconButton type="button" sx={{ p: 1 }} color="top-bar" onClick={themeMode.toggleThemeMode}>
             {theme.palette.mode === "dark" ? <LightModeOutlinedIcon /> : <DarkModeOutlinedIcon />}
           </IconButton>
-          <IconButton type="button" color="inherit" sx={{ p: 1 }}>
+          <IconButton type="button" sx={{ p: 1 }} color="top-bar">
             <NotificationsOutlinedIcon />
           </IconButton>
-          <IconButton type="button" color="inherit" sx={{ p: 1 }}>
+          <IconButton type="button" sx={{ p: 1 }} color="top-bar">
             <SettingsOutlinedIcon />
           </IconButton>
-          <IconButton type="button" color="inherit" sx={{ p: 1 }} onClick={handleOpen}>
+          <IconButton type="button" sx={{ p: 1 }} color="top-bar" onClick={handleOpen}>
             <PersonOutlinedIcon />
           </IconButton>
           <Menu

@@ -1,6 +1,11 @@
 import { createContext, useState, useMemo } from "react";
 import { createTheme } from "@mui/material/styles";
 
+const getUserModePreference = () => {
+  const { matches: isDarkMode } = window.matchMedia("(prefers-color-scheme: dark)");
+  return isDarkMode ? "dark" : "light";
+};
+
 export const getColors = (mode) => {
   return {
     ...(mode === "dark"
@@ -125,11 +130,19 @@ export const getColors = (mode) => {
 export const themeSettings = (mode) => {
   const primaryFont = "Source Sans Pro";
 
-  return {
-    palette: {
-      mode,
-      ...(mode === "dark"
-        ? {
+  const globalSetting = {
+    typography: {
+      allVariants: {
+        fontFamily: `'${primaryFont}', sans-serif`,
+      },
+    },
+  };
+
+  const themeSettings = {
+    ...(mode === "dark"
+      ? {
+          palette: {
+            mode,
             primary: {
               main: "#70d8bd",
             },
@@ -146,17 +159,11 @@ export const themeSettings = (mode) => {
             text: {
               primary: "#e0e0e0",
             },
-            // components: {
-            //   MuiIconButton: {
-            //     styleOverrides: {
-            //       root: {
-            //         color: "#fff",
-            //       },
-            //     },
-            //   },
-            // },
-          }
-        : {
+          },
+        }
+      : {
+          palette: {
+            mode,
             primary: {
               main: "#00796B",
             },
@@ -170,18 +177,23 @@ export const themeSettings = (mode) => {
               default: "#ececec",
               paper: "#ffffff",
             },
-            components: {
-              MuiIconButton: {
-                styleOverrides: {
-                  root: {
-                    color: "#fff",
-                  },
-                },
+            text: {
+              primary: "#222",
+            },
+          },
+          components: {
+            MuiIconButton: {
+              styleOverrides: {
+                root: ({ ownerState }) => ({
+                  ...(ownerState.color === "top-bar" && { color: "#fff" }),
+                }),
               },
             },
-          }),
-    },
+          },
+        }),
   };
+
+  return Object.assign(globalSetting, themeSettings);
 };
 
 export const ThemeModeContext = createContext({
@@ -189,7 +201,7 @@ export const ThemeModeContext = createContext({
 });
 
 export const useThemeMode = () => {
-  const [mode, setMode] = useState("dark");
+  const [mode, setMode] = useState(getUserModePreference());
 
   const themeMode = useMemo(
     () => ({ toggleThemeMode: () => setMode((prev) => (prev === "light" ? "dark" : "light")) }),

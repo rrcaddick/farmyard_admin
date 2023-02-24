@@ -1,7 +1,11 @@
 import { Login, ForgotPassword, ResetPassword, ProtectedRoutes, IsAuthRedirect } from "@auth/components";
 import Layout from "@components/layout";
-import Booking from "@booking/components";
+import AuthLayout from "@components/layout/auth";
 import Dashboard from "@dashboard/components";
+import Booking from "@booking/components";
+import Finance from "@finance/components";
+import Projects from "@projects/components";
+import Contacts from "@contacts/components";
 
 const authRoutes = [
   {
@@ -24,8 +28,20 @@ const appRoutes = [
     element: <Dashboard />,
   },
   {
-    path: "/booking",
+    path: "/bookings",
     element: <Booking />,
+  },
+  {
+    path: "/finance",
+    element: <Finance />,
+  },
+  {
+    path: "/projects",
+    element: <Projects />,
+  },
+  {
+    path: "/contacts",
+    element: <Contacts />,
   },
 ];
 
@@ -33,7 +49,12 @@ const routes = [
   // Auth routes
   {
     element: <IsAuthRedirect />,
-    children: authRoutes,
+    children: [
+      {
+        element: <AuthLayout />,
+        children: authRoutes,
+      },
+    ],
   },
   // App Routes
   {

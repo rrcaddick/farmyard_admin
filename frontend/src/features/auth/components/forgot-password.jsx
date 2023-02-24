@@ -1,22 +1,15 @@
-import styled from "@emotion/styled";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { Button, TextField, Box, Alert } from "@mui/material";
+import { Button, TextField, Alert } from "@mui/material";
 
 import { useYupValidationResolver } from "@hooks/use-yup-validation-resolver";
 import { forgotPasswordSchema } from "@auth/schemas/forgot-password";
 import { useFetch } from "@hooks/use-fetch";
 
-const ForgotPasswordForm = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-  border-radius: 10px;
-`;
+import ForgotPasswordForm from "@auth/components/auth-form";
 
 const ForgotPassword = () => {
-
   const resolver = useYupValidationResolver(forgotPasswordSchema);
   const {
     handleSubmit,
@@ -40,44 +33,28 @@ const ForgotPassword = () => {
   }, [success, navigate, getValues]);
 
   return (
-    <Box display="flex" justifyContent="center" padding="4rem 2rem">
-      <Box
-        padding="2rem"
-        maxWidth="550px"
-        width="100%"
-        borderRadius="10px"
-        display="flex"
-        flexDirection="column"
-        justifyContent="flex-start"
-      >
-        {serverError && (
-          <Alert severity="error" sx={{ marginBottom: "2rem", borderRadius: "8px" }}>
-            {serverError}
-          </Alert>
-        )}
-        <ForgotPasswordForm onSubmit={handleSubmit(sendLinkHandler)} noValidate>
-          <TextField
-            variant="standard"
-            label="Email Address"
-            placeholder="example@example.com"
-            fullWidth
-            type="email"
-            helperText={errors?.email?.message}
-            error={Boolean(errors?.email)}
-            {...register("email")}
-          />
-          <Button
-            sx={{ marginTop: "2rem" }}
-            variant="contained"
-            color="secondary"
-            type="submit"
-            disabled={!isValid || loading}
-          >
-            {loading ? "Loading" : "Send Password Reset"}
-          </Button>
-        </ForgotPasswordForm>
-      </Box>
-    </Box>
+    <>
+      {serverError && (
+        <Alert severity="error" sx={{ borderRadius: "8px" }}>
+          {serverError}
+        </Alert>
+      )}
+      <ForgotPasswordForm onSubmit={handleSubmit(sendLinkHandler)} noValidate>
+        <TextField
+          variant="standard"
+          label="Email Address"
+          placeholder="example@example.com"
+          fullWidth
+          type="email"
+          helperText={errors?.email?.message}
+          error={Boolean(errors?.email)}
+          {...register("email")}
+        />
+        <Button variant="contained" type="submit" sx={{ mt: "1rem" }} disabled={!isValid || loading}>
+          {loading ? "Loading" : "Send Password Reset"}
+        </Button>
+      </ForgotPasswordForm>
+    </>
   );
 };
 

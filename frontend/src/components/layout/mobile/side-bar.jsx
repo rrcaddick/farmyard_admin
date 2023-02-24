@@ -28,7 +28,7 @@ const SideBar = ({ sidebarOpen, toggleSideBar }) => {
       <Box sx={{ width: "75vw" }} role="presentation" onKeyDown={() => toggleSideBar(false)}>
         <Tabs value={value} onChange={(_, newValue) => setValue(newValue)}>
           <Tab icon={<NavigationIcon />}>
-            <MobileNavigation value={value} />
+            <MobileNavigation value={value} toggleSideBar={toggleSideBar} />
           </Tab>
           <Tab icon={<NotificationsOutlinedIcon />}>
             <Notifications value={value} />
