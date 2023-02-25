@@ -32,7 +32,7 @@ const logoutController = asyncHandler(async (req, res) => {
 
   try {
     // TODO: Decide on keeping refresh tokens in the db
-    if (userId) await User.revokeRefreshToken(userI);
+    if (userId) await User.revokeRefreshToken(userId);
     res.status(200).clearCookie("refreshToken", getCookieOptions(false)).json({
       message: "Succesfully logged out",
     });

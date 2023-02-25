@@ -13,25 +13,10 @@ import { Paper, useMediaQuery, useTheme } from "@mui/material";
 
 const drawerWidth = 240;
 
-// FIXME: Makes background color work
-const MainWrapper = ({ children, themeMode }) => {
-  if (themeMode === "dark")
-    return (
-      <Paper component="main" square={true} elevation={8} sx={{ flexGrow: 1, p: 3 }}>
-        {children}
-      </Paper>
-    );
-
-  return (
-    <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-      {children}
-    </Box>
-  );
-};
-
-const Layout = ({ children }) => {
+const Layout = () => {
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
+  const isLightMode = theme.palette.mode === "light";
 
   const [sidebarOpen, setSideBarOpen] = useState(false);
 
@@ -40,23 +25,27 @@ const Layout = ({ children }) => {
   };
 
   return (
-    <Box sx={{ display: "flex", flexGrow: 1 }}>
+    <Box sx={{ display: "flex", flexGrow: 1, overflow: "hidden" }}>
       {isDesktop ? (
         <>
-          <TopBar sidebarOpen={sidebarOpen} toggleSideBar={toggleSideBar} drawerWidth={drawerWidth} />
-          <SideBar sidebarOpen={sidebarOpen} drawerWidth={drawerWidth} toggleSideBar={toggleSideBar} />
+          <TopBar {...{ sidebarOpen, toggleSideBar, drawerWidth }} />
+          <SideBar {...{ sidebarOpen, drawerWidth, toggleSideBar }} />
         </>
       ) : (
         <>
-          <MobileTopBar sidebarOpen={sidebarOpen} toggleSideBar={toggleSideBar} />
-          <MobileSideBar sidebarOpen={sidebarOpen} toggleSideBar={toggleSideBar} />
+          <MobileTopBar {...{ sidebarOpen, toggleSideBar }} />
+          <MobileSideBar {...{ sidebarOpen, toggleSideBar }} />
         </>
       )}
-
-      <MainWrapper themeMode={theme.palette.mode}>
+      <Paper
+        component="main"
+        square={true}
+        elevation={8}
+        sx={{ flexGrow: 1, p: 3, overflow: "auto", ...(isLightMode && { backgroundColor: "#ececec" }) }}
+      >
         <DrawerHeader />
         <Outlet />
-      </MainWrapper>
+      </Paper>
     </Box>
   );
 };

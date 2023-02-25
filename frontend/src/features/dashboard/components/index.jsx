@@ -11,7 +11,7 @@ const Dashboad = () => {
 
   return (
     <Box>
-      <Header title="Dashboad" subtitle="Information about your business" />
+      <Header title="Dashboard" subtitle="Information about your business" />
     </Box>
   );
 };

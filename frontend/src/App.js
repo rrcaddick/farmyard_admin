@@ -8,8 +8,6 @@ import { useFetch } from "@hooks/use-fetch";
 import { useApolloCache } from "@hooks/use-apollo-cache";
 import { getMe } from "@auth/graphql/queries";
 
-// import Navigation from "@navigation/components";
-
 const rememberMe = getRememberMe();
 
 const App = () => {

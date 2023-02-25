@@ -2,8 +2,12 @@ import { createContext, useState, useMemo } from "react";
 import { createTheme } from "@mui/material/styles";
 
 const getUserModePreference = () => {
+  const mode = localStorage.getItem("themeMode");
+
   const { matches: isDarkMode } = window.matchMedia("(prefers-color-scheme: dark)");
-  return isDarkMode ? "dark" : "light";
+  if (!mode) localStorage.setItem("themeMode", isDarkMode ? "dark" : "light");
+
+  return localStorage.getItem("themeMode");
 };
 
 export const getColors = (mode) => {
@@ -204,7 +208,14 @@ export const useThemeMode = () => {
   const [mode, setMode] = useState(getUserModePreference());
 
   const themeMode = useMemo(
-    () => ({ toggleThemeMode: () => setMode((prev) => (prev === "light" ? "dark" : "light")) }),
+    () => ({
+      toggleThemeMode: () =>
+        setMode((prev) => {
+          const newMode = prev === "light" ? "dark" : "light";
+          localStorage.setItem("themeMode", newMode);
+          return newMode;
+        }),
+    }),
     []
   );
 
