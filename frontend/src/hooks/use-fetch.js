@@ -29,12 +29,12 @@ const useFetch = (onComplete) => {
         if (!response.ok) {
           const { message } = await response.json();
           setServerError(message);
-          return response;
+          return { message, success: false };
         } else {
           const responseData = await response.json();
           onComplete && onComplete(responseData);
           setSuccess(true);
-          return responseData;
+          return { data: responseData, success: true };
         }
       } catch (err) {
         setServerError("Something went wrong. Please try again");

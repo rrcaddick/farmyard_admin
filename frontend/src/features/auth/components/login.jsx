@@ -60,10 +60,10 @@ const Login = () => {
   };
 
   const loginHandler = async (loginData) => {
-    const userData = await sendRequest("POST", "/login", loginData);
+    const response = await sendRequest("POST", "/login", loginData);
 
     // Write user to apollo cache
-    cache.write(getMe, "User", userData);
+    response.success && cache.write(getMe, "User", response.data);
   };
 
   useEffect(() => {

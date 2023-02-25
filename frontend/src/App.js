@@ -21,10 +21,10 @@ const App = ({ rememberMe }) => {
     if (rememberMe) {
       (async () => {
         // Attempt login with refresh token
-        const userData = await sendRequest("POST", "/login", { rememberMe });
+        const response = await sendRequest("POST", "/login", { rememberMe });
 
         // Write user to apollo cache
-        userData && cache.write(getMe, "User", userData);
+        response.success && cache.write(getMe, "User", response.data);
         endLoading();
       })();
     }

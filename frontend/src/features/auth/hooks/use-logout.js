@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect } from "react";
+import { useCallback, useContext } from "react";
 import { useApolloClient } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
 import { useFetch } from "@hooks/use-fetch";
@@ -13,12 +13,12 @@ const useLogout = () => {
 
   const logout = useCallback(async () => {
     startLoading();
-    const response = await sendRequest("GET", "/logout");
+    const { success } = await sendRequest("GET", "/logout");
     client.clearStore();
     client.setToken = undefined;
     removeRememberMe(true);
 
-    if (!response.ok) {
+    if (!success) {
       navigate("/login", { state: { logoutError: true } });
     } else {
       navigate("/login");
