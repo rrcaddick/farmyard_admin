@@ -5,7 +5,8 @@
       "port": 9222,
       "request": "attach",
       "type": "chrome",
-      "webRoot": "${workspaceFolder}/frontend"
+      "webRoot": "${workspaceFolder}/frontend",
+      "skipFiles": ["${workspaceFolder}/<node_internals>/**", "${workspaceFolder}/node_modules/**"]
     },
     {
       "name": "Attach to Node",

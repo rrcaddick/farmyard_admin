@@ -1,42 +1,30 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useContext, useEffect } from "react";
 import { useApolloClient } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
 import { useFetch } from "@hooks/use-fetch";
 import { removeRememberMe } from "@utils/auth";
+import { LoadingContext } from "@context/loading";
 
 const useLogout = () => {
   const client = useApolloClient();
   const navigate = useNavigate();
-  const { sendRequest, loading, success, serverError } = useFetch();
+  const { sendRequest } = useFetch();
+  const { startLoading, endLoading } = useContext(LoadingContext);
 
   const logout = useCallback(async () => {
-    await sendRequest("GET", "/logout");
-  }, [sendRequest]);
+    startLoading();
+    const response = await sendRequest("GET", "/logout");
+    client.clearStore();
+    client.setToken = undefined;
+    removeRememberMe(true);
 
-  useEffect(() => {
-    if (loading) {
-      // TODO: Add context to show loading screen
-    }
-
-    if (success || serverError) {
-      client.clearStore();
-      client.setToken = undefined;
-      removeRememberMe(true);
-    }
-
-    if (success) {
-      // Normal navigate to login
+    if (!response.ok) {
+      navigate("/login", { state: { logoutError: true } });
+    } else {
       navigate("/login");
     }
-
-    if (serverError) {
-      // Modal warning to clear cookies
-      // FIXME - Setting timeout seems to be the only way to pass state on android chrome
-      setTimeout(() => {
-        navigate("/login", { state: { logoutError: true } });
-      }, 1);
-    }
-  }, [loading, success, serverError, client, navigate]);
+    endLoading();
+  }, [sendRequest, endLoading, navigate, startLoading, client]);
 
   return logout;
 };

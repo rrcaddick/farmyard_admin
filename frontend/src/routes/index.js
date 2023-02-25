@@ -6,6 +6,7 @@ import Booking from "@booking/components";
 import Finance from "@finance/components";
 import Projects from "@projects/components";
 import Contacts from "@contacts/components";
+import Loading from "@components/loading";
 
 const authRoutes = [
   {
@@ -48,29 +49,34 @@ const appRoutes = [
 const routes = [
   // Auth routes
   {
-    element: <IsAuthRedirect />,
+    element: <Loading />,
     children: [
       {
-        element: <AuthLayout />,
-        children: authRoutes,
+        element: <IsAuthRedirect />,
+        children: [
+          {
+            element: <AuthLayout />,
+            children: authRoutes,
+          },
+        ],
       },
-    ],
-  },
-  // App Routes
-  {
-    element: <ProtectedRoutes />,
-    children: [
+      // App Routes
       {
-        element: <Layout />,
-        children: appRoutes,
+        element: <ProtectedRoutes />,
+        children: [
+          {
+            element: <Layout />,
+            children: appRoutes,
+          },
+        ],
+      },
+      // Not Found
+      // TODO: Add 404 not found with lottie sheep
+      {
+        path: "*",
+        element: "Not found",
       },
     ],
-  },
-  // Not Found
-  // TODO: Add 404 not found with lottie sheep
-  {
-    path: "*",
-    element: "Not found",
   },
 ];
 
