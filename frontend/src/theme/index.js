@@ -140,6 +140,19 @@ export const themeSettings = (mode) => {
         fontFamily: `'${primaryFont}', sans-serif`,
       },
     },
+    mixins: {
+      content: {
+        "@media (min-width:0px)": {
+          "@media (orientation: landscape)": {
+            marginTop: "48px",
+          },
+        },
+        "@media (min-width:600px)": {
+          marginTop: "64px",
+        },
+        marginTop: "56px",
+      },
+    },
   };
 
   const themeSettings = {

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Outlet } from "react-router-dom";
 
 import Box from "@mui/material/Box";
@@ -9,14 +9,14 @@ import SideBar from "@components/layout/side-bar";
 import MobileSideBar from "@components/layout/mobile/side-bar";
 import DrawerHeader from "@components/layout/drawer-header";
 
-import { Paper, useMediaQuery, useTheme } from "@mui/material";
+import { Paper } from "@mui/material";
+import { useIsDesktop } from "@hooks/use-is-desktop";
 
 const drawerWidth = 240;
 
 const Layout = () => {
-  const theme = useTheme();
-  const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
-  const isLightMode = theme.palette.mode === "light";
+  const isDesktop = useIsDesktop();
+  const container = useRef();
 
   const [sidebarOpen, setSideBarOpen] = useState(false);
 
@@ -40,11 +40,20 @@ const Layout = () => {
       <Paper
         component="main"
         square={true}
-        elevation={8}
-        sx={{ flexGrow: 1, p: 3, overflow: "auto", ...(isLightMode && { backgroundColor: "#ececec" }) }}
+        elevation={20}
+        ref={container}
+        sx={{
+          position: "relative",
+          display: "flex",
+          flexDirection: "column",
+          flexGrow: 1,
+          p: isDesktop ? 3 : 1.5,
+          overflow: "auto",
+          backgroundColor: "background.default",
+        }}
       >
         <DrawerHeader />
-        <Outlet />
+        <Outlet context={{ container }} />
       </Paper>
     </Box>
   );

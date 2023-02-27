@@ -7,6 +7,7 @@ import Finance from "@finance/components";
 import Projects from "@projects/components";
 import Contacts from "@contacts/components";
 import Loading from "@components/loading";
+import _404 from "@components/404";
 
 const authRoutes = [
   {
@@ -74,7 +75,7 @@ const routes = [
       // TODO: Add 404 not found with lottie sheep
       {
         path: "*",
-        element: "Not found",
+        element: <_404 />,
       },
     ],
   },
