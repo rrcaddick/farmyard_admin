@@ -1,22 +1,24 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form";
-import { Button, TextField, Alert } from "@mui/material";
+import { FormProvider, useForm } from "react-hook-form";
+import { Button, Alert } from "@mui/material";
 
 import { useYupValidationResolver } from "@hooks/use-yup-validation-resolver";
 import { forgotPasswordSchema } from "@auth/schemas/forgot-password";
 import { useFetch } from "@hooks/use-fetch";
 
 import ForgotPasswordForm from "@auth/components/auth-form";
+import TextInput from "@components/input/text-input";
 
 const ForgotPassword = () => {
   const resolver = useYupValidationResolver(forgotPasswordSchema);
+  const formMethods = useForm({ resolver, mode: "all", defaultValues: { email: "rrcaddick@gmail.com" } });
+
   const {
     handleSubmit,
-    register,
     getValues,
-    formState: { isValid, errors },
-  } = useForm({ resolver, mode: "all", defaultValues: { email: "rrcaddick@gmail.com" } });
+    formState: { isValid },
+  } = formMethods;
 
   const navigate = useNavigate();
 
@@ -39,21 +41,14 @@ const ForgotPassword = () => {
           {serverError}
         </Alert>
       )}
-      <ForgotPasswordForm onSubmit={handleSubmit(sendLinkHandler)} noValidate>
-        <TextField
-          variant="standard"
-          label="Email Address"
-          placeholder="example@example.com"
-          fullWidth
-          type="email"
-          helperText={errors?.email?.message}
-          error={Boolean(errors?.email)}
-          {...register("email")}
-        />
-        <Button variant="contained" type="submit" sx={{ mt: "1rem" }} disabled={!isValid || loading}>
-          {loading ? "Loading" : "Send Password Reset"}
-        </Button>
-      </ForgotPasswordForm>
+      <FormProvider {...formMethods}>
+        <ForgotPasswordForm onSubmit={handleSubmit(sendLinkHandler)} noValidate>
+          <TextInput name="email" type="email" label="Email Address" placeholder="example@example.com" />
+          <Button variant="contained" type="submit" sx={{ mt: "1rem" }} disabled={!isValid || loading}>
+            {loading ? "Loading" : "Send Password Reset"}
+          </Button>
+        </ForgotPasswordForm>
+      </FormProvider>
     </>
   );
 };

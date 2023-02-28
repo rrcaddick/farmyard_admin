@@ -23,9 +23,10 @@ const ConainedModal = ({ children, open, close, container, containerProps, ...pr
 
   const defaultContainerProps = useMemo(
     () => ({
-      elevation: 200,
       sx: {
+        elevation: 24,
         display: "flex",
+        flexDirection: "column",
         flexGrow: 1,
         backgroundColor: "background.default",
         borderRadius: "5px",
@@ -47,8 +48,7 @@ const ConainedModal = ({ children, open, close, container, containerProps, ...pr
         <IconButton
           onClick={close}
           sx={{
-            position: "absolute",
-            right: theme.spacing(isDesktop ? 2 : 1),
+            marginLeft: "auto",
           }}
         >
           <CloseIcon />
