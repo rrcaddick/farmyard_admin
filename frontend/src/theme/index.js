@@ -1,5 +1,6 @@
 import { createContext, useState, useMemo } from "react";
 import { createTheme } from "@mui/material/styles";
+import _ from "lodash";
 
 const getUserModePreference = () => {
   const mode = localStorage.getItem("themeMode");
@@ -140,6 +141,13 @@ export const themeSettings = (mode) => {
         fontFamily: `'${primaryFont}', sans-serif`,
       },
     },
+    components: {
+      MuiDateCalendar: {
+        styleOverrides: {
+          root: { margin: 0 },
+        },
+      },
+    },
     mixins: {
       content: {
         "@media (min-width:0px)": {
@@ -210,7 +218,7 @@ export const themeSettings = (mode) => {
         }),
   };
 
-  return Object.assign(globalSetting, themeSettings);
+  return _.merge(globalSetting, themeSettings);
 };
 
 export const ThemeModeContext = createContext({

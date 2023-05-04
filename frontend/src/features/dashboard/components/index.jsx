@@ -1,17 +1,15 @@
 import { useQuery } from "@apollo/client";
 import { getMe } from "@auth/graphql/queries";
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import Header from "@components/display/header";
 
 const Dashboad = () => {
-  const { loading, error, data } = useQuery(getMe);
-
-  if (loading) return "Loading...";
-  if (error) return `Error! ${error.message}`;
-
   return (
-    <Box>
-      <Header title="Dashboard" subtitle="Information about your business" />
+    <Box display="flex" flexDirection="column" flexGrow={1} backgroundColor="green" padding={2}>
+      <Box display="flex" flexGrow={1} backgroundColor="blue">
+        <Box flex={2}></Box>
+        <Box flex={3}></Box>
+      </Box>
     </Box>
   );
 };

@@ -14,6 +14,7 @@ const globalStyles = (theme) => ({
     flexDirection: "column",
     flexGrow: 1,
   },
+
   "::-webkit-scrollbar": {
     width: "10px",
   },

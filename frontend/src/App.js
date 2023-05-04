@@ -8,6 +8,8 @@ import { useApolloCache } from "@hooks/use-apollo-cache";
 import { getMe } from "@auth/graphql/queries";
 import { globalStyles } from "@theme/global-styles";
 import { LoadingContext } from "@context/loading";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 const App = ({ rememberMe }) => {
   const [theme, themeMode] = useThemeMode();
@@ -33,9 +35,11 @@ const App = ({ rememberMe }) => {
   return (
     <ThemeModeContext.Provider value={themeMode}>
       <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <GlobalStyles styles={globalStyles} />
-        {routes}
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <CssBaseline />
+          <GlobalStyles styles={globalStyles} />
+          {routes}
+        </LocalizationProvider>
       </ThemeProvider>
     </ThemeModeContext.Provider>
   );

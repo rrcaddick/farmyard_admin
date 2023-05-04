@@ -1,7 +1,7 @@
 import { Fab } from "@mui/material";
 import Header from "@components/display/header";
 import AddIcon from "@mui/icons-material/Add";
-import NewBooking from "./new-booking";
+import NewBooking from "@booking/components/new-booking/new-booking";
 import { useOutletContext } from "react-router-dom";
 import { useState } from "react";
 
