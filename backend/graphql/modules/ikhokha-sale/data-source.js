@@ -1,4 +1,4 @@
-const { MongoDataSource } = require("apollo-datasource-mongodb");
+const { MongoDataSource } = require("../../data-source/mongo-data-source");
 const { IkhokhaSale } = require("../../../models/ikhokha-sale");
 const { ikhokhaService } = require("../../../services/ikhokha");
 

@@ -7,11 +7,16 @@ const bookingSchema = new Schema(
       _id: { type: Schema.Types.ObjectId, ref: "User", required: true },
       name: { type: String, required: true },
     },
+    bookedBy: {
+      _id: { type: Schema.Types.ObjectId, ref: "Contact", required: true },
+      name: { type: String, required: true },
+    },
     group: {
       _id: { type: Schema.Types.ObjectId, ref: "Group", required: true },
       name: { type: String, required: true },
-      type: {
-        group: { type: String, required: true },
+      groupType: {
+        id: { type: Schema.Types.ObjectId, ref: "GroupType", required: true },
+        type: { type: String, required: true },
       },
       address: {
         street: { type: String, required: true },

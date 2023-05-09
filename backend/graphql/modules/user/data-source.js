@@ -1,4 +1,4 @@
-const { MongoDataSource } = require("apollo-datasource-mongodb");
+const { MongoDataSource } = require("../../data-source/mongo-data-source");
 const { User } = require("../../../models/user");
 
 class UserSource extends MongoDataSource {

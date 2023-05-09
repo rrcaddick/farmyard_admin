@@ -1,4 +1,4 @@
-const { MongoDataSource } = require("apollo-datasource-mongodb");
+const { MongoDataSource } = require("../../data-source/mongo-data-source");
 const { QuicketSale } = require("../../../models/quicket-sale");
 const { quicketService } = require("../../../services/quicket");
 
