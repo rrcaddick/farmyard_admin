@@ -1,18 +1,33 @@
 const { Schema, model } = require("mongoose");
+const dayjs = require("dayjs");
 
 const bookingSchema = new Schema(
   {
-    date: { type: Long, required: true },
+    date: { type: Number, required: true },
     createdBy: {
-      _id: { type: Schema.Types.ObjectId, ref: "User", required: true },
+      user: { type: Schema.Types.ObjectId, ref: "User", required: true },
       name: { type: String, required: true },
     },
     bookedBy: {
-      _id: { type: Schema.Types.ObjectId, ref: "Contact", required: true },
+      contact: { type: Schema.Types.ObjectId, ref: "Contact", required: true },
       name: { type: String, required: true },
     },
+    status: {
+      type: String,
+      enum: [
+        "Created",
+        "Awaiting Confirmation",
+        "Confirmed",
+        "Awaiting Deposit",
+        "Deposit Paid",
+        "Completed",
+        "Canceled",
+      ],
+      default: "Created",
+      required: true,
+    },
     group: {
-      _id: { type: Schema.Types.ObjectId, ref: "Group", required: true },
+      id: { type: Schema.Types.ObjectId, ref: "Group", required: true },
       name: { type: String, required: true },
       groupType: {
         id: { type: Schema.Types.ObjectId, ref: "GroupType", required: true },
@@ -23,6 +38,7 @@ const bookingSchema = new Schema(
         suburb: { type: String, required: true },
         postCode: { type: Number, required: true },
       },
+      // TODO: Should contacts be stored on bookoing?
     },
     visitors: {
       total: { type: Number, required: true },
@@ -32,31 +48,32 @@ const bookingSchema = new Schema(
       todlers: { type: Number },
     },
     price: {
-      _id: { type: Schema.Types.ObjectId, ref: "Price", required: true },
+      id: { type: Schema.Types.ObjectId, ref: "Price", required: true },
       type: { type: String, required: true },
       amount: { type: Number, required: true },
       total: { type: Number, required: true },
     },
     comments: [
       {
-        createdAt: { type: Long, required: true },
+        createdAt: { type: Number, required: true, default: Date.now() },
         comment: { type: String, required: true },
-        user: {
-          _id: { type: Schema.Types.ObjectId, ref: "User", required: true },
+        createdBy: {
+          user: { type: Schema.Types.ObjectId, ref: "User", required: true },
           name: { type: String, required: true },
         },
       },
     ],
     activity: [
       {
-        createdAt: { type: Long, required: true },
+        createdAt: { type: Number, required: true, default: Date.now() },
         action: { type: String, required: true },
-        user: {
-          _id: { type: Schema.Types.ObjectId, ref: "User", required: true },
+        actionedBy: {
+          user: { type: Schema.Types.ObjectId, ref: "User", required: true },
           name: { type: String, required: true },
         },
       },
     ],
+    deleted: { type: Boolean, default: false, required: true, index: true },
   },
   { timestamps: true }
 );

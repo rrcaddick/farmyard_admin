@@ -7,7 +7,7 @@ const typeDefs = gql`
   }
 
   type Mutation {
-    createContact(input: createContactInput!, groupId: ID!): Contact
+    createContact(input: createContactInput!, groupId: ID): Contact
   }
 
   type Contact {

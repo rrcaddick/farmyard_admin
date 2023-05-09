@@ -4,7 +4,8 @@ const resolvers = {
     getBookings: (root, args, { dataSources: { bookingSource } }) => bookingSource.getBookings(),
   },
   Mutation: {
-    createBooking: (root, { input }, { dataSources: { bookingSource } }) => bookingSource.createBooking(input),
+    createBooking: (root, { input }, { userId, dataSources: { bookingSource } }) =>
+      bookingSource.createBooking(input, userId),
   },
 };
 

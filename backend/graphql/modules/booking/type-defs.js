@@ -13,26 +13,43 @@ const typeDefs = gql`
   type Booking {
     id: ID
     date: Int!
-    createdBy: CreateBy!
-    bookedBy: Contact!
-    group: Group
+    createdBy: CreatedBy
+    bookedBy: BookingContact
+    group: BookingGroup
     visitors: Visitors
     price: BookingPrice
     comments: [Comment]!
     activity: [Activity]!
   }
 
-  type CreateBy {
-    id: ID
+  type CreatedBy {
+    user: User
     name: String!
   }
 
+  type BookingContact {
+    contact: Contact
+    name: String
+  }
+
+  type BookingGroup {
+    id: ID
+    name: String!
+    groupType: BookingGroupType
+    address: Address
+  }
+
+  type BookingGroupType {
+    id: ID
+    type: String
+  }
+
   type Visitors {
-    total: Number!
-    adults: Number
-    youth: Number
-    kids: Number
-    todlers: Number
+    total: Int!
+    adults: Int
+    youth: Int
+    kids: Int
+    todlers: Int
   }
 
   type BookingPrice {
@@ -56,9 +73,53 @@ const typeDefs = gql`
 
   input CreateBookingInput {
     date: Int
-    createdBy: User
-    bookedBy: Contact
-    group
+    bookedBy: BookingContactInput
+    status: String
+    group: BookingGroupInput
+    visitors: BookingVisitorsInput
+    price: BookingPriceInput
+    comments: [BookingCommentsInput]
+    activity: [BookingActivityInput]
+  }
+
+  input BookingContactInput {
+    contact: ID
+    name: String
+  }
+
+  input BookingGroupInput {
+    id: ID
+    name: String
+    groupType: BookingGroupTypeInput
+    address: AddressInput
+  }
+
+  input BookingGroupTypeInput {
+    id: ID
+    type: String
+  }
+
+  input BookingVisitorsInput {
+    total: Int
+    adults: Int
+    youth: Int
+    kids: Int
+    todlers: Int
+  }
+
+  input BookingPriceInput {
+    id: ID
+    type: String
+    amount: Int
+    total: Int
+  }
+
+  input BookingCommentsInput {
+    comment: String
+  }
+
+  input BookingActivityInput {
+    action: String
   }
 `;
 
