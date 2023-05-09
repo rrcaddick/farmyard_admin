@@ -7,11 +7,11 @@ class GroupTypeSource extends MongoDataSource {
   }
 
   async getGroupType(groupTypeId) {
-    return await this.findOneById(groupTypeId).populate("price");
+    return this.executeWithGraphqlProjection(this.model.findById(groupTypeId));
   }
 
   async getGroupTypes() {
-    return await this.model.find().populate("price");
+    return this.executeWithGraphqlProjection(this.model.find());
   }
 }
 

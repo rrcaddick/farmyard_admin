@@ -16,7 +16,7 @@ class ContactSource extends MongoDataSource {
 
   async createContact(newContact, groupId = null) {
     const [contact] = await this.model.create([newContact], { groupId });
-    return contact;
+    return this.executeWithGraphqlProjection(contact);
   }
 }
 
