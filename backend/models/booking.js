@@ -1,5 +1,5 @@
 const { Schema, model } = require("mongoose");
-const dayjs = require("dayjs");
+const { getUnixEpochSeconds } = require("../utils/date");
 
 const bookingSchema = new Schema(
   {
@@ -55,7 +55,7 @@ const bookingSchema = new Schema(
     },
     comments: [
       {
-        createdAt: { type: Number, required: true, default: Date.now() },
+        createdAt: { type: Number, required: true, default: getUnixEpochSeconds() },
         comment: { type: String, required: true },
         createdBy: {
           user: { type: Schema.Types.ObjectId, ref: "User", required: true },
@@ -65,9 +65,9 @@ const bookingSchema = new Schema(
     ],
     activity: [
       {
-        createdAt: { type: Number, required: true, default: Date.now() },
+        createdAt: { type: Number, required: true, default: getUnixEpochSeconds() },
         action: { type: String, required: true },
-        actionedBy: {
+        createdBy: {
           user: { type: Schema.Types.ObjectId, ref: "User", required: true },
           name: { type: String, required: true },
         },

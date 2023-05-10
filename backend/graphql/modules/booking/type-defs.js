@@ -62,13 +62,13 @@ const typeDefs = gql`
   type Comment {
     createdAt: Int
     comment: String
-    user: User
+    createdBy: CreatedBy
   }
 
   type Activity {
     createdAt: Int
     action: String
-    user: User
+    createdBy: CreatedBy
   }
 
   input CreateBookingInput {

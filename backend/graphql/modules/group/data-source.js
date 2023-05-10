@@ -15,8 +15,7 @@ class GroupSource extends MongoDataSource {
   }
 
   async createGroup(group) {
-    const newGroup = await this.model.create(group);
-    return this.executeWithGraphqlProjection(newGroup);
+    return this.executeWithGraphqlProjection(await this.model.create(group));
   }
 }
 

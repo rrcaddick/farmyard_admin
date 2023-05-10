@@ -1,6 +1,5 @@
 const { MongoDataSource } = require("../../data-source/mongo-data-source");
 const { Booking } = require("../../../models/booking");
-const { User } = require("../../../models/user");
 
 class BookingSource extends MongoDataSource {
   constructor() {
@@ -16,11 +15,16 @@ class BookingSource extends MongoDataSource {
   }
 
   async createBooking(input, userId) {
-    const { name } = await User.findById(userId);
+    const booking = await this.addCreatedBy(input, userId);
+    const { createdBy } = booking;
 
-    const booking = { createdBy: { user: userId, name }, ...input };
+    booking.comments.forEach((comment) => {
+      this.addCreatedBy(comment, userId, createdBy);
+    });
 
-    booking.activity[0].actionedBy = { user: userId, name };
+    booking.activity.forEach((action) => {
+      this.addCreatedBy(action, userId, createdBy);
+    });
 
     return await this.model.create(booking);
   }
