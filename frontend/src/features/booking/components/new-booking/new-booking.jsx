@@ -1,4 +1,4 @@
-import { useMemo, useRef } from "react";
+import { useRef } from "react";
 import styled from "@emotion/styled";
 import Typography from "@mui/material/Typography";
 import ContainedModal from "@components/modal/contained-modal";
@@ -10,13 +10,12 @@ import { useYupValidationResolver } from "@hooks/use-yup-validation-resolver";
 import { newBookingSchema } from "@booking/schemas/new-booking";
 import TextInput from "@components/input/text-input";
 import CalendarPicker from "@components/input/calendar-picker";
-import { Box, Button, Divider, Fab, IconButton, List, ListItem, ListItemText, Paper, TextField } from "@mui/material";
+import { Box } from "@mui/material";
 import NumberInput from "@components/input/number-input";
 import { useStepValidator } from "@components/stepper/hooks/useStepValidator";
-import BookingsBarGraph from "@components/graph/bar-graph";
-import PoolSunburst from "@components/graph/sun-burst";
-import { testData } from "../../../../testdata";
-import { data as sunBurstData } from "../../../../sunburst-test-data";
+// import BookingsBarGraph from "@components/graph/bar-graph";
+// import PoolSunburst from "@components/graph/sun-burst";
+// import { data as sunBurstData } from "../../../../sunburst-test-data";
 
 import GroupSelection from "./group-selection";
 
@@ -28,33 +27,33 @@ const Form = styled.form`
   overflow: hidden;
 `;
 
-const groupTypeOptions = [
-  { id: "1", text: "School" },
-  { id: "2", text: "Church" },
-  { id: "3", text: "NPO" },
-  { id: "4", text: "Organization" },
-  { id: "5", text: "Other Religious" },
-  { id: "6", text: "Other" },
-];
+// const groupTypeOptions = [
+//   { id: "1", text: "School" },
+//   { id: "2", text: "Church" },
+//   { id: "3", text: "NPO" },
+//   { id: "4", text: "Organization" },
+//   { id: "5", text: "Other Religious" },
+//   { id: "6", text: "Other" },
+// ];
 
-const ageGroupOptions = [
-  { id: 1, text: "Preschool", groupType: [1] },
-  { id: 2, text: "Primary School G1-3", groupType: [1] },
-  { id: 3, text: "Primary School G4-7", groupType: [1] },
-  { id: 4, text: "Primary School G1-7", groupType: [1] },
-  { id: 5, text: "High School", groupType: [1] },
-  { id: 6, text: "Special Needs", groupType: [1] },
-  { id: 7, text: "Disability", groupType: [1] },
-  { id: 8, text: "Sunday School", groupType: [2] },
-  { id: 12, text: "Children", groupType: [3, 5, 6] },
-  { id: 9, text: "Youth", groupType: [2, 3, 5, 6] },
-  { id: 10, text: "Adult", groupType: [2, 3, 5, 6] },
-  { id: 11, text: "Family", groupType: [2, 3, 4, 5, 6] },
-  { id: 13, text: "Sports - Children", groupType: [4] },
-  { id: 14, text: "Sports - Youth", groupType: [4] },
-  { id: 15, text: "Corporate", groupType: [4] },
-  { id: 16, text: "Government", groupType: [4] },
-];
+// const ageGroupOptions = [
+//   { id: 1, text: "Preschool", groupType: [1] },
+//   { id: 2, text: "Primary School G1-3", groupType: [1] },
+//   { id: 3, text: "Primary School G4-7", groupType: [1] },
+//   { id: 4, text: "Primary School G1-7", groupType: [1] },
+//   { id: 5, text: "High School", groupType: [1] },
+//   { id: 6, text: "Special Needs", groupType: [1] },
+//   { id: 7, text: "Disability", groupType: [1] },
+//   { id: 8, text: "Sunday School", groupType: [2] },
+//   { id: 12, text: "Children", groupType: [3, 5, 6] },
+//   { id: 9, text: "Youth", groupType: [2, 3, 5, 6] },
+//   { id: 10, text: "Adult", groupType: [2, 3, 5, 6] },
+//   { id: 11, text: "Family", groupType: [2, 3, 4, 5, 6] },
+//   { id: 13, text: "Sports - Children", groupType: [4] },
+//   { id: 14, text: "Sports - Youth", groupType: [4] },
+//   { id: 15, text: "Corporate", groupType: [4] },
+//   { id: 16, text: "Government", groupType: [4] },
+// ];
 
 const NewBooking = ({ open, close, container }) => {
   const formRef = useRef();
@@ -63,11 +62,11 @@ const NewBooking = ({ open, close, container }) => {
 
   const { handleSubmit, trigger, watch } = formMethods;
 
-  const groupType = watch("groupType");
-  const options = useMemo(
-    () => ageGroupOptions.filter((option) => option.groupType.includes(Number(groupType))),
-    [groupType]
-  );
+  // const groupType = watch("groupType");
+  // const options = useMemo(
+  //   () => ageGroupOptions.filter((option) => option.groupType.includes(Number(groupType))),
+  //   [groupType]
+  // );
 
   const submitHandler = (data) => {
     console.log(data);

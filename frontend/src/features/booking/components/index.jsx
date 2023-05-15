@@ -36,7 +36,7 @@ const Booking = () => {
   };
 
   return (
-    <Box flexGrow={1} position="relative" display="flex" flexDirection="column">
+    <Box flexGrow={1} position="relative" display="flex" flexDirection="column" overflow="hidden">
       <Header title="Bookings" subtitle="Manage your bookings" />
       <NewBooking open={openNewBooking} container={container} close={closeNewBookingHandler} />
       <Fab
@@ -47,7 +47,6 @@ const Booking = () => {
         <AddIcon />
       </Fab>
 
-      {/* <BasicTable /> */}
       <GroupTable {...{ columns, data, selectedRowId: selectedGroup?.id, setSelectedRow }} />
     </Box>
   );
