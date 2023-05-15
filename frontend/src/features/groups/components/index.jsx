@@ -21,6 +21,10 @@ const columns = [
     label: "Suburb",
     dataKey: "suburb",
   },
+  {
+    label: "Post Code",
+    dataKey: "postCode",
+  },
 ];
 
 const Booking = () => {
@@ -36,8 +40,8 @@ const Booking = () => {
   };
 
   return (
-    <Box flexGrow={1} position="relative" display="flex" flexDirection="column">
-      <Header title="Bookings" subtitle="Manage your bookings" />
+    <Box flexGrow={1} position="relative">
+      <Header title="Groups" subtitle="View, Change or Add new groups" />
       <NewBooking open={openNewBooking} container={container} close={closeNewBookingHandler} />
       <Fab
         color="primary"
@@ -46,8 +50,6 @@ const Booking = () => {
       >
         <AddIcon />
       </Fab>
-
-      {/* <BasicTable /> */}
       <GroupTable {...{ columns, data, selectedRowId: selectedGroup?.id, setSelectedRow }} />
     </Box>
   );

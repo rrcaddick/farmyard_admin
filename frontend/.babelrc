@@ -21,7 +21,8 @@
           "@user": "./src/features/user",
           "@finance": "./src/features/finance",
           "@projects": "./src/features/projects",
-          "@contacts": "./src/features/contacts"
+          "@contacts": "./src/features/contacts",
+          "@groups": "./src/features/groups"
         }
       }
     ]

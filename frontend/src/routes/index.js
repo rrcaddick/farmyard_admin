@@ -6,6 +6,7 @@ import Booking from "@booking/components";
 import Finance from "@finance/components";
 import Projects from "@projects/components";
 import Contacts from "@contacts/components";
+import Groups from "@groups/components";
 import Loading from "@components/loading";
 import _404 from "@components/404";
 
@@ -42,10 +43,15 @@ const appRoutes = [
     element: <Projects />,
   },
   {
+    path: "/groups",
+    element: <Groups />,
+  },
+  {
     path: "/contacts",
     element: <Contacts />,
   },
 ];
+
 
 const routes = [
   // Auth routes

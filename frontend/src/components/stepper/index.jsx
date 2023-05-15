@@ -54,8 +54,6 @@ const HorizontalStepper = ({ onComplete = null, children }) => {
 
   const stepsComplete = activeStep === stepLabels.length;
 
-  console.log(!isValid[activeStep]);
-
   return (
     <>
       <Stepper activeStep={activeStep} alternativeLabel>
@@ -65,7 +63,7 @@ const HorizontalStepper = ({ onComplete = null, children }) => {
           </Step>
         ))}
       </Stepper>
-      <Box display="flex" flexDirection="column" flexGrow={1}>
+      <Box display="flex" flexDirection="column" flexGrow={1} overflow="hidden">
         {Children.map(children, (child) => {
           if (stepsComplete && child.type.name === "CompleteStep") return child;
           const stepChild = cloneElement(child, { ...child.props, step: stepIndex });
@@ -80,6 +78,7 @@ const HorizontalStepper = ({ onComplete = null, children }) => {
         <Button
           variant="contained"
           disabled={!isValid[activeStep]}
+          sx={{ fontWeight: 900 }}
           onClick={stepsComplete ? onCompletHandler : nextHandler}
         >
           {stepsComplete ? buttonLabel : "Next"}

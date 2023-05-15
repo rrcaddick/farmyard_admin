@@ -1,6 +1,7 @@
 import { createContext, useState, useMemo } from "react";
 import { createTheme } from "@mui/material/styles";
 import _ from "lodash";
+import { addHexOpacity } from "@utils/style";
 
 const getUserModePreference = () => {
   const mode = localStorage.getItem("themeMode");
@@ -135,36 +136,8 @@ export const getColors = (mode) => {
 export const themeSettings = (mode) => {
   const primaryFont = "Source Sans Pro";
 
-  const globalSetting = {
-    typography: {
-      allVariants: {
-        fontFamily: `'${primaryFont}', sans-serif`,
-      },
-    },
-    components: {
-      MuiDateCalendar: {
-        styleOverrides: {
-          root: { margin: 0 },
-        },
-      },
-    },
-    mixins: {
-      content: {
-        "@media (min-width:0px)": {
-          "@media (orientation: landscape)": {
-            marginTop: "48px",
-          },
-        },
-        "@media (min-width:600px)": {
-          marginTop: "64px",
-        },
-        marginTop: "56px",
-      },
-    },
-  };
-
-  const themeSettings = {
-    ...(mode === "dark"
+  const colors =
+    mode === "dark"
       ? {
           palette: {
             mode,
@@ -206,6 +179,13 @@ export const themeSettings = (mode) => {
               primary: "#222",
             },
           },
+        };
+
+  const themeSettings = {
+    ...colors,
+    ...(mode === "dark"
+      ? {}
+      : {
           components: {
             MuiIconButton: {
               styleOverrides: {
@@ -216,6 +196,56 @@ export const themeSettings = (mode) => {
             },
           },
         }),
+  };
+
+  const globalSetting = {
+    typography: {
+      allVariants: {
+        fontFamily: `'${primaryFont}', sans-serif`,
+      },
+    },
+    components: {
+      MuiDateCalendar: {
+        styleOverrides: {
+          root: { margin: 0, width: "100%", height: "100%" },
+        },
+      },
+      MuiButton: {
+        styleOverrides: {
+          root: { fontWeight: 900 },
+        },
+      },
+      MuiTableRow: {
+        styleOverrides: {
+          root: {
+            "&.Mui-selected": {
+              backgroundColor: addHexOpacity(colors.palette.primary.main, 35),
+              "&:hover": {
+                backgroundColor: addHexOpacity(colors.palette.primary.main, 54),
+              },
+            },
+          },
+        },
+      },
+    },
+    mixins: {
+      content: {
+        "@media (min-width:0px)": {
+          "@media (orientation: landscape)": {
+            marginTop: "48px",
+          },
+        },
+        "@media (min-width:600px)": {
+          marginTop: "64px",
+        },
+        marginTop: "56px",
+      },
+    },
+    palette: {
+      common: {
+        text: "#222",
+      },
+    },
   };
 
   return _.merge(globalSetting, themeSettings);

@@ -17,7 +17,9 @@ import BookingsBarGraph from "@components/graph/bar-graph";
 import PoolSunburst from "@components/graph/sun-burst";
 import { testData } from "../../../../testdata";
 import { data as sunBurstData } from "../../../../sunburst-test-data";
-
+import AddIcon from "@mui/icons-material/Add";
+import SelectInput from "@components/input/select-input";
+import BasicTable from "./example-table";
 import GroupSelection from "./group-selection";
 
 const Form = styled.form`
@@ -25,7 +27,6 @@ const Form = styled.form`
   flex-grow: 1;
   flex-direction: column;
   border-radius: 10px;
-  overflow: hidden;
 `;
 
 const groupTypeOptions = [
@@ -87,19 +88,9 @@ const NewBooking = ({ open, close, container }) => {
           <HorizontalStepper onComplete={onComplete}>
             {/* Availability and Visitor Count */}
             <Step stepLabel="Availability" isValid={stepOneValid}>
-              <Box
-                display="flex"
-                justifyItems="flex-start"
-                padding={0}
-                paddingTop={2}
-                flexGrow={1}
-                gap={1}
-                overflow="auto"
-              >
-                <Box display="flex" flexDirection="column" justifyContent="space-between" p={2}>
-                  <Box flex={1}>
-                    <CalendarPicker name="bookingDate" validate={validateStepOne} />
-                  </Box>
+              <Box display="flex" justifyItems="flex-start" padding={0} paddingTop={2} flexGrow={1} gap={1}>
+                <Box sx={{ display: "flex", flexDirection: "column", p: 5, justifyContent: "space-between" }}>
+                  <CalendarPicker name="bookingDate" validate={validateStepOne} />
                   <NumberInput
                     name="visitorCount"
                     label="Visitors"
