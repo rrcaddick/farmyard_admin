@@ -4,7 +4,7 @@ import { useIsDesktop } from "@hooks/use-is-desktop";
 import { IconButton, Modal, Paper, useTheme } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 
-const ConainedModal = ({ children, open, close, container, containerProps, ...props }) => {
+const ConainedModal = ({ children, open, onClose, container, containerProps, ...props }) => {
   const theme = useTheme();
   const isDesktop = useIsDesktop();
 
@@ -12,11 +12,11 @@ const ConainedModal = ({ children, open, close, container, containerProps, ...pr
     () => ({
       container: container.current,
       open,
-      onClose: close,
+      onClose,
       slotProps: { backdrop: { style: { position: "absolute" } } },
       sx: { flexGrow: 1, display: "flex", p: isDesktop ? 3 : 1.5, position: "absolute", ...theme.mixins.content },
     }),
-    [container, open, close, isDesktop, theme.mixins.content]
+    [container, open, onClose, isDesktop, theme.mixins.content]
   );
 
   const modalProps = useMemo(() => _.merge(defaultModalProps, props), [defaultModalProps, props]);
@@ -46,7 +46,7 @@ const ConainedModal = ({ children, open, close, container, containerProps, ...pr
     <Modal {...modalProps}>
       <Paper {...completeContainerProps}>
         <IconButton
-          onClick={close}
+          onClick={onClose}
           sx={{
             marginLeft: "auto",
           }}

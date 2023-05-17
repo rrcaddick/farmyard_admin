@@ -31,10 +31,10 @@ const graphqlApplication = createApplication({
   ],
   middlewares: {
     Query: {
-      "*": [addInfoToContext, authGaurd],
+      "*": [authGaurd, addInfoToContext ],
     },
     Mutation: {
-      "*": [addInfoToContext, authGaurd],
+      "*": [authGaurd, addInfoToContext ],
     },
   },
   providers: [],
@@ -60,9 +60,14 @@ const dataSources = () => ({
   bookingSource: new BookingSource(),
 });
 
-const formatError = (err) => ({});
-
-// const executor = ;
+const formatError = (err) => {
+  return {
+    message: err.message,
+    path: err?.path,
+    code: err?.extensions?.code,
+    data: err?.extensions?.data,
+  };
+};
 
 module.exports = {
   graphqlApplication,

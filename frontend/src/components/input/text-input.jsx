@@ -1,6 +1,11 @@
 import { TextField } from "@mui/material";
 import { Controller, useFormContext } from "react-hook-form";
 
+const validate = (value) => {
+  const matches = value.match(/^(?:0\.(?:0[0-9]|[0-9]\d?)|[0-9]\d*(?:\.\d{1,2})?)(?:e[+-]?\d+)?$/);
+  return matches?.length > 0 || "Not a Number";
+};
+
 const TextInput = ({
   name,
   type = "text",
@@ -8,7 +13,8 @@ const TextInput = ({
   label,
   variant = "outlined",
   InputProps = null,
-  defaultValue = undefined,
+  defaultValue = "",
+  number = false,
   ...props
 }) => {
   const { control } = useFormContext();
@@ -16,11 +22,13 @@ const TextInput = ({
   return (
     <Controller
       {...{ control, name, defaultValue }}
+      // {...(number && { rules: { validate } })}
+      rules={{ validate }}
       render={({ field: { name, onBlur, onChange, ref, value }, fieldState: { error }, formState }) => (
         <TextField
           inputRef={ref}
           error={!!error}
-          {...{ name, onBlur, onChange, value, type, placeholder, label, variant }}
+          {...{ name, onBlur, value, onChange, type, placeholder, label, variant }}
           {...(!!error && { helperText: error.message })}
           {...(InputProps && { InputProps })}
           {...props}

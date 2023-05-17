@@ -38,9 +38,9 @@ const Booking = () => {
   return (
     <Box flexGrow={1} position="relative" display="flex" flexDirection="column" overflow="hidden">
       <Header title="Bookings" subtitle="Manage your bookings" />
-      <NewBooking open={openNewBooking} container={container} close={closeNewBookingHandler} />
+      <NewBooking open={openNewBooking} container={container} onClose={closeNewBookingHandler} />
       <Fab
-        color="primary"
+        color="secondary"
         onClick={() => setOpenNewBooking(true)}
         sx={(theme) => ({ position: "absolute", top: theme.spacing(2), right: 0 })}
       >

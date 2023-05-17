@@ -163,10 +163,10 @@ export const themeSettings = (mode) => {
           palette: {
             mode,
             primary: {
-              main: "#00796B",
+              main: "#009687",
             },
             secondary: {
-              main: "#96000f",
+              main: "#004b79",
             },
             error: {
               main: "#d32f2f",
@@ -223,6 +223,18 @@ export const themeSettings = (mode) => {
               "&:hover": {
                 backgroundColor: addHexOpacity(colors.palette.primary.main, 54),
               },
+            },
+          },
+        },
+      },
+      MuiTextField: {
+        styleOverrides: {
+          root: {
+            "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button": {
+              display: "none",
+            },
+            "& input[type=number]": {
+              MozAppearance: "textfield",
             },
           },
         },

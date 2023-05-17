@@ -20,7 +20,7 @@ const columns = [
 ];
 
 const newGroup = (
-  <Button variant="outlined" sx={{ boxShadow: (theme) => theme.shadows[15] }}>
+  <Button variant="outlined" color="secondary" sx={{ boxShadow: (theme) => theme.shadows[15] }}>
     NEW GROUP
   </Button>
 );

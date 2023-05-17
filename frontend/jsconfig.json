@@ -5,6 +5,7 @@
       "@components/*": ["src/components/*"],
       "@utils/*": ["src/utils/*"],
       "@hooks/*": ["src/hooks/*"],
+      "@graphql/*": ["src/graphql/*"],
       "@routes/*": ["src/routes/*"],
       "@theme/*": ["src/theme/*"],
       "@context/*": ["src/context/*"],

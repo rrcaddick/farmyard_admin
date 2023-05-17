@@ -7,7 +7,7 @@ const SelectInput = ({
   label,
   selectItems,
   variant = "outlined",
-  defaultValue = undefined,
+  defaultValue = "",
   formControlProps = null,
   inputLabelProps = null,
   selectProps = null,
@@ -21,6 +21,7 @@ const SelectInput = ({
       render={({
         field: { name, onBlur, onChange: onChangeForm, ref: inputRef, value },
         fieldState: { error },
+
         formState,
       }) => (
         <FormControl error={!!error} {...formControlProps}>
@@ -34,7 +35,9 @@ const SelectInput = ({
             }}
           >
             {selectItems.map(({ id, text }) => (
-              <MenuItem value={id}>{text}</MenuItem>
+              <MenuItem value={id} key={id}>
+                {text}
+              </MenuItem>
             ))}
           </Select>
           {!!error && <FormHelperText>{error.message}</FormHelperText>}

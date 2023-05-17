@@ -1,17 +1,21 @@
-import { Box, Fab } from "@mui/material";
 import Header from "@components/display/header";
 import AddIcon from "@mui/icons-material/Add";
-import NewBooking from "@booking/components/new-booking/new-booking";
-import { useOutletContext } from "react-router-dom";
-import { useState } from "react";
+import NewGroup from "@groups/components/new-group";
 import GroupTable from "@components/table/virtualized-table";
-
-import { groupData as data } from "./new-booking/groupTestData";
+import GroupActions from "@groups/components/group-actions";
+import { useMemo, useState } from "react";
+import { Box, Fab, Typography } from "@mui/material";
+import { useOutletContext } from "react-router-dom";
+import { useGetAllGroups } from "@groups/graphql/hooks";
 
 const columns = [
   {
-    label: "Group Name",
-    dataKey: "groupName",
+    label: "Name",
+    dataKey: "name",
+  },
+  {
+    label: "Type",
+    dataKey: "type",
   },
   {
     label: "Address",
@@ -25,13 +29,33 @@ const columns = [
     label: "Post Code",
     dataKey: "postCode",
   },
+  {
+    label: "Actions",
+    dataKey: "render",
+    align: "center",
+    width: "100px",
+  },
 ];
 
-const Booking = () => {
-  const [openNewBooking, setOpenNewBooking] = useState(false);
+const createTableData = (groups) => {
+  return groups.map((group) => {
+    const {
+      id,
+      name,
+      groupType: { type },
+      address: { street, suburb, postCode },
+    } = group;
+
+    return { id, name, type, street, suburb, postCode, render: GroupActions };
+  });
+};
+
+const Groups = () => {
+  const { groups, loading } = useGetAllGroups();
   const { container } = useOutletContext();
 
-  const closeNewBookingHandler = () => setOpenNewBooking(false);
+  const [openNewGroup, setOpenNewGroup] = useState(false);
+  const closeNewGroupHandler = () => setOpenNewGroup(false);
 
   const [selectedGroup, setSelectedGroup] = useState({ id: 5 });
 
@@ -39,20 +63,21 @@ const Booking = () => {
     setSelectedGroup({ id });
   };
 
+  const data = useMemo(() => createTableData(groups), [groups]);
+
   return (
-    <Box flexGrow={1} position="relative">
-      <Header title="Groups" subtitle="View, Change or Add new groups" />
-      <NewBooking open={openNewBooking} container={container} close={closeNewBookingHandler} />
-      <Fab
-        color="primary"
-        onClick={() => setOpenNewBooking(true)}
-        sx={(theme) => ({ position: "absolute", top: theme.spacing(2), right: 0 })}
-      >
-        <AddIcon />
-      </Fab>
-      <GroupTable {...{ columns, data, selectedRowId: selectedGroup?.id, setSelectedRow }} />
+    <Box flexGrow={1} display="flex" flexDirection="column">
+      <Box display="flex" justifyContent="space-between" alignItems="center" px="10px">
+        <Header title="Groups" subtitle="View, Change or Add new groups" />
+        <Fab color="secondary" onClick={() => setOpenNewGroup(true)}>
+          <AddIcon />
+        </Fab>
+      </Box>
+      <NewGroup open={openNewGroup} container={container} onClose={closeNewGroupHandler} />
+      {loading && <Typography>Loading...</Typography>}
+      {!loading && <GroupTable {...{ columns, data, selectedRowId: selectedGroup?.id, setSelectedRow }} />}
     </Box>
   );
 };
 
-export default Booking;
+export default Groups;

@@ -55,7 +55,7 @@ const Form = styled.form`
 //   { id: 16, text: "Government", groupType: [4] },
 // ];
 
-const NewBooking = ({ open, close, container }) => {
+const NewBooking = ({ open, onClose, container }) => {
   const formRef = useRef();
   const resolver = useYupValidationResolver(newBookingSchema);
   const formMethods = useForm({ resolver, mode: "all", defaultValues: { visitorCount: 40 } });
@@ -70,7 +70,7 @@ const NewBooking = ({ open, close, container }) => {
 
   const submitHandler = (data) => {
     console.log(data);
-    close();
+    onClose();
   };
 
   const onComplete = () => {
@@ -80,7 +80,7 @@ const NewBooking = ({ open, close, container }) => {
   const [stepOneValid, validateStepOne] = useStepValidator(async () => await trigger(["bookingDate", "visitorCount"]));
 
   return (
-    <ContainedModal {...{ open, close, container }}>
+    <ContainedModal {...{ open, onClose, container }}>
       <FormProvider {...formMethods}>
         <Form ref={formRef} onSubmit={handleSubmit(submitHandler)} noValidate>
           <HorizontalStepper onComplete={onComplete}>
