@@ -5,10 +5,12 @@ import { useMemo, useRef } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { useYupValidationResolver } from "@hooks/use-yup-validation-resolver";
 import { newGroupSchema } from "@groups/schemas/new-group";
-import { Box, Button, Paper, Typography } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import { useGetAllGroupTypes } from "@groups/graphql/hooks";
 import { useCreateGroup } from "@groups/graphql/hooks/use-create-group";
 import { generateTempId } from "@graphql/utils/generate-temp-id";
+import CrudDataGrid from "@components/data-grid/crud-data-grid";
+import { contactSchema } from "@contacts/schemas/contactSchema";
 
 const Form = styled.form`
   display: flex;
@@ -29,6 +31,27 @@ const createGroupTypeSelectOptions = (groupTypes) => {
     return { id, text, price };
   });
 };
+
+const columns = [
+  {
+    field: "name",
+    headerName: "Name",
+    editable: true,
+    flex: 1,
+  },
+  {
+    field: "email",
+    headerName: "Email Address",
+    editable: true,
+    flex: 1,
+  },
+  {
+    field: "tel",
+    headerName: "Tel",
+    editable: true,
+    flex: 1,
+  },
+];
 
 const GroupForm = ({ onClose }) => {
   // Load drop down options
@@ -98,13 +121,10 @@ const GroupForm = ({ onClose }) => {
           <TextInput variant="outlined" name="suburb" label="Suburb" placeholder="Eg: Bellville" sx={{ flex: 2 }} />
           <TextInput type="number" variant="outlined" name="postCode" label="Post Code" placeholder="Eg: 7625" />
         </Box>
-        <Box></Box>
-        <Paper sx={{ display: "flex", gap: "10px", p: "5px" }}>
-          <TextInput name="fullName" label="Full Name" placeholder="Eg: Bellville" sx={{ flex: 4 }} />
-          <TextInput name="email" label="Email Address" placeholder="Eg: Bellville" sx={{ flex: 4 }} />
-          <TextInput name="tel" label="Tel" placeholder="Eg: Bellville" sx={{ flex: 4 }} />
-        </Paper>
-        <Button type="submit" variant="contained" color="secondary" sx={{ mt: "auto" }}>
+
+        <CrudDataGrid {...{ columns, schema: contactSchema }} />
+
+        <Button type="submit" variant="contained" color="secondary" sx={{ mt: "auto", mb: "1rem", ml: "auto" }}>
           Add New Group
         </Button>
       </Form>

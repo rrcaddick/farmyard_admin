@@ -22,7 +22,6 @@ const TextInput = ({
   return (
     <Controller
       {...{ control, name, defaultValue }}
-      // {...(number && { rules: { validate } })}
       rules={{ validate }}
       render={({ field: { name, onBlur, onChange, ref, value }, fieldState: { error }, formState }) => (
         <TextField

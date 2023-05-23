@@ -28,13 +28,19 @@ const typeDefs = gql`
     name: String
     groupType: GroupTypeInput
     address: AddressInput
-    contacts: [ID]
+    contacts: [GroupContactInput]
   }
 
   input AddressInput {
     street: String
     suburb: String
     postCode: Int
+  }
+
+  input GroupContactInput {
+    name: String!
+    email: String
+    tel: String
   }
 `;
 

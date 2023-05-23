@@ -9,6 +9,7 @@
     "@emotion/styled": "^11.10.5",
     "@mui/icons-material": "^5.11.0",
     "@mui/material": "^5.11.7",
+    "@mui/x-data-grid": "^6.4.0",
     "@mui/x-date-pickers": "^6.0.1",
     "@nivo/bar": "^0.80.0",
     "@nivo/core": "^0.80.0",
@@ -56,5 +57,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@mui/x-data-grid-generator": "^6.4.0"
   }
 }
