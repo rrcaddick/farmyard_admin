@@ -25,10 +25,18 @@ const columns = [
 ];
 
 const Finance = () => {
+  const onSave = (data) => {
+    console.log(data);
+  };
+
+  const onDelete = (id) => {
+    console.log(id);
+  };
+
   return (
     <Box display="flex" flexDirection="column" flexGrow={1} overflow="hidden">
       <Header title="Finance" subtitle="Manage Finances" />
-      <CrudDataGrid {...{ columns, schema: contactSchema, addButtonText: "Add Contact" }} />
+      <CrudDataGrid {...{ columns, onSave, onDelete, schema: contactSchema, addButtonText: "Add Contact" }} />
     </Box>
   );
 };

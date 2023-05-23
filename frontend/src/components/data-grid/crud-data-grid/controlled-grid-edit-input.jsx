@@ -31,22 +31,7 @@ const GridEditInputCellRoot = styled(InputBase, {
 }));
 
 const ControlledGridEditInput = (props) => {
-  const {
-    id,
-    value,
-    formattedValue,
-    api,
-    field: name,
-    row,
-    rowNode,
-    colDef,
-    cellMode,
-    isEditable,
-    tabIndex,
-    hasFocus,
-    getValue,
-    ...other
-  } = props;
+  const { id, api, field: name, colDef, hasFocus } = props;
 
   const rootProps = useGridRootProps();
   const ownerState = { classes: rootProps.classes };
@@ -71,7 +56,7 @@ const ControlledGridEditInput = (props) => {
 
   return (
     <Controller
-      {...{ control, name }}
+      {...{ control, name, defaultValue: "" }}
       render={({ field: { name, onBlur, onChange, ref: inputRef, value }, fieldState: { error } }) => {
         return (
           <Box display="flex" position="relative" flexGrow={1} ref={containerRef}>
@@ -93,16 +78,17 @@ const ControlledGridEditInput = (props) => {
                 },
               }}
             >
-              <GridEditInputCellRoot
-                className={classes.root}
-                type={colDef.type === "number" ? colDef.type : "text"}
-                onChange={(event) => {
-                  onChange(event);
-                  handleChange(event);
-                }}
-                {...{ name, value, onBlur, id, inputRef, fullWidth: true }}
-                {...other}
-              />
+              <Box flexGrow={1}>
+                <GridEditInputCellRoot
+                  className={classes.root}
+                  type={colDef.type === "number" ? colDef.type : "text"}
+                  onChange={(event) => {
+                    onChange(event);
+                    handleChange(event);
+                  }}
+                  {...{ name, value, onBlur, id, inputRef, fullWidth: true }}
+                />
+              </Box>
             </Tooltip>
             {!!error && <CellError sx={{ position: "absolute", color: "red", right: 10 }} />}
           </Box>

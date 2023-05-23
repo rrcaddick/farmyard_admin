@@ -18,7 +18,7 @@ const actionsColumn = {
   getActions: CrudActions,
 };
 
-const CrudDataGrid = ({ columns, existingRows = [], schema, addButtonText }) => {
+const CrudDataGrid = ({ columns, existingRows = [], schema, addButtonText, onSave, onDelete }) => {
   const [rows, setRows] = useState(existingRows);
   const [rowModesModel, setRowModesModel] = useState({});
   const [hasNoContent, setHasNoContent] = useState();
@@ -54,16 +54,21 @@ const CrudDataGrid = ({ columns, existingRows = [], schema, addButtonText }) => 
     async (newRow) => {
       const { id, isNew, ...data } = newRow;
 
-      try {
-        await schema.validate(data);
-        const updatedRow = { ...newRow, isNew: false };
-        setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
-        return updatedRow;
-      } catch (error) {
-        return rows;
-      }
+      await schema.validate(data);
+      onSave(data);
+      const updatedRow = { ...newRow, isNew: false };
+      setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
+      return updatedRow;
     },
-    [rows, schema]
+    [rows, schema, onSave]
+  );
+
+  const onProcessRowUpdateError = useCallback(
+    (error) => {
+      //TODO: Proceses row update error
+      return rows;
+    },
+    [rows]
   );
 
   const dataGridContextValue = useMemo(
@@ -72,8 +77,9 @@ const CrudDataGrid = ({ columns, existingRows = [], schema, addButtonText }) => 
       setRows,
       rowModesModel,
       setRowModesModel,
+      onDelete,
     }),
-    [rows, setRows, rowModesModel, setRowModesModel]
+    [rows, setRows, rowModesModel, setRowModesModel, onDelete]
   );
 
   return (
@@ -100,6 +106,7 @@ const CrudDataGrid = ({ columns, existingRows = [], schema, addButtonText }) => 
           rowModesModel={rowModesModel}
           onRowModesModelChange={handleRowModesModelChange}
           processRowUpdate={processRowUpdate}
+          onProcessRowUpdateError={onProcessRowUpdateError}
           slots={{
             toolbar: EditToolbar,
             noRowsOverlay: () => {

@@ -8,7 +8,7 @@ import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Close";
 
 const CrudActions = ({ id }) => {
-  const { setRowModesModel, rows, setRows, rowModesModel } = useContext(DataGridContext);
+  const { setRowModesModel, rows, setRows, rowModesModel, onDelete } = useContext(DataGridContext);
   const {
     formState: { isValid },
   } = useFormContext();
@@ -24,6 +24,7 @@ const CrudActions = ({ id }) => {
   };
 
   const handleDeleteClick = (id) => () => {
+    onDelete(id);
     setRows(rows.filter((row) => row.id !== id));
   };
 
