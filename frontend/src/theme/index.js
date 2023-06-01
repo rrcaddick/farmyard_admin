@@ -212,7 +212,7 @@ export const themeSettings = (mode) => {
       },
       MuiButton: {
         styleOverrides: {
-          root: { fontWeight: 900 },
+          root: { fontWeight: 900, borderRadius: "20px", paddingTop: "8px", paddingBottom: "8px" },
         },
       },
       MuiTableRow: {

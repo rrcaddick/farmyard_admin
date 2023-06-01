@@ -73,7 +73,7 @@ const ControlledGridEditInput = (props) => {
                     width: () => {
                       return `${containerRef.current.offsetWidth}px`;
                     },
-                    textAlign: "center",
+                    paddingLeft: "16px",
                   },
                 },
               }}

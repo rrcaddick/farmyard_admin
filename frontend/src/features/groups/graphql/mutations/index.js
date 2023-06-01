@@ -17,6 +17,9 @@ const CREATE_GROUP_MUTATION = gql`
         suburb
         postCode
       }
+      contacts {
+        id
+      }
     }
   }
 `;

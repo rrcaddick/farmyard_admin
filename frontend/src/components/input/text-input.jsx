@@ -11,10 +11,13 @@ const TextInput = ({
   type = "text",
   placeholder,
   label,
+  onChange = null,
   variant = "outlined",
   InputProps = null,
   defaultValue = "",
   number = false,
+  tabIndex = null,
+  serverError = null,
   ...props
 }) => {
   const { control } = useFormContext();
@@ -23,16 +26,30 @@ const TextInput = ({
     <Controller
       {...{ control, name, defaultValue }}
       rules={{ validate }}
-      render={({ field: { name, onBlur, onChange, ref, value }, fieldState: { error }, formState }) => (
-        <TextField
-          inputRef={ref}
-          error={!!error}
-          {...{ name, onBlur, value, onChange, type, placeholder, label, variant }}
-          {...(!!error && { helperText: error.message })}
-          {...(InputProps && { InputProps })}
-          {...props}
-        />
-      )}
+      render={({ field: { name, onBlur, onChange: onChangeRHF, ref, value }, fieldState: { error }, formState }) => {
+        return (
+          <TextField
+            inputRef={ref}
+            error={!!error || !!serverError}
+            onChange={(e) => {
+              onChange && onChange(e);
+              onChangeRHF(e);
+            }}
+            {...{
+              name,
+              onBlur,
+              value,
+              type,
+              placeholder,
+              label,
+              variant,
+            }}
+            {...((!!error || !!serverError) && { helperText: error?.message || serverError })}
+            {...(InputProps && { InputProps })}
+            {...props}
+          />
+        );
+      }}
     />
   );
 };

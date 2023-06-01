@@ -8,7 +8,17 @@ import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Close";
 
 const CrudActions = ({ id }) => {
-  const { setRowModesModel, rows, setRows, rowModesModel, onDelete } = useContext(DataGridContext);
+  const {
+    setRowModesModel,
+    rows,
+    setRows,
+    setDeletedRow,
+    rowModesModel,
+    onDelete,
+    toggleEditMode,
+    toggleDeleteSnackbar,
+  } = useContext(DataGridContext);
+
   const {
     formState: { isValid },
   } = useFormContext();
@@ -17,6 +27,7 @@ const CrudActions = ({ id }) => {
 
   const handleEditClick = (id) => () => {
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
+    toggleEditMode(true);
   };
 
   const handleSaveClick = (id) => () => {
@@ -24,8 +35,11 @@ const CrudActions = ({ id }) => {
   };
 
   const handleDeleteClick = (id) => () => {
+    const index = rows.findIndex((row) => row.id === id);
+    setDeletedRow({ index, row: rows.at(index) });
+    setRows((prevRows) => prevRows.filter((row) => row.id !== id));
+    toggleDeleteSnackbar(true);
     onDelete(id);
-    setRows(rows.filter((row) => row.id !== id));
   };
 
   const handleCancelClick = (id) => () => {
@@ -38,6 +52,7 @@ const CrudActions = ({ id }) => {
     if (editedRow.isNew) {
       setRows(rows.filter((row) => row.id !== id));
     }
+    toggleEditMode(false);
   };
 
   if (isInEditMode) {

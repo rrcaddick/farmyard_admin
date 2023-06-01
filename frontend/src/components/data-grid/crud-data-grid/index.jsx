@@ -1,12 +1,14 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { GridRowModes, DataGrid } from "@mui/x-data-grid";
-import { randomId } from "@mui/x-data-grid-generator";
+import { forwardRef, useCallback, useImperativeHandle, useMemo, useState } from "react";
+import { GridRowModes, DataGrid, useGridApiRef } from "@mui/x-data-grid";
 import { DataGridContext } from "@components/data-grid/crud-data-grid/context/data-grid";
 import Box from "@mui/material/Box";
 import EditToolbar from "@components/data-grid/crud-data-grid/edit-toolbar";
 import CrudActions from "@components/data-grid/crud-data-grid/crud-actions";
 import ControlledGridEditInput from "@components/data-grid/crud-data-grid/controlled-grid-edit-input";
 import FormRow from "@components/data-grid/crud-data-grid/form-row";
+import { Button, IconButton, Snackbar, Zoom } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import { useCrudDataGrid } from "@components/data-grid/crud-data-grid/hooks/use-crud-data-grid";
 
 const actionsColumn = {
   field: "actions",
@@ -18,14 +20,50 @@ const actionsColumn = {
   getActions: CrudActions,
 };
 
-const CrudDataGrid = ({ columns, existingRows = [], schema, addButtonText, onSave, onDelete }) => {
-  const [rows, setRows] = useState(existingRows);
-  const [rowModesModel, setRowModesModel] = useState({});
-  const [hasNoContent, setHasNoContent] = useState();
+const CrudDataGrid = forwardRef(({ columns, existingRows = [], schema, addButtonText, onSave, onDelete }, ref) => {
+  const [deleteSnackbarOpen, setDeleteSnackbarOpen] = useState(false);
 
-  useEffect(() => {
-    setHasNoContent(rows.length === 0);
-  }, [rows]);
+  const {
+    state: { rows, rowModesModel, hasNoContent, isEditing },
+    methods: {
+      toggleEditMode,
+      handleRowModesModelChange,
+      onRowEditStop,
+      addRowHandler,
+      processRowUpdate,
+      onProcessRowUpdateError,
+      setDeletedRow,
+      setRows,
+      setRowModesModel,
+      undoRowDelete,
+    },
+  } = useCrudDataGrid({ existingRows, schema, onSave });
+
+  const apiRef = useGridApiRef();
+
+  // Exposes child state to parent
+  useImperativeHandle(
+    ref,
+    () => {
+      return {
+        isEditing,
+        disgardUnsavedChanges: () => {
+          const { id, isNew } = rows.find((x) => x.isNew) || { id: Object.keys(rowModesModel)[0] };
+
+          setRowModesModel({
+            ...rowModesModel,
+            [id]: { mode: GridRowModes.View, ignoreModifications: true },
+          });
+
+          if (isNew) {
+            setRows(rows.filter((row) => row.id !== id));
+          }
+          toggleEditMode(false);
+        },
+      };
+    },
+    [rows, isEditing, rowModesModel, toggleEditMode, setRowModesModel, setRows]
+  );
 
   const renderEditCell = useCallback((props) => {
     return <ControlledGridEditInput {...props} />;
@@ -36,50 +74,32 @@ const CrudDataGrid = ({ columns, existingRows = [], schema, addButtonText, onSav
     [columns, renderEditCell]
   );
 
-  const handleRowModesModelChange = (newRowModesModel) => {
-    setRowModesModel(newRowModesModel);
+  const undoDeleteHandler = () => {
+    const row = undoRowDelete();
+    onSave(row);
+    setDeleteSnackbarOpen(false);
   };
 
-  const addRowHandler = () => {
-    //TODO: Replace random id
-    const id = randomId();
-    setRows((oldRows) => [{ id, name: "", email: "", tel: "", isNew: true }, ...oldRows]);
-    setRowModesModel((oldModel) => ({
-      ...oldModel,
-      [id]: { mode: GridRowModes.Edit, fieldToFocus: "name" },
-    }));
+  const toggleDeleteSnackbar = useCallback((mode) => {
+    setDeleteSnackbarOpen((prevDeleteSnackbarOpen) => (mode === undefined ? !prevDeleteSnackbarOpen : mode));
+  }, []);
+
+  const closeSnackbarHandler = () => {
+    setDeleteSnackbarOpen(false);
   };
-
-  const processRowUpdate = useCallback(
-    async (newRow) => {
-      const { id, isNew, ...data } = newRow;
-
-      await schema.validate(data);
-      onSave(data);
-      const updatedRow = { ...newRow, isNew: false };
-      setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
-      return updatedRow;
-    },
-    [rows, schema, onSave]
-  );
-
-  const onProcessRowUpdateError = useCallback(
-    (error) => {
-      //TODO: Proceses row update error
-      return rows;
-    },
-    [rows]
-  );
 
   const dataGridContextValue = useMemo(
     () => ({
       rows,
       setRows,
+      setDeletedRow,
       rowModesModel,
       setRowModesModel,
       onDelete,
+      toggleEditMode,
+      toggleDeleteSnackbar,
     }),
-    [rows, setRows, rowModesModel, setRowModesModel, onDelete]
+    [rows, setRows, rowModesModel, setDeletedRow, setRowModesModel, onDelete, toggleEditMode, toggleDeleteSnackbar]
   );
 
   return (
@@ -98,11 +118,13 @@ const CrudDataGrid = ({ columns, existingRows = [], schema, addButtonText, onSav
       <DataGridContext.Provider value={dataGridContextValue}>
         <DataGrid
           autoHeight
+          apiRef={apiRef}
           rows={rows}
           density="compact"
           hideFooter
           columns={columnsWithActions}
           editMode="row"
+          onRowEditStop={onRowEditStop}
           rowModesModel={rowModesModel}
           onRowModesModelChange={handleRowModesModelChange}
           processRowUpdate={processRowUpdate}
@@ -115,7 +137,7 @@ const CrudDataGrid = ({ columns, existingRows = [], schema, addButtonText, onSav
             row: FormRow,
           }}
           slotProps={{
-            toolbar: { setRows, setRowModesModel, addRowHandler, buttonText: addButtonText },
+            toolbar: { setRows, setRowModesModel, addRowHandler, isEditing, buttonText: addButtonText },
             row: { schema },
           }}
           sx={{
@@ -128,9 +150,32 @@ const CrudDataGrid = ({ columns, existingRows = [], schema, addButtonText, onSav
             },
           }}
         />
+        <Snackbar
+          open={deleteSnackbarOpen}
+          autoHideDuration={4000}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+          onClose={closeSnackbarHandler}
+          message="Contact removed"
+          TransitionComponent={Zoom}
+          action={
+            <>
+              <Button color="warning" size="small" onClick={undoDeleteHandler}>
+                UNDO
+              </Button>
+              <IconButton size="small" aria-label="close" color="inherit" onClick={closeSnackbarHandler}>
+                <CloseIcon fontSize="small" />
+              </IconButton>
+            </>
+          }
+          sx={{
+            "& .MuiSnackbarContent-root": {
+              backgroundColor: "secondary.main",
+            },
+          }}
+        />
       </DataGridContext.Provider>
     </Box>
   );
-};
+});
 
 export default CrudDataGrid;

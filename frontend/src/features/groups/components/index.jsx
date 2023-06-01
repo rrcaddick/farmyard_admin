@@ -68,14 +68,14 @@ const Groups = () => {
   return (
     <Box flexGrow={1} display="flex" flexDirection="column">
       <Box display="flex" justifyContent="space-between" alignItems="center" px="10px">
-        <Header title="Groups" subtitle="View, Change or Add new groups" />
+        <Header title="Groups" subtitle="View, Update or Add new groups" />
         <Fab color="secondary" onClick={() => setOpenNewGroup(true)}>
           <AddIcon />
         </Fab>
       </Box>
       <NewGroup open={openNewGroup} container={container} onClose={closeNewGroupHandler} />
-      {loading && <Typography>Loading...</Typography>}
-      {!loading && <GroupTable {...{ columns, data, selectedRowId: selectedGroup?.id, setSelectedRow }} />}
+      {/* {loading && <Typography>Loading...</Typography>}
+      {!loading && <GroupTable {...{ columns, data, selectedRowId: selectedGroup?.id, setSelectedRow }} />} */}
     </Box>
   );
 };

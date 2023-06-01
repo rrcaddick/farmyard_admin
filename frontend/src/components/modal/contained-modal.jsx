@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import { useIsDesktop } from "@hooks/use-is-desktop";
 import { IconButton, Modal, Paper, useTheme } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import { waitForElementToBeRemoved } from "@testing-library/react";
 
 const ConainedModal = ({ children, open, onClose, container, containerProps, ...props }) => {
   const theme = useTheme();
@@ -49,6 +50,9 @@ const ConainedModal = ({ children, open, onClose, container, containerProps, ...
           onClick={onClose}
           sx={{
             marginLeft: "auto",
+            position: "absolute",
+            right: isDesktop ? "1.5rem" : "0.5rem",
+            top: isDesktop ? "1.5rem" : "0.5rem",
           }}
         >
           <CloseIcon />

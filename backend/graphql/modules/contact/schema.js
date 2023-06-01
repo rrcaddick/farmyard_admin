@@ -1,14 +1,16 @@
-import { object, string } from "yup";
+const { object, string } = require("yup");
 
 const contactSchema = object().shape(
   {
-    // name: string().required("Contact name is required"),
+    name: string().required("You need to provide a contact name"),
     email: string().when("tel", {
       is: (tel) => {
         return !tel || tel.length === 0;
       },
       then: () =>
-        string().required("Either email address or contact number is required").email("Invalid email address"),
+        string()
+          .required("A contact requires either an email or contact number")
+          .email("Please enter a valid email address"),
       otherwise: () => string().email("Invalid email address"),
     }),
     tel: string()
@@ -17,10 +19,12 @@ const contactSchema = object().shape(
         is: (email) => {
           return !email || email.length === 0;
         },
-        then: () => string().required("Either email address or contact number is required"),
+        then: () => string().required("A contact requires either an email or contact number"),
       }),
   },
   [["email", "tel"]]
 );
 
-export { contactSchema };
+module.exports = {
+  contactSchema,
+};

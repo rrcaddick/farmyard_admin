@@ -1,22 +1,22 @@
 import { useYupValidationResolver } from "@hooks/use-yup-validation-resolver";
+import { Box } from "@mui/material";
 import { GridRow } from "@mui/x-data-grid";
 import { useForm, FormProvider } from "react-hook-form";
 
 const FormRow = (props) => {
-  const { schema } = props;
-  const resolver = useYupValidationResolver(schema);
-  const formMethods = useForm({ resolver, mode: "all" });
-  const { handleSubmit } = formMethods;
+  const {
+    schema,
+    row: { id, idNew, ...data },
+  } = props;
 
-  const submitHandler = (data) => {
-    console.log(data);
-  };
+  const resolver = useYupValidationResolver(schema);
+  const formMethods = useForm({ resolver, mode: "all", defaultValues: data });
 
   return (
     <FormProvider {...formMethods}>
-      <form noValidate onSubmit={handleSubmit(submitHandler)}>
+      <Box>
         <GridRow {...props} />
-      </form>
+      </Box>
     </FormProvider>
   );
 };

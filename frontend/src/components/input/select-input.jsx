@@ -10,25 +10,26 @@ const SelectInput = ({
   defaultValue = "",
   formControlProps = null,
   inputLabelProps = null,
-  selectProps = null,
   onChange = () => {},
+  inputProps = null,
+  serverError = null,
+  ...props
 }) => {
   const { control } = useFormContext();
 
   return (
     <Controller
       {...{ control, name, defaultValue }}
-      render={({
-        field: { name, onBlur, onChange: onChangeForm, ref: inputRef, value },
-        fieldState: { error },
-
-        formState,
-      }) => (
-        <FormControl error={!!error} {...formControlProps}>
-          <InputLabel {...inputLabelProps}>{label}</InputLabel>
+      render={({ field: { name, onBlur, onChange: onChangeForm, ref: inputRef, value }, fieldState: { error } }) => (
+        <FormControl error={!!error || !!serverError} {...formControlProps}>
+          <InputLabel {...inputLabelProps} sx={{ marginLeft: "-14px", marginTop: "4px" }}>
+            {label}
+          </InputLabel>
           <Select
+            // tabIndex={2}
             {...{ name, onBlur, value, label, variant, inputRef, defaultValue }}
-            {...selectProps}
+            {...(inputProps && { inputProps })}
+            {...props}
             onChange={(e) => {
               onChange(e);
               onChangeForm(e.target.value);
@@ -40,7 +41,9 @@ const SelectInput = ({
               </MenuItem>
             ))}
           </Select>
-          {!!error && <FormHelperText>{error.message}</FormHelperText>}
+          {(!!error || !!serverError) && (
+            <FormHelperText sx={{ marginLeft: 0 }}>{error?.message || serverError}</FormHelperText>
+          )}
         </FormControl>
       )}
     />

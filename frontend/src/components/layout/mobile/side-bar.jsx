@@ -22,6 +22,7 @@ const SideBar = ({ sidebarOpen, toggleSideBar }) => {
     <SwipeableDrawer
       anchor="right"
       open={sidebarOpen}
+      sx={{ zIndex: 1301 }}
       onClose={() => toggleSideBar(false)}
       onOpen={() => toggleSideBar(false)}
     >
