@@ -1,4 +1,5 @@
 import ContainedModal from "@components/modal/contained-modal";
+import { useIsDesktop } from "@hooks/use-is-desktop";
 import { Divider, Typography, useTheme } from "@mui/material";
 import Box from "@mui/material/Box";
 import GroupForm from "./new-group-form";
@@ -6,6 +7,7 @@ import GroupForm from "./new-group-form";
 //TODO: Look into adding modal that accepts children to outlet context
 const NewBooking = ({ open, onClose, container }) => {
   const theme = useTheme();
+  const isDesktop = useIsDesktop();
 
   return (
     <ContainedModal {...{ open, onClose, container }}>
@@ -30,10 +32,7 @@ const NewBooking = ({ open, onClose, container }) => {
           fontWeight="700"
           color="primary.main"
           sx={{
-            marginLeft: "0.5rem",
-            [theme.breakpoints.up("sm")]: {
-              marginLeft: "1rem",
-            },
+            marginLeft: isDesktop ? "1rem" : "0.5rem",
           }}
         >
           Group Details:
@@ -43,10 +42,7 @@ const NewBooking = ({ open, onClose, container }) => {
           sx={{
             borderWidth: "1px",
             borderColor: "primary.dark",
-            marginLeft: "0.5rem",
-            [theme.breakpoints.up("sm")]: {
-              marginLeft: "1rem",
-            },
+            marginLeft: isDesktop ? "1rem" : "0.5rem",
           }}
         />
         <GroupForm {...{ onClose }} />

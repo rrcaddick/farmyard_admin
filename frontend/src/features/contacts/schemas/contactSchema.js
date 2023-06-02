@@ -2,7 +2,7 @@ import { object, string } from "yup";
 
 const contactSchema = object().shape(
   {
-    // name: string().required("Contact name is required"),
+    name: string().required("Contact name is required"),
     email: string().when("tel", {
       is: (tel) => {
         return !tel || tel.length === 0;

@@ -1,7 +1,10 @@
 import { createContext, useState, useMemo } from "react";
 import { createTheme } from "@mui/material/styles";
+import { createBreakpoints } from "@mui/system";
 import _ from "lodash";
 import { addHexOpacity } from "@utils/style";
+
+const breakpoints = createBreakpoints({});
 
 const getUserModePreference = () => {
   const mode = localStorage.getItem("themeMode");
@@ -208,6 +211,65 @@ export const themeSettings = (mode) => {
       MuiDateCalendar: {
         styleOverrides: {
           root: { margin: 0, width: "100%", height: "100%" },
+        },
+      },
+      MUIDataTable: {
+        styleOverrides: {
+          root: {
+            flexGrow: 1,
+            display: "flex",
+            flexDirection: "column",
+          },
+          responsiveBase: {
+            overflow: "auto",
+          },
+        },
+      },
+      MUIDataTableToolbar: {
+        styleOverrides: {
+          root: {
+            minHeight: "inherit",
+            padding: "10px 15px",
+            [breakpoints.down("sm")]: {
+              margin: "0 auto",
+            },
+          },
+        },
+      },
+      MUIDataTableSearch: {
+        styleOverrides: {
+          main: {
+            [breakpoints.down("sm")]: {
+              justifyContent: "space-between",
+            },
+          },
+        },
+      },
+      MUIDataTableToolbarSelect: {
+        styleOverrides: {
+          root: {
+            flex: "1 0 56px",
+          },
+        },
+      },
+      MUIDataTablePagination: {
+        styleOverrides: {
+          navContainer: {
+            justifyContent: "center",
+            [breakpoints.up("md")]: {
+              justifyContent: "flex-end",
+            },
+          },
+          toolbar: {
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            padding: 0,
+            "& > *": {
+              margin: "0 auto !important",
+              padding: 0,
+            },
+          },
         },
       },
       MuiButton: {

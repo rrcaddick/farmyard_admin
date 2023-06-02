@@ -93,8 +93,8 @@ const GroupForm = ({ onClose }) => {
         },
       });
 
-      // reset();
-      // onClose();
+      reset();
+      onClose();
     },
     [createGroup, onClose, groupTypes, reset]
   );
@@ -206,16 +206,7 @@ const GroupForm = ({ onClose }) => {
 
             {fields.map((field, index) => (
               <Grid xs={12} key={field.id}>
-                <Box
-                  display="flex"
-                  flexDirection="column"
-                  gap="1rem"
-                  sx={{
-                    [theme.breakpoints.up("sm")]: {
-                      flexDirection: "row",
-                    },
-                  }}
-                >
+                <Box display="flex" flexDirection={isDesktop ? "row" : "column"} gap="1rem">
                   <TextInput
                     variant="standard"
                     name={`contacts[${index}].name`}
