@@ -30,6 +30,11 @@ class GroupSource extends MongoDataSource {
       throw error;
     }
   }
+
+  async deleteGroups(groupIds) {
+    const { acknowledged: ok, deletedCount } = await this.model.deleteMany({ _id: groupIds });
+    return { ok, deletedCount, deletedIds: groupIds };
+  }
 }
 
 module.exports = {

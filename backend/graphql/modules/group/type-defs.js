@@ -8,6 +8,7 @@ const typeDefs = gql`
 
   type Mutation {
     createGroup(input: CreateGroupInput): Group!
+    deleteGroups(groupIds: [ID]): DeleteResponse
   }
 
   type Group {
@@ -22,6 +23,12 @@ const typeDefs = gql`
     street: String
     suburb: String
     postCode: Int
+  }
+
+  type DeleteResponse {
+    ok: Boolean!
+    deletedCount: Int
+    deletedIds: [ID]
   }
 
   input CreateGroupInput {

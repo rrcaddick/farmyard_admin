@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 
 const CREATE_GROUP_MUTATION = gql`
-  mutation Mutation($input: CreateGroupInput) {
+  mutation CreateGroup($input: CreateGroupInput) {
     createGroup(input: $input) {
       id
       name
@@ -24,4 +24,14 @@ const CREATE_GROUP_MUTATION = gql`
   }
 `;
 
-export { CREATE_GROUP_MUTATION };
+const DELETE_GROUPS_MUTATION = gql`
+  mutation DeleteGroups($groupIds: [ID]) {
+    deleteGroups(groupIds: $groupIds) {
+      ok
+      deletedCount
+      deletedIds
+    }
+  }
+`;
+
+export { CREATE_GROUP_MUTATION, DELETE_GROUPS_MUTATION };

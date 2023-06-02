@@ -225,11 +225,20 @@ export const themeSettings = (mode) => {
           },
         },
       },
+      MUIDataTableBody: {
+        styleOverrides: {
+          emptyTitle: {
+            [breakpoints.down("md")]: {
+              textAlign: "right",
+            },
+          },
+        },
+      },
       MUIDataTableToolbar: {
         styleOverrides: {
           root: {
             minHeight: "inherit",
-            padding: "10px 15px",
+            padding: "8px 15px",
             [breakpoints.down("sm")]: {
               margin: "0 auto",
             },
@@ -248,7 +257,17 @@ export const themeSettings = (mode) => {
       MUIDataTableToolbarSelect: {
         styleOverrides: {
           root: {
-            flex: "1 0 56px",
+            maxHeight: "89.59px",
+            [breakpoints.up("sm")]: {
+              maxHeight: "56px",
+            },
+          },
+        },
+      },
+      MUIDataTableFooter: {
+        styleOverrides: {
+          root: {
+            marginTop: "auto",
           },
         },
       },
