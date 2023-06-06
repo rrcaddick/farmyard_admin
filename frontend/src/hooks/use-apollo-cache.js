@@ -18,12 +18,20 @@ const useApolloCache = () => {
           ...(variables && variables),
         });
       },
-      read: (query, variables) => {
+      read: (query, variables = null) => {
         const data = client.readQuery({
           query,
-          ...(variables && variables),
+          variables: { ...variables },
         });
         return data ? Object.values(data)[0] : null;
+      },
+      readFragment: (typeName, id, fragment) => {
+        const data = client.readFragment({
+          id: `${typeName}:${id}`,
+          fragment: fragment,
+        });
+
+        return data ? data : null;
       },
     }),
     [client]

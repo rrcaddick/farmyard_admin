@@ -8,6 +8,7 @@ const typeDefs = gql`
 
   type Mutation {
     createGroup(input: CreateGroupInput): Group!
+    updateGroup(input: UpdateGroupInput): Group!
     deleteGroups(groupIds: [ID]): DeleteResponse
   }
 
@@ -32,10 +33,18 @@ const typeDefs = gql`
   }
 
   input CreateGroupInput {
+    name: String!
+    groupType: GroupTypeInput!
+    address: AddressInput
+    contacts: [GroupContactInput]
+  }
+
+  input UpdateGroupInput {
+    id: ID!
     name: String
     groupType: GroupTypeInput
     address: AddressInput
-    contacts: [GroupContactInput]
+    contacts: [UpdateGroupContactInput]
   }
 
   input AddressInput {
@@ -48,6 +57,14 @@ const typeDefs = gql`
     name: String!
     email: String
     tel: String
+  }
+
+  input UpdateGroupContactInput {
+    id: ID
+    name: String
+    email: String
+    tel: String
+    shouldDelete: Boolean
   }
 `;
 

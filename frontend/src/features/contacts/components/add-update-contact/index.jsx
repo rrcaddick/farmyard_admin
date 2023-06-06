@@ -4,45 +4,24 @@ import { useIsDesktop } from "@hooks/use-is-desktop";
 import { Divider, Typography, useTheme } from "@mui/material";
 import Box from "@mui/material/Box";
 import { useEffect, useState } from "react";
-import GroupForm from "./new-group-form";
-import { GET_GROUP_BY_ID } from "@groups/graphql/queries";
-import { useGetAllGroupTypes } from "@groups/graphql/hooks";
+import ContactForm from "@contacts/components/add-update-contact/form";
+import { GET_CONTACT_BY_ID } from "@contacts/graphql/queries";
 
 //TODO: Look into adding modal that accepts children to outlet context
-const AddUpdateGroup = ({ open, onClose, container, groupId }) => {
-  const [group, setGroup] = useState();
+const AddUpdateContact = ({ open, onClose, container, contactId }) => {
+  const [contact, setContact] = useState();
 
   const theme = useTheme();
   const isDesktop = useIsDesktop();
   const cache = useApolloCache();
 
-  const { groupTypes, loading, error } = useGetAllGroupTypes();
-
-  const removeContactHandler = (contactId) => {
-    setGroup((group) => ({ ...group, contacts: group.contacts.filter(({ id }) => id !== contactId) }));
-  };
-
   useEffect(() => {
-    const group = cache.read(GET_GROUP_BY_ID, { groupId });
-    if (group) {
-      const {
-        id,
-        name,
-        address: { street, suburb, postCode },
-        groupType,
-        contacts,
-      } = group;
-      setGroup({
-        id,
-        name,
-        address: { street, suburb, postCode },
-        groupType: JSON.stringify(groupType),
-        contacts: contacts.map(({ id, name, email, tel }) => ({ id, name, email: email ?? "", tel: tel ?? "" })),
-      });
-
-      return () => setGroup();
+    const contact = cache.read(GET_CONTACT_BY_ID, { contactId });
+    if (contact) {
+      const { id, name, email, tel } = contact;
+      setContact({ id, name, email, tel });
     }
-  }, [groupId, cache]);
+  }, [contactId, cache]);
 
   return (
     <ContainedModal {...{ open, onClose, container }}>
@@ -70,7 +49,7 @@ const AddUpdateGroup = ({ open, onClose, container, groupId }) => {
             marginLeft: isDesktop ? "1rem" : "0.5rem",
           }}
         >
-          {groupId ? group?.name : "New Group Details:"}
+          {contactId ? contact?.name : "New Contact Details:"}
         </Typography>
         <Divider
           light
@@ -80,9 +59,9 @@ const AddUpdateGroup = ({ open, onClose, container, groupId }) => {
             marginLeft: isDesktop ? "1rem" : "0.5rem",
           }}
         />
-        <GroupForm {...{ onClose, groupTypes, ...(group && { group, removeContact: removeContactHandler }) }} />
+        <ContactForm {...{ onClose, ...(contact && { contact }) }} />
       </Box>
     </ContainedModal>
   );
 };
-export default AddUpdateGroup;
+export default AddUpdateContact;

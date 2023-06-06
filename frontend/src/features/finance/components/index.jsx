@@ -1,7 +1,7 @@
 import { Box, Button } from "@mui/material";
 import Header from "@components/display/header";
 import CrudDataGrid from "@components/data-grid/crud-data-grid";
-import { contactSchema } from "@contacts/schemas/contactSchema";
+import { contactSchema } from "@contacts/schemas/contact-schema";
 import { useCallback, useRef, useState } from "react";
 import DraggableDialog from "@components/dialog/draggable-dialog";
 

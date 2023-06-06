@@ -11,14 +11,12 @@ const contactSchema = object().shape(
         string().required("Either email address or contact number is required").email("Invalid email address"),
       otherwise: () => string().email("Invalid email address"),
     }),
-    tel: string()
-      .transform((value) => (value === "" ? undefined : value))
-      .when("email", {
-        is: (email) => {
-          return !email || email.length === 0;
-        },
-        then: () => string().required("Either email address or contact number is required"),
-      }),
+    tel: string().when("email", {
+      is: (email) => {
+        return !email || email.length === 0;
+      },
+      then: () => string().required("Either email address or contact number is required"),
+    }),
   },
   [["email", "tel"]]
 );

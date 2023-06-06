@@ -77,7 +77,6 @@ const routes = [
         ],
       },
       // Not Found
-      // TODO: Add 404 not found with lottie sheep
       {
         path: "*",
         element: <_404_NOT_FOUND />,

@@ -13,6 +13,8 @@ const SelectInput = ({
   onChange = () => {},
   inputProps = null,
   serverError = null,
+  setSelectValue,
+  setDisplayText,
   ...props
 }) => {
   const { control } = useFormContext();
@@ -35,9 +37,9 @@ const SelectInput = ({
               onChangeForm(e.target.value);
             }}
           >
-            {selectItems.map(({ id, text }) => (
-              <MenuItem value={id} key={id}>
-                {text}
+            {selectItems.map((item) => (
+              <MenuItem value={JSON.stringify(setSelectValue(item))} key={item.id}>
+                {setDisplayText(item)}
               </MenuItem>
             ))}
           </Select>

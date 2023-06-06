@@ -4,7 +4,30 @@ import { onError } from "@apollo/client/link/error";
 
 const createApolloClient = () => {
   let token;
-  const cache = new InMemoryCache();
+  const cache = new InMemoryCache({
+    typePolicies: {
+      Query: {
+        fields: {
+          getGroup: {
+            read(_, { args: { groupId }, toReference }) {
+              return toReference({
+                __typename: "Group",
+                id: groupId,
+              });
+            },
+          },
+          getContact: {
+            read(_, { args: { contactId }, toReference }) {
+              return toReference({
+                __typename: "Contact",
+                id: contactId,
+              });
+            },
+          },
+        },
+      },
+    },
+  });
 
   const setToken = (newToken) => {
     token = newToken;

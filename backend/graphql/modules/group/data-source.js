@@ -31,6 +31,47 @@ class GroupSource extends MongoDataSource {
     }
   }
 
+  async updateGroup(input) {
+    const { id, contacts, ...updateFields } = input;
+    const newContactIds = [];
+
+    if (contacts && contacts.length > 0) {
+      for (let contact of contacts) {
+        const { id, shouldDelete } = contact;
+        // Contact to delete
+        if (id && shouldDelete) {
+          // Delete contact
+          await Contact.findByIdAndDelete(id);
+          // Remove id from array
+          await this.model.findByIdAndUpdate(id, { $pull: { contacts: id } }, { new: true });
+        }
+
+        // Existing contact to update
+        if (id) {
+          await Contact.findByIdAndUpdate(contact.id, contact, { new: true });
+        }
+
+        // New contact to create
+        if (!id) {
+          const { _id } = await Contact.create(contact);
+          newContactIds.push(_id);
+        }
+      }
+    }
+
+    const hasNewContacts = newContactIds.length > 0;
+
+    const group = this.executeWithGraphqlProjection(
+      await this.model.findByIdAndUpdate(
+        id,
+        { ...updateFields, ...(hasNewContacts && { $push: { contacts: newContactIds } }) },
+        { new: true }
+      )
+    );
+
+    return group;
+  }
+
   async deleteGroups(groupIds) {
     const { acknowledged: ok, deletedCount } = await this.model.deleteMany({ _id: groupIds });
     return { ok, deletedCount, deletedIds: groupIds };

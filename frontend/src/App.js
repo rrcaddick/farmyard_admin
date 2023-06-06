@@ -26,7 +26,7 @@ const App = ({ rememberMe }) => {
         const response = await sendRequest("POST", "/login", { rememberMe });
 
         // Write user to apollo cache
-        response.success && cache.write(getMe, "User", response.data);
+        response?.success && cache.write(getMe, "User", response.data);
         endLoading();
       })();
     }

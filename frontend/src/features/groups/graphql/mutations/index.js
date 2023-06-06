@@ -1,25 +1,21 @@
 import { gql } from "@apollo/client";
+import { FULL_GROUP_FRAGMENT } from "../fragments";
 
 const CREATE_GROUP_MUTATION = gql`
+  ${FULL_GROUP_FRAGMENT}
   mutation CreateGroup($input: CreateGroupInput) {
     createGroup(input: $input) {
-      id
-      name
-      groupType {
-        id
-        type
-        price {
-          id
-        }
-      }
-      address {
-        street
-        suburb
-        postCode
-      }
-      contacts {
-        id
-      }
+      ...FullGroup
+    }
+  }
+`;
+
+const UPDATE_GROUP_MUTATION = gql`
+  # TODO: Create function to dynamically create fragment based on dirty fields
+  ${FULL_GROUP_FRAGMENT}
+  mutation UpdateGroup($input: UpdateGroupInput) {
+    updateGroup(input: $input) {
+      ...FullGroup
     }
   }
 `;
@@ -34,4 +30,4 @@ const DELETE_GROUPS_MUTATION = gql`
   }
 `;
 
-export { CREATE_GROUP_MUTATION, DELETE_GROUPS_MUTATION };
+export { CREATE_GROUP_MUTATION, UPDATE_GROUP_MUTATION, DELETE_GROUPS_MUTATION };
