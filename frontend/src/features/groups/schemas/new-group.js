@@ -1,4 +1,4 @@
-import { object, string, number, array, transform } from "yup";
+import { object, string, number, array } from "yup";
 import { contactSchema } from "@contacts/schemas/contact-schema";
 
 const addressSchema = object().shape({
@@ -15,12 +15,13 @@ const groupTypeSchema = object()
     return groupType ? JSON.parse(groupType) : "";
   })
   .shape({
-    id: string().required("Please select a group Type"),
-    type: string().required(""),
+    id: string().required("GroupType.id is required"),
+    type: string().required("GroupType.type is required"),
     price: object().shape({
-      id: string().required(),
+      id: string().required("GroupType.price.id is required"),
     }),
-  });
+  })
+  .typeError("Please select a group Type");
 
 const newGroupSchema = object().shape({
   name: string().required("Group name is required"),

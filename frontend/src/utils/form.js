@@ -14,7 +14,7 @@ const createDirtyFields = (defaultValues, submittedValues) => {
       const { id } = submittedValues[i];
       const defaultArrayValue = defaultValues.find((value) => value.id === id);
       const dirtyFieldsObject = createDirtyFields(defaultArrayValue, submittedValues[i]);
-      if (Object.keys(dirtyFieldsObject).length > 0) arrayObjects.push({ ...dirtyFieldsObject, index: 1 });
+      if (Object.keys(dirtyFieldsObject).length > 0) arrayObjects.push({ ...dirtyFieldsObject, index: i });
     }
     return arrayObjects.length > 0 ? arrayObjects : undefined;
   }

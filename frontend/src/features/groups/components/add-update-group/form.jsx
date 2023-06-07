@@ -99,7 +99,7 @@ const GroupForm = ({ groupTypes, onClose, group }) => {
   }, [setFocus]);
 
   const submitHandler = useCallback(
-    async (data) => {
+    (data) => {
       const getInputData = (data) => {
         const { groupType: { __typename, price: { id } = {}, ...groupType } = {}, contacts } = data;
 
@@ -122,7 +122,7 @@ const GroupForm = ({ groupTypes, onClose, group }) => {
         };
 
         const dirtyData = getDirtyData(group, data, stringfySelectObjects, { withId: true });
-        await updateGroup({
+        updateGroup({
           variables: { input: getInputData(dirtyData) },
           optimisticResponse: {
             updateGroup: createOptimisticResponse(data),
@@ -131,7 +131,7 @@ const GroupForm = ({ groupTypes, onClose, group }) => {
       }
 
       if (!group) {
-        await createGroup({
+        createGroup({
           variables: { input: getInputData(data) },
           optimisticResponse: {
             createGroup: createOptimisticResponse(data),
