@@ -5,8 +5,9 @@ const createMutation =
   (mutation, updateFn) =>
   (onCompelteFn = null) => {
     const [serverErrors, setServerErrors] = useState({});
+    const [complete, setComplete] = useState(false);
 
-    const [mutate, { loading }] = useMutation(mutation, {
+    const [apolloMutate, { loading }] = useMutation(mutation, {
       onError: ({ graphQLErrors }) => {
         if (graphQLErrors?.length > 0) {
           const { data: errors } = graphQLErrors[0]?.extensions || {};
@@ -14,10 +15,16 @@ const createMutation =
         }
       },
       onCompleted: (data) => {
+        setComplete(true);
         onCompelteFn && onCompelteFn(data);
       },
       update: updateFn,
     });
+
+    const mutate = (args) => {
+      setComplete(false);
+      apolloMutate(args);
+    };
 
     const clearServerError = (name) => {
       setServerErrors((serverErrors) => ({ ...serverErrors, [name]: undefined }));
@@ -25,6 +32,7 @@ const createMutation =
 
     return {
       loading,
+      complete,
       serverErrors,
       clearServerError,
       mutate,

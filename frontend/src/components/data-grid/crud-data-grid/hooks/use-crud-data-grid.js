@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { GridRowEditStopReasons, GridRowModes } from "@mui/x-data-grid";
 import { v4 as uuid } from "uuid";
 
+//TODO: Remove mui data grid package and component if no longer required
 const useCrudDataGrid = ({ existingRows, schema, onSave }) => {
   const [rows, setRows] = useState(existingRows);
   const [deletedRow, setDeletedRow] = useState();
@@ -51,7 +52,6 @@ const useCrudDataGrid = ({ existingRows, schema, onSave }) => {
 
   const onProcessRowUpdateError = useCallback(
     (error) => {
-      //TODO: Proceses row update error
       return rows;
     },
     [rows]

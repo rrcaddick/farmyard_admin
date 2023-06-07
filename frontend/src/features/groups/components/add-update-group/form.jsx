@@ -39,16 +39,17 @@ const createOptimisticResponse = (data) => {
   return groupResponse;
 };
 
-const GroupForm = ({ groupTypes, onClose, group, removeContact }) => {
+const GroupForm = ({ groupTypes, onClose, group }) => {
   const theme = useTheme();
   const isDesktop = useIsDesktop();
 
-  //TODO: Create useGroup which has all crud functions
+  const definedProps = (obj) => Object.fromEntries(Object.entries(obj).filter(([k, v]) => v !== undefined));
 
-  //TODO: Create universal clearServerError funciton
+  //TODO: Create useGroup which has all crud (create, update and delete) functions
   const {
     mutate: createGroup,
     loading: createLoading,
+    complete: createComplete,
     serverErrors: createServerErrors,
     clearServerError: clearCreateError,
   } = useCreateGroup();
@@ -56,16 +57,17 @@ const GroupForm = ({ groupTypes, onClose, group, removeContact }) => {
   const {
     mutate: updateGroup,
     loading: updateLoading,
+    complete: updateComplete,
     serverErrors: updateServerErrors,
     clearServerError: clearUpdateError,
   } = useUpdateGroup();
 
-  const serverErrors = useMemo(
-    () => _.merge(createServerErrors, updateServerErrors),
-    [createServerErrors, updateServerErrors]
-  );
+  const serverErrors = useMemo(() => {
+    return Object.assign(definedProps(createServerErrors), definedProps(updateServerErrors));
+  }, [createServerErrors, updateServerErrors]);
 
-  const loading = useMemo(() => _.merge(createLoading, updateLoading), [createLoading, updateLoading]);
+  const loading = useMemo(() => createLoading || updateLoading, [createLoading, updateLoading]);
+  const complete = useMemo(() => updateComplete || createComplete, [updateComplete, createComplete]);
 
   const clearServerError = useMemo(
     () => (group ? clearUpdateError : clearCreateError),
@@ -76,7 +78,7 @@ const GroupForm = ({ groupTypes, onClose, group, removeContact }) => {
 
   const formMethods = useForm({
     resolver,
-    mode: "onChange",
+    mode: "all",
     defaultValues: { name: "", groupType: "", address: { street: "", suburb: "", postCode: "" } },
     values: group,
   });
@@ -97,10 +99,20 @@ const GroupForm = ({ groupTypes, onClose, group, removeContact }) => {
   }, [setFocus]);
 
   const submitHandler = useCallback(
-    (data) => {
+    async (data) => {
       const getInputData = (data) => {
-        const { groupType: { __typename, price: { id } = {}, ...groupType } = {} } = data;
-        return { ...data, ...(!_.isEmpty(groupType) && { groupType: { ...groupType, price: id } }) };
+        const { groupType: { __typename, price: { id } = {}, ...groupType } = {}, contacts } = data;
+
+        return {
+          ...data,
+          ...(contacts && {
+            contacts: contacts.map((contact) => {
+              const { id, ...contactData } = contact;
+              return id.includes("Temp") ? contactData : contact;
+            }),
+          }),
+          ...(!_.isEmpty(groupType) && { groupType: { ...groupType, price: id } }),
+        };
       };
 
       if (group) {
@@ -110,7 +122,7 @@ const GroupForm = ({ groupTypes, onClose, group, removeContact }) => {
         };
 
         const dirtyData = getDirtyData(group, data, stringfySelectObjects, { withId: true });
-        updateGroup({
+        await updateGroup({
           variables: { input: getInputData(dirtyData) },
           optimisticResponse: {
             updateGroup: createOptimisticResponse(data),
@@ -119,19 +131,23 @@ const GroupForm = ({ groupTypes, onClose, group, removeContact }) => {
       }
 
       if (!group) {
-        createGroup({
+        await createGroup({
           variables: { input: getInputData(data) },
           optimisticResponse: {
             createGroup: createOptimisticResponse(data),
           },
         });
       }
+    },
+    [group, createGroup, updateGroup, getDirtyData]
+  );
 
+  useEffect(() => {
+    if (!loading && _.isEmpty(serverErrors) && complete) {
       reset();
       onClose();
-    },
-    [group, createGroup, updateGroup, onClose, reset, getDirtyData]
-  );
+    }
+  }, [loading, serverErrors, onClose, reset, complete]);
 
   const removeContactHandler = (contactIndex) => {
     const deletedContact = { ...getValues(`contacts[${contactIndex}]`), shouldDelete: true };

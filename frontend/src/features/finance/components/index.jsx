@@ -43,9 +43,7 @@ const Finance = () => {
           ...prevContacts.slice(index + 1),
         ]);
       }
-    } catch (error) {
-      // TODO: Throw error for onProcessRowUpdateError
-    }
+    } catch (error) {}
   };
 
   const onDelete = useCallback((deletedId) => {

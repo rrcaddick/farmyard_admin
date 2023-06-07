@@ -1,6 +1,6 @@
 import Header from "@components/display/header";
 import AddIcon from "@mui/icons-material/Add";
-import NewGroup from "@groups/components/new-group";
+import AddUpdateGroup from "@groups/components/add-update-group";
 import { useMemo, useState } from "react";
 import { Box, Fab, IconButton } from "@mui/material";
 import { useOutletContext } from "react-router-dom";
@@ -121,7 +121,7 @@ const Groups = () => {
           <MUIDataTable title="View, Update or Add new groups" data={groups} columns={columns} options={options} />
         </Box>
       </Box>
-      <NewGroup
+      <AddUpdateGroup
         {...{ container, open: openNewGroup, groupId: selectedGroupId }}
         onClose={() => toggleAddUpdateGroup(false)}
       />

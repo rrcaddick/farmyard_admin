@@ -4,11 +4,10 @@ import { useIsDesktop } from "@hooks/use-is-desktop";
 import { Divider, Typography, useTheme } from "@mui/material";
 import Box from "@mui/material/Box";
 import { useEffect, useState } from "react";
-import GroupForm from "./new-group-form";
+import GroupForm from "./form";
 import { GET_GROUP_BY_ID } from "@groups/graphql/queries";
 import { useGetAllGroupTypes } from "@groups/graphql/hooks";
 
-//TODO: Look into adding modal that accepts children to outlet context
 const AddUpdateGroup = ({ open, onClose, container, groupId }) => {
   const [group, setGroup] = useState();
 
@@ -17,10 +16,6 @@ const AddUpdateGroup = ({ open, onClose, container, groupId }) => {
   const cache = useApolloCache();
 
   const { groupTypes, loading, error } = useGetAllGroupTypes();
-
-  const removeContactHandler = (contactId) => {
-    setGroup((group) => ({ ...group, contacts: group.contacts.filter(({ id }) => id !== contactId) }));
-  };
 
   useEffect(() => {
     const group = cache.read(GET_GROUP_BY_ID, { groupId });
@@ -80,7 +75,7 @@ const AddUpdateGroup = ({ open, onClose, container, groupId }) => {
             marginLeft: isDesktop ? "1rem" : "0.5rem",
           }}
         />
-        <GroupForm {...{ onClose, groupTypes, ...(group && { group, removeContact: removeContactHandler }) }} />
+        <GroupForm {...{ onClose, groupTypes, ...(group && { group }) }} />
       </Box>
     </ContainedModal>
   );
