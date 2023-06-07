@@ -28,6 +28,10 @@ class MongoDataSource extends MongoDataSourceOriginal {
     input.createdBy = { user: userId, name };
     return input;
   }
+
+  createSubDocumentUpdateQuery(subDocumentName, subDocument) {
+    return Object.fromEntries(Object.entries(subDocument).map(([key, value]) => [`${subDocumentName}.${key}`, value]));
+  }
 }
 
 module.exports = {

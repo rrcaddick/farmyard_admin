@@ -80,7 +80,7 @@ const getDirtyValues = (dirtyFields, allValues, { withId = false }) => {
     return arrayObjects;
   }
 
-  if (withId && Object.keys(dirtyFields).length > 0) dirtyFields = { ...dirtyFields, id: true };
+  if (withId && Object.keys(dirtyFields).length > 0 && allValues?.id) dirtyFields = { ...dirtyFields, id: true };
 
   return Object.fromEntries(
     Object.keys(dirtyFields).reduce((acc, key) => {

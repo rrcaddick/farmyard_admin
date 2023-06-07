@@ -1,9 +1,10 @@
 const { validate } = require("../../middleware/validate");
-const { groupSchema } = require("./schema");
+const { createGroupSchema, updateGroupSchema } = require("./schemas");
 
 const middlewares = {
   Mutation: {
-    createGroup: [validate(groupSchema)],
+    createGroup: [validate(createGroupSchema)],
+    updateGroup: [validate(updateGroupSchema)],
   },
 };
 

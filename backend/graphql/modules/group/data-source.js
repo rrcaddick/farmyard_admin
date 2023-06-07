@@ -32,7 +32,7 @@ class GroupSource extends MongoDataSource {
   }
 
   async updateGroup(input) {
-    const { id, contacts, ...updateFields } = input;
+    const { id, contacts, address, ...updateFields } = input;
     const newContactIds = [];
 
     if (contacts && contacts.length > 0) {
@@ -64,7 +64,11 @@ class GroupSource extends MongoDataSource {
     const group = this.executeWithGraphqlProjection(
       await this.model.findByIdAndUpdate(
         id,
-        { ...updateFields, ...(hasNewContacts && { $push: { contacts: newContactIds } }) },
+        {
+          ...updateFields,
+          ...(hasNewContacts && { $push: { contacts: newContactIds } }),
+          ...(address && { $set: this.createSubDocumentUpdateQuery("address", address) }),
+        },
         { new: true }
       )
     );

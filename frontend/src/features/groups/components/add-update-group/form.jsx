@@ -43,7 +43,9 @@ const GroupForm = ({ groupTypes, onClose, group }) => {
   const theme = useTheme();
   const isDesktop = useIsDesktop();
 
-  const definedProps = (obj) => Object.fromEntries(Object.entries(obj).filter(([k, v]) => v !== undefined));
+  const definedProps = (obj) => {
+    return Object.fromEntries(Object.entries(obj).filter(([k, v]) => v !== undefined));
+  };
 
   //TODO: Create useGroup which has all crud (create, update and delete) functions
   const {
@@ -63,7 +65,7 @@ const GroupForm = ({ groupTypes, onClose, group }) => {
   } = useUpdateGroup();
 
   const serverErrors = useMemo(() => {
-    return Object.assign(definedProps(createServerErrors), definedProps(updateServerErrors));
+    return Object.assign(definedProps(createServerErrors) || {}, definedProps(updateServerErrors) || {});
   }, [createServerErrors, updateServerErrors]);
 
   const loading = useMemo(() => createLoading || updateLoading, [createLoading, updateLoading]);
@@ -105,12 +107,7 @@ const GroupForm = ({ groupTypes, onClose, group }) => {
 
         return {
           ...data,
-          ...(contacts && {
-            contacts: contacts.map((contact) => {
-              const { id, ...contactData } = contact;
-              return id.includes("Temp") ? contactData : contact;
-            }),
-          }),
+          ...(contacts && { contacts }),
           ...(!_.isEmpty(groupType) && { groupType: { ...groupType, price: id } }),
         };
       };
