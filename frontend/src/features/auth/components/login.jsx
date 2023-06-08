@@ -103,12 +103,19 @@ const Login = () => {
       </Box>
       <FormProvider {...formMethods}>
         <LoginForm onSubmit={handleSubmit(loginHandler)} noValidate>
-          <TextInput name="email" label="Email Address" type="email" placeholder="example@example.com" />
+          <TextInput
+            name="email"
+            label="Email Address"
+            type="email"
+            placeholder="example@example.com"
+            variant="outlined"
+          />
           <TextInput
             name="password"
             label="Password"
             type={showPassword ? "text" : "password"}
             placeholder="P@ssw0rd!2$"
+            variant="outlined"
             InputProps={{
               endAdornment: (
                 <IconButton onClick={toggleShowPassword}>

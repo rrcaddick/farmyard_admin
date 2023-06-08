@@ -175,11 +175,9 @@ const GroupForm = ({ groupTypes, onClose, group }) => {
         <Grid container spacing={{ xs: 2, md: 4 }} sx={{ overflowY: "scroll", margin: 0 }}>
           <Grid xs={12} md={6}>
             <TextInput
-              variant="standard"
               name="name"
               label="Group Name"
               placeholder="Eg: Chirst Church"
-              fullWidth
               serverError={serverErrors?.name}
               clearServerError={clearServerError}
             />
@@ -187,66 +185,43 @@ const GroupForm = ({ groupTypes, onClose, group }) => {
 
           <Grid xs={12} md={6}>
             <SelectInput
-              variant="standard"
-              inputLabelProps={{ sx: { margin: 0 } }}
               name="groupType"
               label="Group Type"
               placeholder="Select group type..."
               selectItems={groupTypes}
               setSelectValue={(item) => item}
               setDisplayText={(item) => item.type}
-              formControlProps={{ sx: { width: "100%" } }}
               serverError={serverErrors?.groupType}
-              onChange={({ target }) => {
-                serverErrors?.groupType && clearServerError(target?.name);
-              }}
+              clearServerError={clearServerError}
             />
           </Grid>
 
           <Grid xs={12} md={6}>
             <TextInput
-              variant="standard"
               name="address.street"
               label="Street"
               placeholder="Eg: 123 Example Street"
-              fullWidth
               serverError={serverErrors?.["address.street"]}
-              {...(serverErrors?.["address.street"] && {
-                onChange: ({ target }) => {
-                  clearServerError(target?.name);
-                },
-              })}
+              clearServerError={clearServerError}
             />
           </Grid>
 
           <Grid xs={12} md={6}>
             <Box display="flex" gap="2rem" flexGrow={1}>
               <TextInput
-                variant="standard"
                 name="address.suburb"
                 label="Suburb"
                 placeholder="Eg: Bellville"
-                sx={{ flexGrow: 1 }}
                 serverError={serverErrors?.["address.suburb"]}
-                {...(serverErrors?.["address.suburb"] && {
-                  onChange: ({ target }) => {
-                    clearServerError(target?.name);
-                  },
-                })}
+                clearServerError={clearServerError}
               />
               <TextInput
-                variant="standard"
                 type="number"
                 name="address.postCode"
                 label="Post Code"
                 placeholder="Eg: 7625"
-                sx={{ flexGrow: 1 }}
                 serverError={serverErrors?.["address.postCode"]}
-                {...(serverErrors?.["address.postCode"] && {
-                  onChange: ({ target }) => {
-                    clearServerError(target?.name);
-                  },
-                })}
+                clearServerError={clearServerError}
               />
             </Box>
           </Grid>
@@ -273,43 +248,25 @@ const GroupForm = ({ groupTypes, onClose, group }) => {
             <Grid xs={12} key={field.id}>
               <Box display="flex" flexDirection={isDesktop ? "row" : "column"} gap="1rem">
                 <TextInput
-                  variant="standard"
                   name={`contacts[${index}].name`}
                   label="Contact Name"
                   placeholder="John Doe"
-                  fullWidth
                   serverError={serverErrors?.[`contacts[${index}].name`]}
-                  {...(serverErrors?.[`contacts[${index}].name`] && {
-                    onChange: ({ target }) => {
-                      clearServerError(target?.name);
-                    },
-                  })}
+                  clearServerError={clearServerError}
                 />
                 <TextInput
-                  variant="standard"
                   name={`contacts[${index}].email`}
                   label="Email Address"
                   placeholder="example@example.com"
-                  fullWidth
                   serverError={serverErrors?.[`contacts[${index}].email`]}
-                  {...(serverErrors?.[`contacts[${index}].email`] && {
-                    onChange: ({ target }) => {
-                      clearServerError(target?.name);
-                    },
-                  })}
+                  clearServerError={clearServerError}
                 />
                 <TextInput
-                  variant="standard"
                   name={`contacts[${index}].tel`}
                   label="Tel"
                   placeholder="073 123 4567"
-                  fullWidth
                   serverError={serverErrors?.[`contacts[${index}].tel`]}
-                  {...(serverErrors?.[`contacts[${index}].tel`] && {
-                    onChange: ({ target }) => {
-                      clearServerError(target?.name);
-                    },
-                  })}
+                  clearServerError={clearServerError}
                 />
 
                 {!isDesktop && (
@@ -332,7 +289,6 @@ const GroupForm = ({ groupTypes, onClose, group }) => {
           ))}
         </Grid>
         <Divider
-          light
           sx={{
             borderWidth: "1px",
             borderColor: "primary.dark",

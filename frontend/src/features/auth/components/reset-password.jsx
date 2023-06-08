@@ -64,6 +64,7 @@ const ResetPassword = () => {
             label="New Password"
             type={showPassword ? "text" : "password"}
             placeholder="P@ssw0rd!2$"
+            variant="outlined"
             InputProps={getInputProps(toggleShowPassword, showPassword)}
           />
           <TextInput
@@ -71,6 +72,7 @@ const ResetPassword = () => {
             label="Confirm New Password"
             type={showConfirmPassword ? "text" : "password"}
             placeholder="P@ssw0rd!2$"
+            variant="outlined"
             InputProps={getInputProps(toggleShowConfirmPassword, showConfirmPassword)}
           />
           <Button

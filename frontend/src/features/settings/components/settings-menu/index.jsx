@@ -1,9 +1,9 @@
 import { useCallback } from "react";
-import { useMenu } from "@components/hooks/use-menu";
+import { useMenu } from "@components/menu/use-menu";
 import { IconButton, MenuItem } from "@mui/material";
 import SettingsIcon from "@mui/icons-material/SettingsOutlined";
 
-const SettingsMenu = () => {
+const SettingsMenuBased = () => {
   const { Menu, open } = useMenu();
 
   return (
@@ -18,4 +18,4 @@ const SettingsMenu = () => {
   );
 };
 
-export default SettingsMenu;
+export default SettingsMenuBased;

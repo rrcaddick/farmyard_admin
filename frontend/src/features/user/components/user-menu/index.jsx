@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { useLogout } from "@auth/hooks/use-logout";
-import { useMenu } from "@components/hooks/use-menu";
+import { useMenu } from "@components/menu/use-menu";
 import { IconButton, MenuItem } from "@mui/material";
 import UserIcon from "@mui/icons-material/PersonOutline";
 

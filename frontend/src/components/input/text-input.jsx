@@ -12,7 +12,7 @@ const TextInput = ({
   placeholder,
   label,
   onChange,
-  variant = "outlined",
+  variant = "standard",
   InputProps,
   defaultValue = "",
   number,
@@ -32,6 +32,7 @@ const TextInput = ({
           <TextField
             inputRef={ref}
             error={!!error || !!serverError}
+            fullWidth
             onChange={(e) => {
               onChange && onChange(e);
               serverError && clearServerError(e.target.name);

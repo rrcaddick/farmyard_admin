@@ -43,7 +43,13 @@ const ForgotPassword = () => {
       )}
       <FormProvider {...formMethods}>
         <ForgotPasswordForm onSubmit={handleSubmit(sendLinkHandler)} noValidate>
-          <TextInput name="email" type="email" label="Email Address" placeholder="example@example.com" />
+          <TextInput
+            name="email"
+            type="email"
+            label="Email Address"
+            placeholder="example@example.com"
+            variant="outlined"
+          />
           <Button variant="contained" type="submit" sx={{ mt: "1rem" }} disabled={!isValid || loading}>
             {loading ? "Loading" : "Send Password Reset"}
           </Button>

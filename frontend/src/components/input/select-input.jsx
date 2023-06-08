@@ -1,4 +1,6 @@
 import { FormControl, FormHelperText, InputLabel, MenuItem, Select } from "@mui/material";
+import _ from "lodash";
+import { useMemo } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 
 const SelectInput = ({
@@ -6,29 +8,50 @@ const SelectInput = ({
   placeholder,
   label,
   selectItems,
-  variant = "outlined",
+  variant = "standard",
   defaultValue = "",
-  formControlProps = null,
-  inputLabelProps = null,
+  formControlProps,
+  inputLabelProps,
   onChange = () => {},
-  inputProps = null,
-  serverError = null,
+  inputProps,
+  serverError,
   setSelectValue,
   setDisplayText,
   ...props
 }) => {
   const { control } = useFormContext();
 
+  const defaultFormControlProps = useMemo(
+    () => ({
+      sx: { width: "100%" },
+    }),
+    []
+  );
+
+  const mergedFormControlProps = useMemo(
+    () => _.merge(defaultFormControlProps, formControlProps),
+    [defaultFormControlProps, formControlProps]
+  );
+
+  const defaultinputLabelProps = useMemo(
+    () => ({
+      sx: { margin: 0, marginLeft: "-14px", marginTop: "4px" },
+    }),
+    []
+  );
+
+  const mergedinputLabelProps = useMemo(
+    () => _.merge(defaultinputLabelProps, inputLabelProps),
+    [defaultinputLabelProps, inputLabelProps]
+  );
+
   return (
     <Controller
       {...{ control, name, defaultValue }}
       render={({ field: { name, onBlur, onChange: onChangeForm, ref: inputRef, value }, fieldState: { error } }) => (
-        <FormControl error={!!error || !!serverError} {...formControlProps}>
-          <InputLabel {...inputLabelProps} sx={{ marginLeft: "-14px", marginTop: "4px" }}>
-            {label}
-          </InputLabel>
+        <FormControl error={!!error || !!serverError} {...mergedFormControlProps}>
+          <InputLabel {...mergedinputLabelProps}>{label}</InputLabel>
           <Select
-            // tabIndex={2}
             {...{ name, onBlur, value, label, variant, inputRef, defaultValue }}
             {...(inputProps && { inputProps })}
             {...props}

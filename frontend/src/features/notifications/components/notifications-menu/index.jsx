@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { useMenu } from "@components/hooks/use-menu";
+import { useMenu } from "@components/menu/use-menu";
 import { IconButton, MenuItem } from "@mui/material";
 import BellIcon from "@mui/icons-material/NotificationsOutlined";
 

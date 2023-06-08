@@ -3,7 +3,6 @@ import { useMemo } from "react";
 import { useIsDesktop } from "@hooks/use-is-desktop";
 import { IconButton, Modal, Paper, useTheme } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { waitForElementToBeRemoved } from "@testing-library/react";
 
 const ConainedModal = ({ children, open, onClose, container, containerProps, ...props }) => {
   const theme = useTheme();
@@ -15,9 +14,15 @@ const ConainedModal = ({ children, open, onClose, container, containerProps, ...
       open,
       onClose,
       slotProps: { backdrop: { style: { position: "absolute" } } },
-      sx: { flexGrow: 1, display: "flex", p: isDesktop ? 3 : 1.5, position: "absolute", ...theme.mixins.content },
+      sx: {
+        flexGrow: 1,
+        display: "flex",
+        p: isDesktop ? 3 : 1.5,
+        position: "absolute",
+        ...theme.mixins.removeAppBarHeight,
+      },
     }),
-    [container, open, onClose, isDesktop, theme.mixins.content]
+    [container, open, onClose, isDesktop, theme.mixins.removeAppBarHeight]
   );
 
   const modalProps = useMemo(() => _.merge(defaultModalProps, props), [defaultModalProps, props]);

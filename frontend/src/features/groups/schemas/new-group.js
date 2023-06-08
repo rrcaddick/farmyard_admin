@@ -25,7 +25,6 @@ const groupTypeSchema = object()
 
 const newGroupSchema = object().shape({
   name: string().required("Group name is required"),
-  // groupType: string().required("Please select a group Type"),
   groupType: groupTypeSchema,
   address: addressSchema,
   contacts: array().of(contactSchema),

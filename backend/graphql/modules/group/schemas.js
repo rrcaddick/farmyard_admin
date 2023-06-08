@@ -54,7 +54,10 @@ const updateGroup = {
   }),
   schema: object().shape({
     name: string().when({
-      is: (exists) => !!exists,
+      is: (value) => {
+        const exists = !!value || value === "";
+        return exists;
+      },
       then: () => string().required("You must provide a group name"),
     }),
     groupType: getSchema("groupTypeSchema"),

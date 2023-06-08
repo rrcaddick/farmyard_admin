@@ -322,7 +322,7 @@ export const themeSettings = (mode) => {
       },
     },
     mixins: {
-      content: {
+      removeAppBarHeight: {
         "@media (min-width:0px)": {
           "@media (orientation: landscape)": {
             marginTop: "48px",
