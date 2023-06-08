@@ -11,13 +11,14 @@ const TextInput = ({
   type = "text",
   placeholder,
   label,
-  onChange = null,
+  onChange,
   variant = "outlined",
-  InputProps = null,
+  InputProps,
   defaultValue = "",
-  number = false,
-  tabIndex = null,
-  serverError = null,
+  number,
+  tabIndex,
+  serverError,
+  clearServerError,
   ...props
 }) => {
   const { control } = useFormContext();
@@ -33,6 +34,7 @@ const TextInput = ({
             error={!!error || !!serverError}
             onChange={(e) => {
               onChange && onChange(e);
+              serverError && clearServerError(e.target.name);
               onChangeRHF(e);
             }}
             {...{

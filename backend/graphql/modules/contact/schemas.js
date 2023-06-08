@@ -1,5 +1,7 @@
 const { object, string } = require("yup");
 
+//TODO: Clense tel
+//TODO: Make email and tel unique - Requires db to be dropped to create proper indexes
 const createContact = {
   schema: object().shape(
     {

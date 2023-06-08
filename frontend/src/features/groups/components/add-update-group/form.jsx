@@ -47,7 +47,7 @@ const GroupForm = ({ groupTypes, onClose, group }) => {
     return Object.fromEntries(Object.entries(obj).filter(([k, v]) => v !== undefined));
   };
 
-  //TODO: Create useGroup which has all crud (create, update and delete) functions
+  //TODO: Create useGroup which has all crud (create, update and delete) functions. create context which holds server errors and clear server errors
   const {
     mutate: createGroup,
     loading: createLoading,
@@ -107,7 +107,12 @@ const GroupForm = ({ groupTypes, onClose, group }) => {
 
         return {
           ...data,
-          ...(contacts && { contacts }),
+          ...(contacts && {
+            contacts: contacts.map((contact) => {
+              const { id, ...contactData } = contact;
+              return id?.includes("Temp") ? contactData : contact;
+            }),
+          }),
           ...(!_.isEmpty(groupType) && { groupType: { ...groupType, price: id } }),
         };
       };
@@ -176,12 +181,7 @@ const GroupForm = ({ groupTypes, onClose, group }) => {
               placeholder="Eg: Chirst Church"
               fullWidth
               serverError={serverErrors?.name}
-              //TODO: Think of way to add this to the TextInput component
-              {...(serverErrors?.name && {
-                onChange: ({ target }) => {
-                  clearServerError(target?.name);
-                },
-              })}
+              clearServerError={clearServerError}
             />
           </Grid>
 

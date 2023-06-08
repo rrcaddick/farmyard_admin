@@ -1,23 +1,60 @@
 import { useCallback, useMemo, useState } from "react";
+import MuiMenu from "@mui/material/Menu";
 
 const useMenu = () => {
-  const [anchorEl, setAnchorEl] = useState(null);
+  const [anchorElememt, setAnchorElememt] = useState(null);
 
-  const open = useMemo(() => Boolean(anchorEl), [anchorEl]);
+  const isOpen = useMemo(() => Boolean(anchorElememt), [anchorElememt]);
 
-  const handleOpen = useCallback((event) => {
-    setAnchorEl(event.currentTarget);
+  const open = useCallback((event) => {
+    setAnchorElememt(event.currentTarget);
   }, []);
 
-  const handleClose = useCallback(() => {
-    setAnchorEl(null);
+  const close = useCallback(() => {
+    setAnchorElememt(null);
   }, []);
+
+  const Menu = ({ children, anchorOrigin, transformOrigin }) => {
+    const _anchorOrigin = useMemo(
+      () =>
+        anchorOrigin
+          ? anchorOrigin
+          : {
+              vertical: "bottom",
+              horizontal: "right",
+            },
+      [anchorOrigin]
+    );
+    const _transformOrigin = useMemo(
+      () =>
+        transformOrigin
+          ? transformOrigin
+          : {
+              vertical: "top",
+              horizontal: "left",
+            },
+      [transformOrigin]
+    );
+
+    return (
+      <MuiMenu
+        anchorEl={anchorElememt}
+        open={isOpen}
+        onClose={close}
+        anchorOrigin={_anchorOrigin}
+        transformOrigin={_transformOrigin}
+      >
+        {children}
+      </MuiMenu>
+    );
+  };
 
   return {
-    anchorEl,
+    anchorElememt,
+    isOpen,
     open,
-    handleOpen,
-    handleClose,
+    close,
+    Menu,
   };
 };
 
