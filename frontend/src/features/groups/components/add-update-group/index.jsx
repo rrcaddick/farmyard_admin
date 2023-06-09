@@ -2,7 +2,7 @@ import { useIsDesktop } from "@hooks/use-is-desktop";
 import { Divider, Typography, useTheme } from "@mui/material";
 import Box from "@mui/material/Box";
 import GroupForm from "./form";
-import { useGetAllGroupTypes } from "@groups/graphql/hooks";
+import { useGetAllGroupTypes } from "@groups/hooks";
 import { useModalContext } from "@components/modal/use-modal";
 
 const AddUpdateGroup = () => {
@@ -48,7 +48,7 @@ const AddUpdateGroup = () => {
           marginLeft: isDesktop ? "1rem" : "0.5rem",
         }}
       />
-      <GroupForm {...{ groupTypes }} />
+      {!loading && <GroupForm {...{ groupTypes }} />}
     </Box>
   );
 };

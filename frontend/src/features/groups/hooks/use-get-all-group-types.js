@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client";
-import { GET_ALL_GROUP_TYPES } from "../queries";
+import { GET_ALL_GROUP_TYPES } from "../graphql/queries";
 
 const useGetAllGroupTypes = () => {
   const { data: { getGroupTypes } = { getGroupTypes: [] }, loading, error } = useQuery(GET_ALL_GROUP_TYPES);

@@ -1,20 +1,19 @@
 import _ from "lodash";
 import TextInput from "@components/input/text-input";
 import SelectInput from "@components/input/select-input";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect } from "react";
 import { useForm, FormProvider, useFieldArray } from "react-hook-form";
 import { useYupValidationResolver } from "@hooks/use-yup-validation-resolver";
 import { newGroupSchema } from "@groups/schemas/new-group";
 import { Box, Button, IconButton, Divider, useTheme } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
-import { useUpdateGroup } from "@groups/graphql/hooks";
-import { useCreateGroup } from "@groups/graphql/hooks/use-create-group";
 import { generateTempId } from "@graphql/utils/generate-temp-id";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import { useIsDesktop } from "@hooks/use-is-desktop";
 import { useManageDirtyValues } from "@hooks/use-manage-dirty-values";
 import { useModalContext } from "@components/modal/use-modal";
+import useGroup from "@groups/hooks/use-group";
 
 const createOptimisticResponse = (data) => {
   const { address, contacts, ...group } = data;
@@ -40,58 +39,20 @@ const createOptimisticResponse = (data) => {
   return groupResponse;
 };
 
-const defaultValues = { name: "", groupType: "", address: { street: "", suburb: "", postCode: "" } };
-
 const GroupForm = ({ groupTypes }) => {
   const theme = useTheme();
   const isDesktop = useIsDesktop();
+
   const {
     close,
     openContext: { group },
   } = useModalContext();
 
-  const definedProps = (obj) => {
-    return Object.fromEntries(Object.entries(obj).filter(([k, v]) => v !== undefined));
-  };
-
-  //TODO: Create useGroup which has all crud (create, update and delete) functions. create context which holds server errors and clear server errors
-  const {
-    mutate: createGroup,
-    loading: createLoading,
-    complete: createComplete,
-    serverErrors: createServerErrors,
-    clearServerError: clearCreateError,
-  } = useCreateGroup();
-
-  const {
-    mutate: updateGroup,
-    loading: updateLoading,
-    complete: updateComplete,
-    serverErrors: updateServerErrors,
-    clearServerError: clearUpdateError,
-  } = useUpdateGroup();
-
-  const serverErrors = useMemo(() => {
-    return Object.assign(definedProps(createServerErrors) || {}, definedProps(updateServerErrors) || {});
-  }, [createServerErrors, updateServerErrors]);
-
-  const loading = useMemo(() => createLoading || updateLoading, [createLoading, updateLoading]);
-  const complete = useMemo(() => updateComplete || createComplete, [updateComplete, createComplete]);
-
-  const clearServerError = useMemo(
-    () => (group ? clearUpdateError : clearCreateError),
-    [group, clearCreateError, clearUpdateError]
-  );
-
-  const resolver = useYupValidationResolver(newGroupSchema);
-
   const formMethods = useForm({
-    resolver,
+    resolver: useYupValidationResolver(newGroupSchema),
     mode: "all",
-    defaultValues,
-    values: group,
+    defaultValues: group,
   });
-
   const {
     handleSubmit,
     reset,
@@ -100,12 +61,22 @@ const GroupForm = ({ groupTypes }) => {
     getValues,
     formState: { isValid, isDirty },
   } = formMethods;
-  const { fields: contacts, append, remove } = useFieldArray({ name: "contacts", control });
+  const { fields, append, remove } = useFieldArray({ name: "contacts", control });
   const { getDirtyData, markAsDeleted, hasDeletedItems } = useManageDirtyValues();
-
   useEffect(() => {
     setFocus("name");
   }, [setFocus]);
+
+  const onComplete = useCallback(() => {
+    reset();
+    close();
+  }, [reset, close]);
+
+  // TODO: Disable submit and add loading when trying to submit data
+  const { createGroup, updateGroup, loading, serverErrors, clearServerError } = useGroup({
+    onCreateComplete: onComplete,
+    onUpdateComplete: onComplete,
+  });
 
   const submitHandler = useCallback(
     (data) => {
@@ -151,20 +122,12 @@ const GroupForm = ({ groupTypes }) => {
     [group, createGroup, updateGroup, getDirtyData]
   );
 
-  useEffect(() => {
-    if (!loading && _.isEmpty(serverErrors) && complete) {
-      reset();
-      close();
-    }
-  }, [loading, serverErrors, close, reset, complete]);
-
   const removeContactHandler = (contactIndex) => {
     const deletedContact = { ...getValues(`contacts[${contactIndex}]`), shouldDelete: true };
     markAsDeleted("contacts", deletedContact);
     remove(contactIndex);
   };
 
-  //TODO: Intercept next button on mobile and add select to next order
   return (
     <FormProvider {...formMethods}>
       <Box
@@ -241,7 +204,7 @@ const GroupForm = ({ groupTypes }) => {
               onClick={() =>
                 append(
                   { id: generateTempId("Contact"), name: "", email: "", tel: "" },
-                  { shouldFocus: true, focusName: `contacts[${contacts.length}].name` }
+                  { shouldFocus: true, focusName: `contacts[${fields.length}].name` }
                 )
               }
               sx={{ alignSelf: "flex-start" }}
@@ -251,49 +214,51 @@ const GroupForm = ({ groupTypes }) => {
             </Button>
           </Grid>
 
-          {contacts.map((field, index) => (
-            <Grid xs={12} key={field.id}>
-              <Box display="flex" flexDirection={isDesktop ? "row" : "column"} gap="1rem">
-                <TextInput
-                  name={`contacts[${index}].name`}
-                  label="Contact Name"
-                  placeholder="John Doe"
-                  serverError={serverErrors?.[`contacts[${index}].name`]}
-                  clearServerError={clearServerError}
-                />
-                <TextInput
-                  name={`contacts[${index}].email`}
-                  label="Email Address"
-                  placeholder="example@example.com"
-                  serverError={serverErrors?.[`contacts[${index}].email`]}
-                  clearServerError={clearServerError}
-                />
-                <TextInput
-                  name={`contacts[${index}].tel`}
-                  label="Tel"
-                  placeholder="073 123 4567"
-                  serverError={serverErrors?.[`contacts[${index}].tel`]}
-                  clearServerError={clearServerError}
-                />
+          {fields.map((field, index) => {
+            return (
+              <Grid xs={12} key={field.id}>
+                <Box display="flex" flexDirection={isDesktop ? "row" : "column"} gap="1rem">
+                  <TextInput
+                    name={`contacts[${index}].name`}
+                    label="Contact Name"
+                    placeholder="John Doe"
+                    serverError={serverErrors?.[`contacts[${index}].name`]}
+                    clearServerError={clearServerError}
+                  />
+                  <TextInput
+                    name={`contacts[${index}].email`}
+                    label="Email Address"
+                    placeholder="example@example.com"
+                    serverError={serverErrors?.[`contacts[${index}].email`]}
+                    clearServerError={clearServerError}
+                  />
+                  <TextInput
+                    name={`contacts[${index}].tel`}
+                    label="Tel"
+                    placeholder="073 123 4567"
+                    serverError={serverErrors?.[`contacts[${index}].tel`]}
+                    clearServerError={clearServerError}
+                  />
 
-                {!isDesktop && (
-                  <Button type="button" onClick={removeContactHandler.bind(this, index, field.id)}>
-                    <DeleteIcon /> Remove Contact
-                  </Button>
-                )}
+                  {!isDesktop && (
+                    <Button type="button" onClick={removeContactHandler.bind(this, index, field.id)}>
+                      <DeleteIcon /> Remove Contact
+                    </Button>
+                  )}
 
-                {isDesktop && (
-                  <IconButton
-                    type="button"
-                    onClick={() => remove(index)}
-                    sx={{ alignSelf: "flex-start", marginTop: "18px", color: "error.light" }}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                )}
-              </Box>
-            </Grid>
-          ))}
+                  {isDesktop && (
+                    <IconButton
+                      type="button"
+                      onClick={removeContactHandler.bind(this, index, field.id)}
+                      sx={{ alignSelf: "flex-start", marginTop: "18px", color: "error.light" }}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  )}
+                </Box>
+              </Grid>
+            );
+          })}
         </Grid>
         <Divider
           sx={{

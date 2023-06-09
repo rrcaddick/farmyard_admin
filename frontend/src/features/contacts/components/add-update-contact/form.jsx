@@ -7,7 +7,7 @@ import { useYupValidationResolver } from "@hooks/use-yup-validation-resolver";
 import { contactSchema } from "@contacts/schemas/contact-schema";
 import { Box, Button, IconButton, Divider, useTheme } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
-import { useGetAllGroupTypes, useUpdateGroup } from "@groups/graphql/hooks";
+import { useGetAllGroupTypes, useUpdateGroup } from "@groups/hooks";
 // import { useCreateGroup } from "@contacts /graphql/hooks/use-create-contact";
 import { generateTempId } from "@graphql/utils/generate-temp-id";
 import DeleteIcon from "@mui/icons-material/Delete";

@@ -7,11 +7,12 @@ const createMutation =
     const [serverErrors, setServerErrors] = useState({});
     const [complete, setComplete] = useState(false);
 
-    const [apolloMutate, { loading }] = useMutation(mutation, {
+    const [apolloMutate, { loading, error }] = useMutation(mutation, {
       onError: ({ graphQLErrors }) => {
         if (graphQLErrors?.length > 0) {
           const { data: errors } = graphQLErrors[0]?.extensions || {};
           setServerErrors(errors);
+          return errors;
         }
       },
       onCompleted: (data) => {

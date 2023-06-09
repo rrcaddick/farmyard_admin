@@ -31,10 +31,10 @@ const graphqlApplication = createApplication({
   ],
   middlewares: {
     Query: {
-      "*": [authGaurd, addInfoToContext ],
+      "*": [authGaurd, addInfoToContext],
     },
     Mutation: {
-      "*": [authGaurd, addInfoToContext ],
+      "*": [authGaurd, addInfoToContext],
     },
   },
   providers: [],
@@ -60,6 +60,7 @@ const dataSources = () => ({
   bookingSource: new BookingSource(),
 });
 
+// TODO: Extend formatError to account for all error types
 const formatError = (err) => {
   return {
     message: err.message,

@@ -14,8 +14,8 @@ const ModalBase = ({ children, close, isOpen, modalProps, containerProps, closeI
         display: "flex",
         flexGrow: 1,
         p: isDesktop ? 3 : 1.5,
-        ...theme.mixins.removeAppBarHeight,
         position: "absolute",
+        ...theme.mixins.removeAppBarHeight,
       },
       slotProps: { backdrop: { style: { position: "absolute" } } },
     }),
@@ -24,7 +24,13 @@ const ModalBase = ({ children, close, isOpen, modalProps, containerProps, closeI
 
   const defaultContainerProps = useMemo(
     () => ({
-      sx: { position: "relative", flexGrow: 1, p: isDesktop ? 3 : 1.5 },
+      sx: {
+        position: "relative",
+        display: "flex",
+        flexDirection: "column",
+        flexGrow: 1,
+        p: isDesktop ? 2 : 1,
+      },
       elevation: 24,
     }),
     [isDesktop]

@@ -1,16 +1,17 @@
 import Header from "@components/display/header";
 import AddIcon from "@mui/icons-material/Add";
 import AddUpdateGroup from "@groups/components/add-update-group";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Box, Fab, IconButton } from "@mui/material";
 import { useOutletContext } from "react-router-dom";
-import { useDeleteGroups, useGetAllGroups } from "@groups/graphql/hooks";
+import { useGetAllGroups } from "@groups/hooks";
 import ViewIcon from "@mui/icons-material/Visibility";
 import MUIDataTable from "mui-datatables";
 import { useIsDesktop } from "@hooks/use-is-desktop";
 import useModal from "@components/modal/use-modal";
 import { GET_GROUP_BY_ID } from "@groups/graphql/queries";
 import { useApolloCache } from "@hooks/use-apollo-cache";
+import useGroup from "@groups/hooks/use-group";
 
 const columnDefs = [
   {
@@ -76,7 +77,7 @@ const Groups = () => {
 
   const { groups, loading } = useGetAllGroups();
   //TODO: Show feedback for delete errors
-  const { mutate: deleteGroups, loading: deleteGroupsLoading, errors } = useDeleteGroups();
+  const { deleteGroups } = useGroup();
 
   const actions = useMemo(
     () => ({
