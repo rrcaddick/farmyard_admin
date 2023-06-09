@@ -24,15 +24,15 @@ const ModalBase = ({ children, close, isOpen, modalProps, containerProps, closeI
 
   const defaultContainerProps = useMemo(
     () => ({
-      sx: { position: "relative", flexGrow: 1 },
+      sx: { position: "relative", flexGrow: 1, p: isDesktop ? 3 : 1.5 },
       elevation: 24,
     }),
-    []
+    [isDesktop]
   );
 
   const defaultCloseIconProps = useMemo(
     () => ({
-      sx: { position: "absolute", right: "0.5rem", top: "0.5rem" },
+      sx: { position: "absolute", right: "0.5rem", top: "0.5rem", zIndex: 1501 },
     }),
     []
   );

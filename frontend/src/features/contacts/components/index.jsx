@@ -1,14 +1,16 @@
 import Header from "@components/display/header";
 import AddIcon from "@mui/icons-material/Add";
 import AddUpdateContact from "@contacts/components/add-update-contact";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Box, Fab, IconButton } from "@mui/material";
 import { useOutletContext } from "react-router-dom";
 import { useGetAllContacts } from "@contacts/graphql/hooks";
 import ViewIcon from "@mui/icons-material/Visibility";
-import EditIcon from "@mui/icons-material/Update";
 import MUIDataTable from "mui-datatables";
 import { useIsDesktop } from "@hooks/use-is-desktop";
+import useModal from "@components/modal/use-modal";
+import { useApolloCache } from "@hooks/use-apollo-cache";
+import { GET_CONTACT_BY_ID } from "@contacts/graphql/queries";
 
 const columnDefs = [
   {
@@ -40,11 +42,10 @@ const columnDefs = [
 ];
 
 const Contacts = () => {
-  const [openNewGroup, setOpenNewGroup] = useState(false);
-  const [selectedContactId, setSelectedContactId] = useState();
-
-  const { container } = useOutletContext();
   const isDesktop = useIsDesktop();
+  const cache = useApolloCache();
+  const { container } = useOutletContext();
+  const { open, Modal: AddUpdateContactModal } = useModal();
 
   const { contacts, loading } = useGetAllContacts();
   //TODO: Show feedback for delete errors
@@ -57,11 +58,12 @@ const Contacts = () => {
       options: {
         filter: false,
         sort: false,
-        customBodyRender: (value, tableMeta, updateValue) => {
+        customBodyRender: (_, tableMeta) => {
           return (
             <IconButton
               onClick={() => {
-                return toggleAddUpdateGroup(true, tableMeta.rowData[0]);
+                const { __typename, ...contact } = cache.read(GET_CONTACT_BY_ID, { contactId: tableMeta.rowData[0] });
+                return open({ contact, contactName: contact.name });
               }}
             >
               <ViewIcon />
@@ -70,7 +72,7 @@ const Contacts = () => {
         },
       },
     }),
-    []
+    [cache, open]
   );
 
   const columns = useMemo(() => [...columnDefs, actions], [actions]);
@@ -92,36 +94,28 @@ const Contacts = () => {
     // },
   };
 
-  const toggleAddUpdateGroup = (action, selectedContactId) => {
-    setSelectedContactId(selectedContactId ? selectedContactId : null);
-    setOpenNewGroup(action);
-  };
-
   return (
-    <>
-      <Box
-        flexGrow={1}
-        display="flex"
-        flexDirection="column"
-        gap="1rem"
-        overflow="hidden"
-        {...(!isDesktop && { paddingTop: "0.5rem" })}
-      >
-        <Box display="flex" justifyContent="space-between" alignItems="center" px="10px">
-          <Header title="Contacts" />
-          <Fab color="secondary" onClick={() => toggleAddUpdateGroup(true)}>
-            <AddIcon />
-          </Fab>
-        </Box>
-        <Box display="flex" flexGrow={1} overflow="hidden">
-          <MUIDataTable title="View, Update or Add new contacts" data={contacts} columns={columns} options={options} />
-        </Box>
+    <Box
+      flexGrow={1}
+      display="flex"
+      flexDirection="column"
+      gap="1rem"
+      overflow="hidden"
+      {...(!isDesktop && { paddingTop: "0.5rem" })}
+    >
+      <Box display="flex" justifyContent="space-between" alignItems="center" px="10px">
+        <Header title="Contacts" />
+        <Fab color="secondary" onClick={open}>
+          <AddIcon />
+        </Fab>
       </Box>
-      <AddUpdateContact
-        {...{ container, open: openNewGroup, contactId: selectedContactId }}
-        onClose={() => toggleAddUpdateGroup(false)}
-      />
-    </>
+      <Box display="flex" flexGrow={1} overflow="hidden">
+        <MUIDataTable title="View, Update or Add new contacts" data={contacts} columns={columns} options={options} />
+      </Box>
+      <AddUpdateContactModal modalProps={{ container: container.current }}>
+        <AddUpdateContact />
+      </AddUpdateContactModal>
+    </Box>
   );
 };
 

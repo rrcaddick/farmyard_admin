@@ -13,15 +13,7 @@ import { generateTempId } from "@graphql/utils/generate-temp-id";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import { useIsDesktop } from "@hooks/use-is-desktop";
-
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  overflow: hidden;
-  gap: 2rem;
-  padding-top: 10px;
-`;
+import { useModalContext } from "@components/modal/use-modal";
 
 const createGroupTypeSelectOptions = (groupTypes) => {
   return groupTypes.map((groupType) => {
@@ -62,9 +54,14 @@ const createOptimisticResponse = (data) => {
   return groupResponse;
 };
 
-const ContactForm = ({ onClose, contact }) => {
+const ContactForm = () => {
   const theme = useTheme();
   const isDesktop = useIsDesktop();
+
+  const {
+    close,
+    openContext: { contact },
+  } = useModalContext();
 
   // const { mutate: createGroup, loading: createGroupLoading, serverErrors, clearServerError } = useCreateGroup();
   // const {
@@ -125,7 +122,17 @@ const ContactForm = ({ onClose, contact }) => {
   return (
     <>
       <FormProvider {...formMethods}>
-        <Form onSubmit={handleSubmit(submitHandler)} noValidate>
+        <Box
+          component="form"
+          onSubmit={handleSubmit(submitHandler)}
+          noValidate
+          display="flex"
+          flexDirection="column"
+          flexGrow={1}
+          overflow="hidden"
+          gap="2rem"
+          paddingTop="10px"
+        >
           <Box display="flex" flexGrow={1}>
             <Box flex={1}>Search groups here</Box>
             <Box flex={1} display="flex" flexDirection="column">
@@ -189,14 +196,14 @@ const ContactForm = ({ onClose, contact }) => {
             }}
           />
           <Box display="flex" justifyContent="space-between">
-            <Button type="submit" color="secondary" onClick={onClose}>
+            <Button type="submit" color="secondary" onClick={close}>
               Back
             </Button>
             <Button type="submit" variant="contained" color="secondary" disabled={!isValid || !isDirty}>
               {contact ? "Update" : "Add"} Contact
             </Button>
           </Box>
-        </Form>
+        </Box>
       </FormProvider>
     </>
   );

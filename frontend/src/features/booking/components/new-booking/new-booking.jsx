@@ -1,7 +1,6 @@
 import { useRef } from "react";
 import styled from "@emotion/styled";
 import Typography from "@mui/material/Typography";
-import ContainedModal from "@components/modal/contained-modal";
 import HorizontalStepper from "@components/stepper";
 import Step from "@components/stepper/step";
 import CompleteStep from "@components/stepper/complete-step";
@@ -13,11 +12,9 @@ import CalendarPicker from "@components/input/calendar-picker";
 import { Box } from "@mui/material";
 import NumberInput from "@components/input/number-input";
 import { useStepValidator } from "@components/stepper/hooks/useStepValidator";
-// import BookingsBarGraph from "@components/graph/bar-graph";
-// import PoolSunburst from "@components/graph/sun-burst";
-// import { data as sunBurstData } from "../../../../sunburst-test-data";
 
 import GroupSelection from "./group-selection";
+import { useModalContext } from "@components/modal/use-modal";
 
 const Form = styled.form`
   display: flex;
@@ -27,50 +24,16 @@ const Form = styled.form`
   overflow: hidden;
 `;
 
-// const groupTypeOptions = [
-//   { id: "1", text: "School" },
-//   { id: "2", text: "Church" },
-//   { id: "3", text: "NPO" },
-//   { id: "4", text: "Organization" },
-//   { id: "5", text: "Other Religious" },
-//   { id: "6", text: "Other" },
-// ];
-
-// const ageGroupOptions = [
-//   { id: 1, text: "Preschool", groupType: [1] },
-//   { id: 2, text: "Primary School G1-3", groupType: [1] },
-//   { id: 3, text: "Primary School G4-7", groupType: [1] },
-//   { id: 4, text: "Primary School G1-7", groupType: [1] },
-//   { id: 5, text: "High School", groupType: [1] },
-//   { id: 6, text: "Special Needs", groupType: [1] },
-//   { id: 7, text: "Disability", groupType: [1] },
-//   { id: 8, text: "Sunday School", groupType: [2] },
-//   { id: 12, text: "Children", groupType: [3, 5, 6] },
-//   { id: 9, text: "Youth", groupType: [2, 3, 5, 6] },
-//   { id: 10, text: "Adult", groupType: [2, 3, 5, 6] },
-//   { id: 11, text: "Family", groupType: [2, 3, 4, 5, 6] },
-//   { id: 13, text: "Sports - Children", groupType: [4] },
-//   { id: 14, text: "Sports - Youth", groupType: [4] },
-//   { id: 15, text: "Corporate", groupType: [4] },
-//   { id: 16, text: "Government", groupType: [4] },
-// ];
-
-const NewBooking = ({ open, onClose, container }) => {
+const NewBooking = () => {
   const formRef = useRef();
   const resolver = useYupValidationResolver(newBookingSchema);
   const formMethods = useForm({ resolver, mode: "all", defaultValues: { visitorCount: 40 } });
-
-  const { handleSubmit, trigger, watch } = formMethods;
-
-  // const groupType = watch("groupType");
-  // const options = useMemo(
-  //   () => ageGroupOptions.filter((option) => option.groupType.includes(Number(groupType))),
-  //   [groupType]
-  // );
+  const { handleSubmit, trigger } = formMethods;
+  const { close } = useModalContext();
 
   const submitHandler = (data) => {
     console.log(data);
-    onClose();
+    close();
   };
 
   const onComplete = () => {
@@ -80,34 +43,33 @@ const NewBooking = ({ open, onClose, container }) => {
   const [stepOneValid, validateStepOne] = useStepValidator(async () => await trigger(["bookingDate", "visitorCount"]));
 
   return (
-    <ContainedModal {...{ open, onClose, container }}>
-      <FormProvider {...formMethods}>
-        <Form ref={formRef} onSubmit={handleSubmit(submitHandler)} noValidate>
-          <HorizontalStepper onComplete={onComplete}>
-            {/* Availability and Visitor Count */}
-            <Step stepLabel="Availability" isValid={stepOneValid}>
-              <Box
-                display="flex"
-                justifyItems="flex-start"
-                padding={0}
-                paddingTop={2}
-                flexGrow={1}
-                gap={1}
-                overflow="auto"
-              >
-                <Box display="flex" flexDirection="column" justifyContent="space-between" p={2}>
-                  <Box flex={1}>
-                    <CalendarPicker name="bookingDate" validate={validateStepOne} />
-                  </Box>
-                  <NumberInput
-                    name="visitorCount"
-                    label="Visitors"
-                    placeholder="Number of visitors"
-                    defaultValue={null}
-                    validate={validateStepOne}
-                  />
+    <FormProvider {...formMethods}>
+      <Form ref={formRef} onSubmit={handleSubmit(submitHandler)} noValidate>
+        <HorizontalStepper onComplete={onComplete}>
+          {/* Availability and Visitor Count */}
+          <Step stepLabel="Availability" isValid={stepOneValid}>
+            <Box
+              display="flex"
+              justifyItems="flex-start"
+              padding={0}
+              paddingTop={2}
+              flexGrow={1}
+              gap={1}
+              overflow="auto"
+            >
+              <Box display="flex" flexDirection="column" justifyContent="space-between" p={2}>
+                <Box flex={1}>
+                  <CalendarPicker name="bookingDate" validate={validateStepOne} />
                 </Box>
-                {/* <Box flexGrow={1} display="flex" flexDirection="column" gap={1}>
+                <NumberInput
+                  name="visitorCount"
+                  label="Visitors"
+                  placeholder="Number of visitors"
+                  defaultValue={null}
+                  validate={validateStepOne}
+                />
+              </Box>
+              {/* <Box flexGrow={1} display="flex" flexDirection="column" gap={1}>
                   <Box display="flex" flex={6} gap={1}>
                     <Paper sx={{ flex: 1, p: 1 }}>
                       <Typography variant="h4">Bookings</Typography>
@@ -130,42 +92,36 @@ const NewBooking = ({ open, onClose, container }) => {
                     />
                   </Paper>
                 </Box> */}
+            </Box>
+          </Step>
+
+          {/* Group */}
+          <Step stepLabel="Group">
+            <GroupSelection />
+          </Step>
+
+          {/* Contact */}
+          <Step stepLabel="Contact">
+            <Box display="flex" flexGrow={1} padding={5} gap={5}>
+              <Box flexGrow={1} border="1px solid #555" borderRadius="10px" padding={1}>
+                <Typography>Ray Caddick</Typography>
+                <Typography>Linda Caddick</Typography>
+                <Typography>Ashleigh Caddick</Typography>
               </Box>
-            </Step>
-
-            {/* Group */}
-            <Step stepLabel="Group">
-              <GroupSelection />
-            </Step>
-
-            {/* Contact */}
-            <Step stepLabel="Contact">
-              <Box display="flex" flexGrow={1} padding={5} gap={5}>
-                <Box flexGrow={1} border="1px solid #555" borderRadius="10px" padding={1}>
-                  <Typography>Ray Caddick</Typography>
-                  <Typography>Linda Caddick</Typography>
-                  <Typography>Ashleigh Caddick</Typography>
-                </Box>
-                <Box display="flex" flexDirection="column" flex={1} gap={2}>
-                  <TextInput variant="outlined" name="contactName" label="Contact Name" placeholder="Eg: John Doe" />
-                  <TextInput
-                    variant="outlined"
-                    name="email"
-                    label="Email Address"
-                    placeholder="Eg: example@gmail.com"
-                  />
-                  <TextInput variant="outlined" name="tel" label="Contact Number" placeholder="Eg: 073 123 4567" />
-                </Box>
+              <Box display="flex" flexDirection="column" flex={1} gap={2}>
+                <TextInput variant="outlined" name="contactName" label="Contact Name" placeholder="Eg: John Doe" />
+                <TextInput variant="outlined" name="email" label="Email Address" placeholder="Eg: example@gmail.com" />
+                <TextInput variant="outlined" name="tel" label="Contact Number" placeholder="Eg: 073 123 4567" />
               </Box>
-            </Step>
+            </Box>
+          </Step>
 
-            <CompleteStep buttonLabel="Create Booking" buttonType="submit">
-              <Typography>Review booking and create</Typography>
-            </CompleteStep>
-          </HorizontalStepper>
-        </Form>
-      </FormProvider>
-    </ContainedModal>
+          <CompleteStep buttonLabel="Create Booking" buttonType="submit">
+            <Typography>Review booking and create</Typography>
+          </CompleteStep>
+        </HorizontalStepper>
+      </Form>
+    </FormProvider>
   );
 };
 export default NewBooking;
