@@ -4,7 +4,7 @@ import { useIsDesktop } from "@hooks/use-is-desktop";
 import { IconButton, Modal, Paper, useTheme } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 
-const ConainedModal = ({ children, open, onClose, container, containerProps, ...props }) => {
+const ContainedModal = ({ children, open, onClose, container, containerProps, ...props }) => {
   const theme = useTheme();
   const isDesktop = useIsDesktop();
 
@@ -34,7 +34,7 @@ const ConainedModal = ({ children, open, onClose, container, containerProps, ...
         display: "flex",
         flexDirection: "column",
         flexGrow: 1,
-        backgroundColor: "background.default",
+        // backgroundColor: "background.default",
         borderRadius: "5px",
         p: isDesktop ? 2 : 1,
         position: "relative",
@@ -54,7 +54,6 @@ const ConainedModal = ({ children, open, onClose, container, containerProps, ...
         <IconButton
           onClick={onClose}
           sx={{
-            marginLeft: "auto",
             position: "absolute",
             right: isDesktop ? "1.5rem" : "0.5rem",
             top: isDesktop ? "1.5rem" : "0.5rem",
@@ -68,4 +67,4 @@ const ConainedModal = ({ children, open, onClose, container, containerProps, ...
   );
 };
 
-export default ConainedModal;
+export default ContainedModal;

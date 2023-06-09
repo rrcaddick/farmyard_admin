@@ -1,26 +1,58 @@
+import { useMemo } from "react";
 import { IconButton, Modal, Paper, useTheme } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
 import { useIsDesktop } from "@hooks/use-is-desktop";
+import _ from "lodash";
+import CloseIcon from "@mui/icons-material/Close";
 
-const ModalBase = ({ children, close, isOpen, containerRef }) => {
+const ModalBase = ({ children, close, isOpen, modalProps, containerProps, closeIconProps }) => {
   const theme = useTheme();
   const isDesktop = useIsDesktop();
 
-  return (
-    <Modal
-      open={isOpen}
-      {...(containerRef && { container: containerRef })}
-      sx={{
-        // display: "flex",
-        // justifyContent: "center",
-        // alignItems: "center",
+  const defaultModalProps = useMemo(
+    () => ({
+      sx: {
+        display: "flex",
         flexGrow: 1,
-        // p: isDesktop ? 3 : 1.5,
+        p: isDesktop ? 3 : 1.5,
         ...theme.mixins.removeAppBarHeight,
-      }}
-    >
-      <Paper sx={{ position: "relative", flexGrow: 1, height: "100%", m: "5rem", ...theme.mixins.removeAppBarHeight }}>
-        <IconButton onClick={close} sx={{ position: "absolute", right: 0 }}>
+        position: "absolute",
+      },
+      slotProps: { backdrop: { style: { position: "absolute" } } },
+    }),
+    [isDesktop, theme.mixins.removeAppBarHeight]
+  );
+
+  const defaultContainerProps = useMemo(
+    () => ({
+      sx: { position: "relative", flexGrow: 1 },
+      elevation: 24,
+    }),
+    []
+  );
+
+  const defaultCloseIconProps = useMemo(
+    () => ({
+      sx: { position: "absolute", right: "0.5rem", top: "0.5rem" },
+    }),
+    []
+  );
+
+  const mergedModalProps = useMemo(() => _.merge(defaultModalProps, modalProps), [defaultModalProps, modalProps]);
+
+  const mergedContainerProps = useMemo(
+    () => _.merge(defaultContainerProps, containerProps),
+    [defaultContainerProps, containerProps]
+  );
+
+  const mergedCloseIconProps = useMemo(
+    () => _.merge(defaultCloseIconProps, closeIconProps),
+    [defaultCloseIconProps, closeIconProps]
+  );
+
+  return (
+    <Modal open={isOpen} onClose={close} {...mergedModalProps}>
+      <Paper {...mergedContainerProps}>
+        <IconButton onClick={close} {...mergedCloseIconProps}>
           <CloseIcon />
         </IconButton>
         {children}

@@ -15,6 +15,7 @@ const SelectInput = ({
   onChange = () => {},
   inputProps,
   serverError,
+  clearServerError,
   setSelectValue,
   setDisplayText,
   ...props
@@ -48,7 +49,7 @@ const SelectInput = ({
   return (
     <Controller
       {...{ control, name, defaultValue }}
-      render={({ field: { name, onBlur, onChange: onChangeForm, ref: inputRef, value }, fieldState: { error } }) => (
+      render={({ field: { name, onBlur, onChange: onChangeRHF, ref: inputRef, value }, fieldState: { error } }) => (
         <FormControl error={!!error || !!serverError} {...mergedFormControlProps}>
           <InputLabel {...mergedinputLabelProps}>{label}</InputLabel>
           <Select
@@ -56,8 +57,9 @@ const SelectInput = ({
             {...(inputProps && { inputProps })}
             {...props}
             onChange={(e) => {
-              onChange(e);
-              onChangeForm(e.target.value);
+              onChange && onChange(e);
+              serverError && clearServerError(e.target.name);
+              onChangeRHF(e);
             }}
           >
             {selectItems.map((item) => (

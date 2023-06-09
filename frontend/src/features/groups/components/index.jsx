@@ -6,9 +6,11 @@ import { Box, Fab, IconButton } from "@mui/material";
 import { useOutletContext } from "react-router-dom";
 import { useDeleteGroups, useGetAllGroups } from "@groups/graphql/hooks";
 import ViewIcon from "@mui/icons-material/Visibility";
-import EditIcon from "@mui/icons-material/Update";
 import MUIDataTable from "mui-datatables";
 import { useIsDesktop } from "@hooks/use-is-desktop";
+import useModal from "@components/modal/use-modal";
+import { GET_GROUP_BY_ID } from "@groups/graphql/queries";
+import { useApolloCache } from "@hooks/use-apollo-cache";
 
 const columnDefs = [
   {
@@ -43,12 +45,34 @@ const columnDefs = [
   },
 ];
 
-const Groups = () => {
-  const [openNewGroup, setOpenNewGroup] = useState(false);
-  const [selectedGroupId, setSelectedGroupId] = useState();
+const getGroupFormData = (group) => {
+  const {
+    id,
+    name,
+    address: { street, suburb, postCode },
+    groupType,
+    contacts,
+  } = group;
+  return {
+    id,
+    name,
+    address: { street, suburb, postCode },
+    groupType: JSON.stringify(groupType),
+    contacts: contacts.map(({ id, name, email, tel }) => ({
+      id,
+      name,
+      email: email ?? "",
+      tel: tel ?? "",
+    })),
+  };
+};
 
+const Groups = () => {
   const { container } = useOutletContext();
+  const { open: openAddEditGroup, Modal: AddUpdateGroupModal } = useModal();
+
   const isDesktop = useIsDesktop();
+  const cache = useApolloCache();
 
   const { groups, loading } = useGetAllGroups();
   //TODO: Show feedback for delete errors
@@ -65,7 +89,11 @@ const Groups = () => {
           return (
             <IconButton
               onClick={() => {
-                return toggleAddUpdateGroup(true, tableMeta.rowData[0]);
+                const group = cache.read(GET_GROUP_BY_ID, { groupId: tableMeta.rowData[0] });
+                openAddEditGroup({
+                  group: getGroupFormData(group),
+                  groupName: group.name,
+                });
               }}
             >
               <ViewIcon />
@@ -74,7 +102,7 @@ const Groups = () => {
         },
       },
     }),
-    []
+    [openAddEditGroup, cache]
   );
 
   const columns = useMemo(() => [...columnDefs, actions], [actions]);
@@ -86,7 +114,7 @@ const Groups = () => {
     onRowsDelete: async (deletedRows, data) => {
       const deletedIds = deletedRows?.data.map(({ index }) => groups[index].id);
       try {
-        await deleteGroups({
+        deleteGroups({
           variables: { groupIds: deletedIds },
         });
         return true;
@@ -96,36 +124,28 @@ const Groups = () => {
     },
   };
 
-  const toggleAddUpdateGroup = (action, selectedGroupId) => {
-    setSelectedGroupId(selectedGroupId ? selectedGroupId : null);
-    setOpenNewGroup(action);
-  };
-
   return (
-    <>
-      <Box
-        flexGrow={1}
-        display="flex"
-        flexDirection="column"
-        gap="1rem"
-        overflow="hidden"
-        {...(!isDesktop && { paddingTop: "0.5rem" })}
-      >
-        <Box display="flex" justifyContent="space-between" alignItems="center" px="10px">
-          <Header title="Groups" />
-          <Fab color="secondary" onClick={() => toggleAddUpdateGroup(true)}>
-            <AddIcon />
-          </Fab>
-        </Box>
-        <Box display="flex" flexGrow={1} overflow="hidden">
-          <MUIDataTable title="View, Update or Add new groups" data={groups} columns={columns} options={options} />
-        </Box>
+    <Box
+      flexGrow={1}
+      display="flex"
+      flexDirection="column"
+      gap="1rem"
+      overflow="hidden"
+      {...(!isDesktop && { paddingTop: "0.5rem" })}
+    >
+      <Box display="flex" justifyContent="space-between" alignItems="center" px="10px">
+        <Header title="Groups" />
+        <Fab color="secondary" onClick={openAddEditGroup}>
+          <AddIcon />
+        </Fab>
       </Box>
-      <AddUpdateGroup
-        {...{ container, open: openNewGroup, groupId: selectedGroupId }}
-        onClose={() => toggleAddUpdateGroup(false)}
-      />
-    </>
+      <Box display="flex" flexGrow={1} overflow="hidden">
+        <MUIDataTable title="View, Update or Add new groups" data={groups} columns={columns} options={options} />
+      </Box>
+      <AddUpdateGroupModal modalProps={{ container: container.current }}>
+        <AddUpdateGroup />
+      </AddUpdateGroupModal>
+    </Box>
   );
 };
 

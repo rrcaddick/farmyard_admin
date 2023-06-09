@@ -14,6 +14,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import { useIsDesktop } from "@hooks/use-is-desktop";
 import { useManageDirtyValues } from "@hooks/use-manage-dirty-values";
+import { useModalContext } from "@components/modal/use-modal";
 
 const createOptimisticResponse = (data) => {
   const { address, contacts, ...group } = data;
@@ -39,9 +40,15 @@ const createOptimisticResponse = (data) => {
   return groupResponse;
 };
 
-const GroupForm = ({ groupTypes, onClose, group }) => {
+const defaultValues = { name: "", groupType: "", address: { street: "", suburb: "", postCode: "" } };
+
+const GroupForm = ({ groupTypes }) => {
   const theme = useTheme();
   const isDesktop = useIsDesktop();
+  const {
+    close,
+    openContext: { group },
+  } = useModalContext();
 
   const definedProps = (obj) => {
     return Object.fromEntries(Object.entries(obj).filter(([k, v]) => v !== undefined));
@@ -81,7 +88,7 @@ const GroupForm = ({ groupTypes, onClose, group }) => {
   const formMethods = useForm({
     resolver,
     mode: "all",
-    defaultValues: { name: "", groupType: "", address: { street: "", suburb: "", postCode: "" } },
+    defaultValues,
     values: group,
   });
 
@@ -147,9 +154,9 @@ const GroupForm = ({ groupTypes, onClose, group }) => {
   useEffect(() => {
     if (!loading && _.isEmpty(serverErrors) && complete) {
       reset();
-      onClose();
+      close();
     }
-  }, [loading, serverErrors, onClose, reset, complete]);
+  }, [loading, serverErrors, close, reset, complete]);
 
   const removeContactHandler = (contactIndex) => {
     const deletedContact = { ...getValues(`contacts[${contactIndex}]`), shouldDelete: true };
@@ -300,7 +307,7 @@ const GroupForm = ({ groupTypes, onClose, group }) => {
           }}
         />
         <Box display="flex" justifyContent="space-between">
-          <Button type="submit" color="secondary" onClick={onClose}>
+          <Button type="submit" color="secondary" onClick={close}>
             Back
           </Button>
           <Button
