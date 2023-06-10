@@ -1,18 +1,18 @@
-import { useCallback, useContext } from "react";
+import { useCallback } from "react";
 import { useApolloClient } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
 import { useFetch } from "@hooks/use-fetch";
 import { removeRememberMe } from "@utils/auth";
-import { LoadingContext } from "@context/loading";
+import { useLoadingContext } from "@components/loading/use-loading";
 
 const useLogout = () => {
   const client = useApolloClient();
   const navigate = useNavigate();
   const { sendRequest } = useFetch();
-  const { startLoading, endLoading } = useContext(LoadingContext);
+  const { toggleLoading } = useLoadingContext();
 
   const logout = useCallback(async () => {
-    startLoading();
+    toggleLoading(true);
     const { success } = await sendRequest("GET", "/logout");
     client.clearStore();
     client.setToken = undefined;
@@ -23,8 +23,8 @@ const useLogout = () => {
     } else {
       navigate("/login");
     }
-    endLoading();
-  }, [sendRequest, endLoading, navigate, startLoading, client]);
+    toggleLoading(false);
+  }, [sendRequest, navigate, client, toggleLoading]);
 
   return logout;
 };

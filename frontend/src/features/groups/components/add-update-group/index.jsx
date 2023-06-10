@@ -4,6 +4,7 @@ import Box from "@mui/material/Box";
 import GroupForm from "./form";
 import { useGetAllGroupTypes } from "@groups/hooks";
 import { useModalContext } from "@components/modal/use-modal";
+import useLoading from "@components/loading/use-loading";
 
 const AddUpdateGroup = () => {
   const theme = useTheme();
@@ -12,6 +13,8 @@ const AddUpdateGroup = () => {
   const {
     openContext: { groupName },
   } = useModalContext();
+
+  const { Loading } = useLoading(loading);
 
   return (
     <Box
@@ -48,7 +51,9 @@ const AddUpdateGroup = () => {
           marginLeft: isDesktop ? "1rem" : "0.5rem",
         }}
       />
-      {!loading && <GroupForm {...{ groupTypes }} />}
+      <Loading>
+        <GroupForm {...{ groupTypes }} />
+      </Loading>
     </Box>
   );
 };

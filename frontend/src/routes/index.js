@@ -7,7 +7,6 @@ import Finance from "@finance/components";
 import Projects from "@projects/components";
 import Contacts from "@contacts/components";
 import Groups from "@groups/components";
-import Loading from "@components/loading";
 import _404_NOT_FOUND from "@components/404";
 
 const authRoutes = [
@@ -55,33 +54,28 @@ const appRoutes = [
 const routes = [
   // Auth routes
   {
-    element: <Loading />,
+    element: <IsAuthRedirect />,
     children: [
       {
-        element: <IsAuthRedirect />,
-        children: [
-          {
-            element: <AuthLayout />,
-            children: authRoutes,
-          },
-        ],
-      },
-      // App Routes
-      {
-        element: <ProtectedRoutes />,
-        children: [
-          {
-            element: <Layout />,
-            children: appRoutes,
-          },
-        ],
-      },
-      // Not Found
-      {
-        path: "*",
-        element: <_404_NOT_FOUND />,
+        element: <AuthLayout />,
+        children: authRoutes,
       },
     ],
+  },
+  // App Routes
+  {
+    element: <ProtectedRoutes />,
+    children: [
+      {
+        element: <Layout />,
+        children: appRoutes,
+      },
+    ],
+  },
+  // Not Found
+  {
+    path: "*",
+    element: <_404_NOT_FOUND />,
   },
 ];
 

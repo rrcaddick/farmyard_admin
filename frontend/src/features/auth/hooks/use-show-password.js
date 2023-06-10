@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+// TODO: Refactor
 const useShowPassword = () => {
   const defaultState = {
     showCurrentPassword: false,

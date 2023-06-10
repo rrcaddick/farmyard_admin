@@ -8,8 +8,8 @@ const ModalContext = createContext({
   openContext: null,
 });
 
-const useModal = () => {
-  const [isOpen, setIsOpen] = useState(false);
+const useModal = (initState = false) => {
+  const [isOpen, setIsOpen] = useState(initState);
   const [openContext, setOpenContext] = useState();
 
   const open = useCallback((openContext) => {
