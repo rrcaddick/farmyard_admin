@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { useMutation } from "@apollo/client";
+import { useLazyQuery, useMutation } from "@apollo/client";
 import { GET_ALL_GROUPS, GET_GROUP_BY_ID } from "../graphql/queries";
 import { CREATE_GROUP_MUTATION, DELETE_GROUPS_MUTATION } from "../graphql/mutations";
 
@@ -19,7 +19,7 @@ const extractServerError = ({ graphQLErrors, networkError }) => {
   return { ...errors, ...networkErrors };
 };
 
-const useGroup = ({ onCreateComplete, onUpdateComplete, onDeleteComplete } = {}) => {
+const useGroup = ({ onCreateComplete, onGetGroupsComplete, onUpdateComplete, onDeleteComplete } = {}) => {
   const [serverErrors, setServerErrors] = useState({});
   const clearServerError = useCallback((name) => {
     setServerErrors((serverErrors) => ({ ...serverErrors, [name]: undefined }));
@@ -35,6 +35,16 @@ const useGroup = ({ onCreateComplete, onUpdateComplete, onDeleteComplete } = {})
     update: (cache, { data }) => {
       const { createGroup } = data;
       cache.updateQuery({ query: GET_ALL_GROUPS }, ({ getGroups }) => ({ getGroups: [...getGroups, createGroup] }));
+    },
+  });
+
+  const [_getGroups, { loading: getAllLoading }] = useLazyQuery(GET_ALL_GROUPS, {
+    fetchPolicy: "cache-and-network",
+    onError: (error) => {
+      setServerErrors((serverErrors) => ({ ...serverErrors, ...extractServerError(error) }));
+    },
+    onCompleted: (data) => {
+      onGetGroupsComplete && onGetGroupsComplete(data);
     },
   });
 
@@ -72,6 +82,13 @@ const useGroup = ({ onCreateComplete, onUpdateComplete, onDeleteComplete } = {})
     [_createGroup]
   );
 
+  const getGroups = async () => {
+    const {
+      data: { getGroups },
+    } = await _getGroups();
+    return getGroups;
+  };
+
   const updateGroup = useCallback(
     (args) => {
       setServerErrors((serverErrors) => ({ ...serverErrors, network: undefined }));
@@ -89,11 +106,12 @@ const useGroup = ({ onCreateComplete, onUpdateComplete, onDeleteComplete } = {})
   );
 
   const loading = useMemo(() => {
-    return createLoading || updateLoading || deleteLoading;
-  }, [createLoading, updateLoading, deleteLoading]);
+    return createLoading || getAllLoading || updateLoading || deleteLoading;
+  }, [createLoading, getAllLoading, updateLoading, deleteLoading]);
 
   return {
     createGroup,
+    getGroups,
     updateGroup,
     deleteGroups,
     loading,

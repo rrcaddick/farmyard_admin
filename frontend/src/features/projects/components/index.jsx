@@ -1,12 +1,19 @@
-import { Box, Paper } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import Header from "@components/display/header";
-import Compnonent from "./component";
+import useGroup from "@groups/hooks/use-group";
 
 const Projects = () => {
+  const { getGroups } = useGroup();
+
+  const getGroupsHandler = async () => {
+    const data = await getGroups();
+    console.log(data);
+  };
+
   return (
     <Box display="flex" flexDirection="column" overflow="hidden" gap={5}>
       <Header title="Projects" subtitle="Never let a project fail again" />
-      <Compnonent container={<Paper sx={{ backgroundColor: "red", height: "100px", width: "100px" }} />} />
+      <Button onClick={getGroupsHandler}>Load Groups</Button>
     </Box>
   );
 };
