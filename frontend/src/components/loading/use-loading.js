@@ -29,9 +29,9 @@ const useLoading = (initState = false) => {
   );
 
   const Loading = useCallback(
-    ({ children }) => (
+    ({ children, container, animation }) => (
       <LoadingContext.Provider {...{ value }}>
-        <LoadingBase {...{ ...value, children }} />
+        <LoadingBase {...{ ...value, children, container, animation }} />
       </LoadingContext.Provider>
     ),
     [value]
@@ -40,6 +40,15 @@ const useLoading = (initState = false) => {
   return { loading, toggleLoading, Loading };
 };
 
-export const useLoadingContext = () => useContext(LoadingContext);
+export const useLoadingContext = (initState = false) => {
+  const context = useContext(LoadingContext);
+  const { toggleLoading } = context;
+
+  useEffect(() => {
+    toggleLoading(initState);
+  }, [toggleLoading, initState]);
+
+  return context;
+};
 
 export default useLoading;

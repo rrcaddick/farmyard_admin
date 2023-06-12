@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { ThemeModeContext, useThemeMode } from "./theme";
-import { ThemeProvider, CssBaseline, GlobalStyles } from "@mui/material";
+import { ThemeProvider, CssBaseline, GlobalStyles, Paper } from "@mui/material";
 import { useRoutes } from "react-router-dom";
 import RouteMap from "@routes";
 import { useFetch } from "@hooks/use-fetch";
@@ -41,7 +41,7 @@ const App = () => {
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <CssBaseline />
           <GlobalStyles styles={globalStyles} />
-          <Loading>{routes}</Loading>
+          <Loading container={<Paper sx={{ borderRadius: "50%" }} />}>{routes}</Loading>
         </LocalizationProvider>
       </ThemeProvider>
     </ThemeModeContext.Provider>
