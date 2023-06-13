@@ -6,7 +6,7 @@ import { Box, Fab, IconButton } from "@mui/material";
 import { useOutletContext } from "react-router-dom";
 import { useGetAllGroups } from "@groups/hooks";
 import ViewIcon from "@mui/icons-material/Visibility";
-import MUIDataTable from "mui-datatables";
+import MuiDataTable from "@components/table/mui-data-table";
 import { useIsDesktop } from "@hooks/use-is-desktop";
 import useModal from "@components/modal/use-modal";
 import { GET_GROUP_BY_ID } from "@groups/graphql/queries";
@@ -141,7 +141,13 @@ const Groups = () => {
         </Fab>
       </Box>
       <Box display="flex" flexGrow={1} overflow="hidden">
-        <MUIDataTable title="View, Update or Add new groups" data={groups} columns={columns} options={options} />
+        <MuiDataTable
+          title="View, Update or Add new groups"
+          data={groups}
+          columns={columns}
+          options={options}
+          loading={loading}
+        />
       </Box>
       <AddUpdateGroupModal modalProps={{ container: container.current }}>
         <AddUpdateGroup />

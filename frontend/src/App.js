@@ -41,7 +41,21 @@ const App = () => {
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <CssBaseline />
           <GlobalStyles styles={globalStyles} />
-          <Loading container={<Paper sx={{ borderRadius: "50%" }} />}>{routes}</Loading>
+          <Loading
+            container={
+              <Paper
+                sx={{
+                  borderRadius: "50%",
+                  aspectRatio: "1 / 1",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              />
+            }
+          >
+            {routes}
+          </Loading>
         </LocalizationProvider>
       </ThemeProvider>
     </ThemeModeContext.Provider>

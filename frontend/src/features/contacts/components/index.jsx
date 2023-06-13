@@ -6,7 +6,7 @@ import { Box, Fab, IconButton } from "@mui/material";
 import { useOutletContext } from "react-router-dom";
 import { useGetAllContacts } from "@contacts/graphql/hooks";
 import ViewIcon from "@mui/icons-material/Visibility";
-import MUIDataTable from "mui-datatables";
+import MuiDataTable from "@components/table/mui-data-table";
 import { useIsDesktop } from "@hooks/use-is-desktop";
 import useModal from "@components/modal/use-modal";
 import { useApolloCache } from "@hooks/use-apollo-cache";
@@ -110,7 +110,13 @@ const Contacts = () => {
         </Fab>
       </Box>
       <Box display="flex" flexGrow={1} overflow="hidden">
-        <MUIDataTable title="View, Update or Add new contacts" data={contacts} columns={columns} options={options} />
+        <MuiDataTable
+          title="View, Update or Add new contacts"
+          data={contacts}
+          columns={columns}
+          options={options}
+          loading={loading}
+        />
       </Box>
       <AddUpdateContactModal modalProps={{ container: container.current }}>
         <AddUpdateContact />

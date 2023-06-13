@@ -215,14 +215,22 @@ export const themeSettings = (mode) => {
       },
       MUIDataTable: {
         styleOverrides: {
-          root: {
+          tableRoot: ({ loading }) => ({
+            ...(loading && {
+              height: "100%",
+            }),
+          }),
+          root: ({ loading }) => ({
             flexGrow: 1,
             display: "flex",
             flexDirection: "column",
-          },
-          responsiveBase: {
+          }),
+          responsiveBase: ({ loading }) => ({
+            ...(loading && {
+              height: "100% !important",
+            }),
             overflow: "auto",
-          },
+          }),
         },
       },
       MUIDataTableBody: {
