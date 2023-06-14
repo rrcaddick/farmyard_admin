@@ -1,6 +1,8 @@
 import { ApolloClient, ApolloLink, createHttpLink, from, InMemoryCache } from "@apollo/client";
 import { createSafeFetch } from "@utils/fetch";
 import { onError } from "@apollo/client/link/error";
+import { persistCache, SessionStorageWrapper } from "apollo3-cache-persist";
+import { removeRememberMe } from "@utils/auth";
 
 const createApolloClient = () => {
   let token;
@@ -28,6 +30,13 @@ const createApolloClient = () => {
       },
     },
   });
+
+  (async () => {
+    await persistCache({
+      cache,
+      storage: new SessionStorageWrapper(window.sessionStorage),
+    });
+  })();
 
   const setToken = (newToken) => {
     token = newToken;
@@ -75,6 +84,13 @@ const createApolloClient = () => {
   client.setToken = setToken;
   client.getFetch = () => {
     return safeFetch;
+  };
+
+  client.clearPersistedCache = async () => {
+    await client.clearStore();
+    client.setToken = undefined;
+    removeRememberMe();
+    sessionStorage.removeItem("apollo-cache-persist");
   };
 
   return client;

@@ -3,7 +3,6 @@ import { useLoadingContext } from "@components/loading/use-loading";
 import useFetch from "@hooks/use-fetch";
 import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { removeRememberMe } from "@utils/auth";
 import { useApolloCache } from "@hooks/use-apollo-cache";
 import { getMe } from "@auth/graphql/queries";
 
@@ -15,7 +14,7 @@ const useAuthenticate = () => {
   const { toggleLoading } = useLoadingContext(loading);
 
   const login = useCallback(
-    async (loginData) => {
+    async (loginData, pathname = "/") => {
       const { data, message } = await sendRequest(
         "/login",
         { method: "POST", body: loginData },
@@ -24,7 +23,7 @@ const useAuthenticate = () => {
 
       if (data) {
         cache.write(getMe, "User", data);
-        navigate("/");
+        navigate(pathname);
       }
 
       if (!data) {
@@ -37,11 +36,11 @@ const useAuthenticate = () => {
 
   const logout = useCallback(async () => {
     const { message } = await sendRequest("/logout", { method: "GET" }, { shouldRetry: true, retries: 2 });
-    client.clearStore();
-    client.setToken = undefined;
-    removeRememberMe(true);
+
+    await client.clearPersistedCache();
 
     navigate("/login", { state: { logoutError: message } });
+
     toggleLoading(false);
   }, [sendRequest, client, navigate, toggleLoading]);
 

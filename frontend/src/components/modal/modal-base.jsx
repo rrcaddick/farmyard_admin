@@ -38,7 +38,7 @@ const ModalBase = ({ children, close, isOpen, modalProps, containerProps, closeI
 
   const defaultCloseIconProps = useMemo(
     () => ({
-      sx: { position: "absolute", right: "0.5rem", top: "0.5rem", zIndex: 1501 },
+      sx: { position: "absolute", right: isDesktop ? "0.5rem" : 0, top: isDesktop ? "0.5rem" : 0, zIndex: 1501 },
     }),
     []
   );

@@ -9,6 +9,8 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { getRememberMe } from "@utils/auth";
 import useLoading from "@components/loading/use-loading";
 import { useAuthenticate } from "@auth/hooks/use-authenticate";
+import { hasApolloCache } from "@utils/apollo-cache";
+import { useLocation } from "react-router-dom";
 
 const rememberMe = getRememberMe();
 
@@ -17,13 +19,17 @@ const App = () => {
   const routes = useRoutes(RouteMap);
   const { login } = useAuthenticate();
   const { Loading, toggleLoading } = useLoading(rememberMe);
+  const { pathname } = useLocation();
 
   useEffect(() => {
-    if (rememberMe) {
+    if (rememberMe && !hasApolloCache()) {
       (async () => {
-        await login();
+        await login(undefined, pathname);
         toggleLoading(false);
       })();
+    }
+    if (hasApolloCache()) {
+      toggleLoading(false);
     }
   }, []);
 
