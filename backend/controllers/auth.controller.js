@@ -31,14 +31,14 @@ const logoutController = asyncHandler(async (req, res) => {
   const { userId } = req;
 
   try {
-    // TODO: Decide on keeping refresh tokens in the db
+    // TODO: Decide on keeping refresh tokens in the db. Look into server side cache
     if (userId) await User.revokeRefreshToken(userId);
     res.status(200).clearCookie("refreshToken", getCookieOptions(false)).json({
       message: "Succesfully logged out",
     });
   } catch (error) {
     res.status(500).clearCookie("refreshToken", getCookieOptions(false));
-    throw error;
+    throw new Error("An error occured trying to log out");
   }
 });
 

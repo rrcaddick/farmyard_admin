@@ -1,51 +1,70 @@
-import { useApolloClient } from "@apollo/client";
-import { useState, useCallback } from "react";
+import _ from "lodash";
+import { useCallback, useState } from "react";
 
-const useFetch = (onComplete) => {
-  const [loading, setLoading] = useState(false);
-  const [serverError, setServerError] = useState(null);
-  const [success, setSuccess] = useState(false);
+const defaultOptions = {
+  headers: {
+    Accept: "application/json",
+    "Content-Type": "application/json",
+  },
+};
 
-  const client = useApolloClient();
+const isRetryCode = (statusCode) => {
+  return /^5\d{2}$/.test(statusCode);
+};
 
-  const safeFetch = client.getFetch();
+const isClientCode = (statusCode) => {
+  return /^4\d{2}$/.test(statusCode);
+};
+
+const useFetch = () => {
+  const [loading, setLoading] = useState();
+  const [error, setError] = useState();
+
+  const startRequestState = useCallback(() => {
+    setError(null);
+    setLoading(true);
+  }, []);
 
   const sendRequest = useCallback(
-    async (method, url, body = null) => {
+    async (url, fetchOptions = {}, { shouldRetry = false, retries = 0 }) => {
+      startRequestState();
       try {
-        setLoading(true);
-        setServerError(null);
-        setSuccess(false);
+        const { body, ...options } = fetchOptions;
 
-        const response = await safeFetch(url, {
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-          method,
-          ...(body && { body: JSON.stringify(body) }),
-        });
+        const response = await fetch(
+          url,
+          _.merge({}, defaultOptions, { ...options, ...(body && { body: JSON.stringify(body) }) })
+        );
 
-        if (!response.ok) {
-          const { message } = await response.json();
-          setServerError(message);
-          return { message, success: false };
-        } else {
+        if (response.ok) {
           const responseData = await response.json();
-          onComplete && onComplete(responseData);
-          setSuccess(true);
           return { data: responseData, success: true };
         }
-      } catch (err) {
-        setServerError("Something went wrong. Please try again");
+
+        if (isRetryCode(response.status) && shouldRetry && retries > 0) {
+          return sendRequest(url, options, retries - 1);
+        }
+
+        if (isClientCode(response.status)) {
+          const { message } = await response.json();
+          setError(message);
+          return { message, success: false };
+        }
+
+        throw new Error(
+          "Oops! Something went wrong. Please try again, or contact your system administrator if the error persists"
+        );
+      } catch ({ message }) {
+        setError(message);
+        return { message, success: false };
       } finally {
         setLoading(false);
       }
     },
-    [onComplete, safeFetch]
+    [startRequestState]
   );
 
-  return { sendRequest, loading, serverError, success };
+  return { sendRequest, loading, error };
 };
 
-export { useFetch };
+export default useFetch;

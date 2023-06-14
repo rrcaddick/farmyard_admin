@@ -6,7 +6,7 @@ import { Button, IconButton, Alert } from "@mui/material";
 import { useShowPassword } from "@auth/hooks";
 import { useYupValidationResolver } from "@hooks/use-yup-validation-resolver";
 import { resetPasswordSchema } from "@auth/schemas/reset-password";
-import { useFetch } from "@hooks/use-fetch";
+import useFetch from "@hooks/use-fetch";
 
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
@@ -32,7 +32,7 @@ const ResetPassword = () => {
 
   const resetPasswordHandler = useCallback(
     (data) => {
-      sendRequest("POST", "/reset-password", { userId, token, ...data });
+      sendRequest("/reset-password", { method: "POST", body: { userId, token, ...data } });
     },
     [sendRequest, userId, token]
   );

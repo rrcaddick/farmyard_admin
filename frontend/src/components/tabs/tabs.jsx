@@ -2,6 +2,7 @@ import { useRef, Children, cloneElement } from "react";
 import MuiTabs from "@mui/material/Tabs";
 import Box from "@mui/material/Box";
 
+// TODO: Look into creating hooks for tabs to avoid multiple re renders
 const Tabs = ({ children, ...props }) => {
   const container = useRef();
 

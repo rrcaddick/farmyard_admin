@@ -13,7 +13,8 @@ import AddIcon from "@mui/icons-material/Add";
 import { useIsDesktop } from "@hooks/use-is-desktop";
 import { useManageDirtyValues } from "@hooks/use-manage-dirty-values";
 import { useModalContext } from "@components/modal/use-modal";
-import useGroup from "@groups/hooks/use-group";
+import { useGroup } from "@groups/hooks";
+import useLoading from "@components/loading/use-loading";
 
 const createOptimisticResponse = (data) => {
   const { address, contacts, ...group } = data;
@@ -72,11 +73,12 @@ const GroupForm = ({ groupTypes }) => {
     close();
   }, [reset, close]);
 
-  // TODO: Disable submit and add loading when trying to submit data
   const { createGroup, updateGroup, loading, serverErrors, clearServerError } = useGroup({
     onCreateComplete: onComplete,
     onUpdateComplete: onComplete,
   });
+
+  const { Loading } = useLoading(loading);
 
   const submitHandler = useCallback(
     (data) => {
@@ -129,163 +131,165 @@ const GroupForm = ({ groupTypes }) => {
   };
 
   return (
-    <FormProvider {...formMethods}>
-      <Box
-        component="form"
-        onSubmit={handleSubmit(submitHandler)}
-        noValidate
-        display="flex"
-        flexDirection="column"
-        flexGrow={1}
-        overflow="hidden"
-        gap="2rem"
-        paddingTop="10px"
-      >
-        {/* Form Grid */}
-        <Grid container spacing={{ xs: 2, md: 4 }} sx={{ overflowY: "scroll", margin: 0 }}>
-          <Grid xs={12} md={6}>
-            <TextInput
-              name="name"
-              label="Group Name"
-              placeholder="Eg: Chirst Church"
-              serverError={serverErrors?.name}
-              clearServerError={clearServerError}
-            />
-          </Grid>
-
-          <Grid xs={12} md={6}>
-            <SelectInput
-              name="groupType"
-              label="Group Type"
-              placeholder="Select group type..."
-              selectItems={groupTypes}
-              setSelectValue={(item) => item}
-              setDisplayText={(item) => item.type}
-              serverError={serverErrors?.groupType}
-              clearServerError={clearServerError}
-            />
-          </Grid>
-
-          <Grid xs={12} md={6}>
-            <TextInput
-              name="address.street"
-              label="Street"
-              placeholder="Eg: 123 Example Street"
-              serverError={serverErrors?.["address.street"]}
-              clearServerError={clearServerError}
-            />
-          </Grid>
-
-          <Grid xs={12} md={6}>
-            <Box display="flex" gap="2rem" flexGrow={1}>
+    <Loading>
+      <FormProvider {...formMethods}>
+        <Box
+          component="form"
+          onSubmit={handleSubmit(submitHandler)}
+          noValidate
+          display="flex"
+          flexDirection="column"
+          flexGrow={1}
+          overflow="hidden"
+          gap="2rem"
+          paddingTop="10px"
+        >
+          {/* Form Grid */}
+          <Grid container spacing={{ xs: 2, md: 4 }} sx={{ overflowY: "scroll", margin: 0 }}>
+            <Grid xs={12} md={6}>
               <TextInput
-                name="address.suburb"
-                label="Suburb"
-                placeholder="Eg: Bellville"
-                serverError={serverErrors?.["address.suburb"]}
+                name="name"
+                label="Group Name"
+                placeholder="Eg: Chirst Church"
+                serverError={serverErrors?.name}
                 clearServerError={clearServerError}
               />
-              <TextInput
-                type="number"
-                name="address.postCode"
-                label="Post Code"
-                placeholder="Eg: 7625"
-                serverError={serverErrors?.["address.postCode"]}
+            </Grid>
+
+            <Grid xs={12} md={6}>
+              <SelectInput
+                name="groupType"
+                label="Group Type"
+                placeholder="Select group type..."
+                selectItems={groupTypes}
+                setSelectValue={(item) => item}
+                setDisplayText={(item) => item.type}
+                serverError={serverErrors?.groupType}
                 clearServerError={clearServerError}
               />
-            </Box>
-          </Grid>
+            </Grid>
 
-          <Grid xs={12}>
+            <Grid xs={12} md={6}>
+              <TextInput
+                name="address.street"
+                label="Street"
+                placeholder="Eg: 123 Example Street"
+                serverError={serverErrors?.["address.street"]}
+                clearServerError={clearServerError}
+              />
+            </Grid>
+
+            <Grid xs={12} md={6}>
+              <Box display="flex" gap="2rem" flexGrow={1}>
+                <TextInput
+                  name="address.suburb"
+                  label="Suburb"
+                  placeholder="Eg: Bellville"
+                  serverError={serverErrors?.["address.suburb"]}
+                  clearServerError={clearServerError}
+                />
+                <TextInput
+                  type="number"
+                  name="address.postCode"
+                  label="Post Code"
+                  placeholder="Eg: 7625"
+                  serverError={serverErrors?.["address.postCode"]}
+                  clearServerError={clearServerError}
+                />
+              </Box>
+            </Grid>
+
+            <Grid xs={12}>
+              <Button
+                type="button"
+                variant="contained"
+                color="secondary"
+                onClick={() =>
+                  append(
+                    { id: generateTempId("Contact"), name: "", email: "", tel: "" },
+                    { shouldFocus: true, focusName: `contacts[${fields.length}].name` }
+                  )
+                }
+                sx={{ alignSelf: "flex-start" }}
+              >
+                <AddIcon />
+                Add Contacts
+              </Button>
+            </Grid>
+
+            {fields.map((field, index) => {
+              return (
+                <Grid xs={12} key={field.id}>
+                  <Box display="flex" flexDirection={isDesktop ? "row" : "column"} gap="1rem">
+                    <TextInput
+                      name={`contacts[${index}].name`}
+                      label="Contact Name"
+                      placeholder="John Doe"
+                      serverError={serverErrors?.[`contacts[${index}].name`]}
+                      clearServerError={clearServerError}
+                    />
+                    <TextInput
+                      name={`contacts[${index}].email`}
+                      label="Email Address"
+                      placeholder="example@example.com"
+                      serverError={serverErrors?.[`contacts[${index}].email`]}
+                      clearServerError={clearServerError}
+                    />
+                    <TextInput
+                      name={`contacts[${index}].tel`}
+                      label="Tel"
+                      placeholder="073 123 4567"
+                      serverError={serverErrors?.[`contacts[${index}].tel`]}
+                      clearServerError={clearServerError}
+                    />
+
+                    {!isDesktop && (
+                      <Button type="button" onClick={removeContactHandler.bind(this, index, field.id)}>
+                        <DeleteIcon /> Remove Contact
+                      </Button>
+                    )}
+
+                    {isDesktop && (
+                      <IconButton
+                        type="button"
+                        onClick={removeContactHandler.bind(this, index, field.id)}
+                        sx={{ alignSelf: "flex-start", marginTop: "18px", color: "error.light" }}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    )}
+                  </Box>
+                </Grid>
+              );
+            })}
+          </Grid>
+          <Divider
+            sx={{
+              borderWidth: "1px",
+              borderColor: "primary.dark",
+              marginLeft: "0.5rem",
+              [theme.breakpoints.up("sm")]: {
+                marginLeft: "1rem",
+              },
+              marginTop: "auto",
+            }}
+          />
+          <Box display="flex" justifyContent="space-between">
+            <Button type="submit" color="secondary" onClick={close}>
+              Back
+            </Button>
             <Button
-              type="button"
+              type="submit"
               variant="contained"
               color="secondary"
-              onClick={() =>
-                append(
-                  { id: generateTempId("Contact"), name: "", email: "", tel: "" },
-                  { shouldFocus: true, focusName: `contacts[${fields.length}].name` }
-                )
-              }
-              sx={{ alignSelf: "flex-start" }}
+              disabled={(!isValid || !isDirty || loading) && !hasDeletedItems}
             >
-              <AddIcon />
-              Add Contacts
+              {group ? "Update" : "Add"} Group
             </Button>
-          </Grid>
-
-          {fields.map((field, index) => {
-            return (
-              <Grid xs={12} key={field.id}>
-                <Box display="flex" flexDirection={isDesktop ? "row" : "column"} gap="1rem">
-                  <TextInput
-                    name={`contacts[${index}].name`}
-                    label="Contact Name"
-                    placeholder="John Doe"
-                    serverError={serverErrors?.[`contacts[${index}].name`]}
-                    clearServerError={clearServerError}
-                  />
-                  <TextInput
-                    name={`contacts[${index}].email`}
-                    label="Email Address"
-                    placeholder="example@example.com"
-                    serverError={serverErrors?.[`contacts[${index}].email`]}
-                    clearServerError={clearServerError}
-                  />
-                  <TextInput
-                    name={`contacts[${index}].tel`}
-                    label="Tel"
-                    placeholder="073 123 4567"
-                    serverError={serverErrors?.[`contacts[${index}].tel`]}
-                    clearServerError={clearServerError}
-                  />
-
-                  {!isDesktop && (
-                    <Button type="button" onClick={removeContactHandler.bind(this, index, field.id)}>
-                      <DeleteIcon /> Remove Contact
-                    </Button>
-                  )}
-
-                  {isDesktop && (
-                    <IconButton
-                      type="button"
-                      onClick={removeContactHandler.bind(this, index, field.id)}
-                      sx={{ alignSelf: "flex-start", marginTop: "18px", color: "error.light" }}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  )}
-                </Box>
-              </Grid>
-            );
-          })}
-        </Grid>
-        <Divider
-          sx={{
-            borderWidth: "1px",
-            borderColor: "primary.dark",
-            marginLeft: "0.5rem",
-            [theme.breakpoints.up("sm")]: {
-              marginLeft: "1rem",
-            },
-            marginTop: "auto",
-          }}
-        />
-        <Box display="flex" justifyContent="space-between">
-          <Button type="submit" color="secondary" onClick={close}>
-            Back
-          </Button>
-          <Button
-            type="submit"
-            variant="contained"
-            color="secondary"
-            disabled={(!isValid || !isDirty) && !hasDeletedItems}
-          >
-            {group ? "Update" : "Add"} Group
-          </Button>
+          </Box>
         </Box>
-      </Box>
-    </FormProvider>
+      </FormProvider>
+    </Loading>
   );
 };
 

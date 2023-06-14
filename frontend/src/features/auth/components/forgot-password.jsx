@@ -5,7 +5,7 @@ import { Button, Alert } from "@mui/material";
 
 import { useYupValidationResolver } from "@hooks/use-yup-validation-resolver";
 import { forgotPasswordSchema } from "@auth/schemas/forgot-password";
-import { useFetch } from "@hooks/use-fetch";
+import useFetch from "@hooks/use-fetch";
 
 import ForgotPasswordForm from "@auth/components/auth-form";
 import TextInput from "@components/input/text-input";
@@ -25,7 +25,7 @@ const ForgotPassword = () => {
   const { sendRequest, loading, serverError, success } = useFetch();
 
   const sendLinkHandler = (email) => {
-    sendRequest("POST", "/forgot-password", email);
+    sendRequest("/forgot-password", { method: "POST", body: email });
   };
 
   useEffect(() => {

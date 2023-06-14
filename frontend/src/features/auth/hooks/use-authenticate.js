@@ -1,6 +1,6 @@
 import { useApolloClient } from "@apollo/client";
 import { useLoadingContext } from "@components/loading/use-loading";
-import { useFetch } from "@hooks/use-fetch";
+import useFetch from "@hooks/use-fetch";
 import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { removeRememberMe } from "@utils/auth";
@@ -9,48 +9,47 @@ import { getMe } from "@auth/graphql/queries";
 
 const useAuthenticate = () => {
   const client = useApolloClient();
-  const { sendRequest } = useFetch();
-  const { toggleLoading } = useLoadingContext();
-  const navigate = useNavigate();
   const cache = useApolloCache();
+  const navigate = useNavigate();
+  const { sendRequest, loading } = useFetch();
+  const { toggleLoading } = useLoadingContext(loading);
 
   const login = useCallback(
     async (loginData) => {
-      toggleLoading(true);
-      const response = await sendRequest("POST", "/login", loginData);
-      // Write user to apollo cache
-      if (response.success) {
-        cache.write(getMe, "User", response.data);
+      const { data, message } = await sendRequest(
+        "/login",
+        { method: "POST", body: loginData },
+        { shouldRetry: true, retries: 2 }
+      );
+
+      if (data) {
+        cache.write(getMe, "User", data);
         navigate("/");
       }
-      // TODO: Check for authentication error or network error
-      if (!response.success) {
-        navigate("/login", { state: { loginError: response.message } });
+
+      if (!data) {
+        navigate("/login", { state: { loginError: message } });
       }
       toggleLoading(false);
     },
-    [toggleLoading, sendRequest, cache, navigate]
+    [sendRequest, cache, navigate, toggleLoading]
   );
 
   const logout = useCallback(async () => {
-    toggleLoading(true);
-    const { success } = await sendRequest("GET", "/logout");
+    const { message } = await sendRequest("/logout", { method: "GET" }, { shouldRetry: true, retries: 2 });
     client.clearStore();
     client.setToken = undefined;
     removeRememberMe(true);
 
-    if (!success) {
-      navigate("/login", { state: { logoutError: true } });
-    } else {
-      navigate("/login");
-    }
+    navigate("/login", { state: { logoutError: message } });
     toggleLoading(false);
-  }, [sendRequest, navigate, client, toggleLoading]);
+  }, [sendRequest, client, navigate, toggleLoading]);
 
   return {
     login,
     logout,
+    loading,
   };
 };
 
-export default useAuthenticate;
+export { useAuthenticate };

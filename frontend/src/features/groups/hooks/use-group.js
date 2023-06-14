@@ -7,6 +7,7 @@ const extractServerError = ({ graphQLErrors, networkError }) => {
   let errors = {};
   let networkErrors = {};
 
+  // TODO: Create error link for all errors. Loop all and check error type
   if (graphQLErrors?.length > 0) {
     const { data } = graphQLErrors[0]?.extensions || {};
     errors = data;
@@ -69,8 +70,14 @@ const useGroup = ({ onCreateComplete, onGetGroupsComplete, onUpdateComplete, onD
       onDeleteComplete && onDeleteComplete(data);
     },
     update: (cache, { data }) => {
-      const { updateGroup } = data;
-      cache.updateQuery({ query: GET_GROUP_BY_ID, variables: { groupId: updateGroup.id } }, () => updateGroup);
+      const {
+        deleteGroups: { deletedIds, ok },
+      } = data;
+
+      ok &&
+        cache.updateQuery({ query: GET_ALL_GROUPS }, ({ getGroups }) => ({
+          getGroups: getGroups.filter((group) => !deletedIds.includes(group.id)),
+        }));
     },
   });
 
@@ -98,9 +105,12 @@ const useGroup = ({ onCreateComplete, onGetGroupsComplete, onUpdateComplete, onD
   );
 
   const deleteGroups = useCallback(
-    (args) => {
+    async (args) => {
       setServerErrors((serverErrors) => ({ ...serverErrors, network: undefined }));
-      _deleteGroups(args);
+      const {
+        data: { deleteGroups },
+      } = await _deleteGroups(args);
+      return deleteGroups;
     },
     [_deleteGroups]
   );
@@ -120,4 +130,4 @@ const useGroup = ({ onCreateComplete, onGetGroupsComplete, onUpdateComplete, onD
   };
 };
 
-export default useGroup;
+export { useGroup };

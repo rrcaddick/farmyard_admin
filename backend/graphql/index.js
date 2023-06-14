@@ -60,7 +60,7 @@ const dataSources = () => ({
   bookingSource: new BookingSource(),
 });
 
-// TODO: Extend formatError to account for all error types
+// TODO: Extend formatError to account for all error types. Find out why INTERAL_ERROR doesn't trigger format
 const formatError = (err) => {
   return {
     message: err.message,

@@ -11,7 +11,7 @@ import { getRememberMe, toggleRememberMe } from "@utils/auth";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import TextInput from "@components/input/text-input";
-import useAuthenticate from "@auth/hooks/use-authenticate";
+import { useAuthenticate } from "@auth/hooks/use-authenticate";
 
 const Login = () => {
   const { state: navigateState } = useLocation();
@@ -91,6 +91,7 @@ const Login = () => {
             type={showPassword ? "text" : "password"}
             placeholder="P@ssw0rd!2$"
             variant="outlined"
+            // TODO: Add password-input component that has this baked in
             InputProps={{
               endAdornment: (
                 <IconButton onClick={toggleShowPassword}>

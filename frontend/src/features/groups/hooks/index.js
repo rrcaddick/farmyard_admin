@@ -1,4 +1,5 @@
-import { useGetAllGroups } from "@groups/hooks/use-get-all-groups";
+import { useGroup } from "@groups/hooks/use-group";
+import { useGetGroups } from "@groups/hooks/use-get-groups";
 import { useGetAllGroupTypes } from "@groups/hooks/use-get-all-group-types";
 
-export { useGetAllGroups, useGetAllGroupTypes };
+export { useGroup, useGetGroups, useGetAllGroupTypes };

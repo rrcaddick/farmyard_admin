@@ -63,7 +63,9 @@ const createApolloClient = () => {
     });
   });
 
-  const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) => {});
+  const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) => {
+    console.log(networkError);
+  });
 
   const client = new ApolloClient({
     link: from([errorLink, authLink, httpLink]),

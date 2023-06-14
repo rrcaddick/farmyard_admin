@@ -4,14 +4,13 @@ import AddUpdateGroup from "@groups/components/add-update-group";
 import { useMemo } from "react";
 import { Box, Fab, IconButton } from "@mui/material";
 import { useOutletContext } from "react-router-dom";
-import { useGetAllGroups } from "@groups/hooks";
 import ViewIcon from "@mui/icons-material/Visibility";
 import MuiDataTable from "@components/table/mui-data-table";
 import { useIsDesktop } from "@hooks/use-is-desktop";
 import useModal from "@components/modal/use-modal";
 import { GET_GROUP_BY_ID } from "@groups/graphql/queries";
 import { useApolloCache } from "@hooks/use-apollo-cache";
-import useGroup from "@groups/hooks/use-group";
+import { useGroup, useGetGroups } from "@groups/hooks";
 
 const columnDefs = [
   {
@@ -75,7 +74,8 @@ const Groups = () => {
   const isDesktop = useIsDesktop();
   const cache = useApolloCache();
 
-  const { groups, loading } = useGetAllGroups();
+  const { groups, loading } = useGetGroups();
+
   //TODO: Show feedback for delete errors
   const { deleteGroups } = useGroup();
 
@@ -114,14 +114,10 @@ const Groups = () => {
     responsive: "vertical",
     onRowsDelete: async (deletedRows, data) => {
       const deletedIds = deletedRows?.data.map(({ index }) => groups[index].id);
-      try {
-        deleteGroups({
-          variables: { groupIds: deletedIds },
-        });
-        return true;
-      } catch (error) {
-        return false;
-      }
+      const { ok } = await deleteGroups({
+        variables: { groupIds: deletedIds },
+      });
+      return ok;
     },
   };
 
