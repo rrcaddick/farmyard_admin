@@ -279,6 +279,18 @@ export const themeSettings = (mode) => {
           },
         },
       },
+      MUIDataTableBodyCell: {
+        styleOverrides: {
+          stackedCommon: {
+            "&.datatables-noprint": {
+              width: "100%",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            },
+          },
+        },
+      },
       MUIDataTablePagination: {
         styleOverrides: {
           navContainer: {

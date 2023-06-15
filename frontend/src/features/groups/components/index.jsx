@@ -74,7 +74,7 @@ const Groups = () => {
   const isDesktop = useIsDesktop();
   const cache = useApolloCache();
 
-  const { groups, loading } = useGetGroups();
+  const { groups, loading, error } = useGetGroups();
 
   //TODO: Show feedback for delete errors
   const { deleteGroups } = useGroup();
