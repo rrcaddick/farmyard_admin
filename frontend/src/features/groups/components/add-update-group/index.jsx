@@ -9,7 +9,8 @@ import useLoading from "@components/loading/use-loading";
 const AddUpdateGroup = () => {
   const theme = useTheme();
   const isDesktop = useIsDesktop();
-  const { groupTypes, loading, error } = useGetAllGroupTypes();
+  const { groupTypes, loading, error, retry } = useGetAllGroupTypes();
+
   const {
     openContext: { groupName },
   } = useModalContext();
@@ -17,44 +18,45 @@ const AddUpdateGroup = () => {
   const { Loading } = useLoading(loading);
 
   return (
-    <Box
-      display="flex"
-      flexDirection="column"
-      flex={1}
-      gap="1rem"
-      flexGrow={1}
-      overflow="hidden"
-      paddingY="0.5rem"
-      sx={{
-        [theme.breakpoints.up("sm")]: {
-          padding: "2rem",
-          paddingLeft: "1rem",
-          paddingBottom: "1rem",
-        },
-      }}
-    >
-      <Typography
-        variant="h4"
-        fontWeight="700"
-        color="primary.main"
+    <Loading {...{ error: !!error, retry }}>
+      <Box
+        display="flex"
+        flexDirection="column"
+        flex={1}
+        gap="1rem"
+        flexGrow={1}
+        overflow="hidden"
+        paddingY="0.5rem"
         sx={{
-          marginLeft: isDesktop ? "1rem" : "0.5rem",
+          [theme.breakpoints.up("sm")]: {
+            padding: "2rem",
+            paddingLeft: "1rem",
+            paddingBottom: "1rem",
+          },
         }}
       >
-        {groupName ?? "New Group Details:"}
-      </Typography>
-      <Divider
-        light
-        sx={{
-          borderWidth: "1px",
-          borderColor: "primary.dark",
-          marginLeft: isDesktop ? "1rem" : "0.5rem",
-        }}
-      />
-      <Loading>
+        <Typography
+          variant="h4"
+          fontWeight="700"
+          color="primary.main"
+          sx={{
+            marginLeft: isDesktop ? "1rem" : "0.5rem",
+          }}
+        >
+          {groupName ?? "New Group Details:"}
+        </Typography>
+        <Divider
+          light
+          sx={{
+            borderWidth: "1px",
+            borderColor: "primary.dark",
+            marginLeft: isDesktop ? "1rem" : "0.5rem",
+          }}
+        />
+
         <GroupForm {...{ groupTypes }} />
-      </Loading>
-    </Box>
+      </Box>
+    </Loading>
   );
 };
 export default AddUpdateGroup;

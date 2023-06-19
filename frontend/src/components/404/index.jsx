@@ -18,7 +18,7 @@ const _404 = () => {
       padding="3rem"
     >
       <Typography variant="h4" textAlign="center">
-        Look like the page you're looking for doesn't exist
+        Looks like the page you're looking for doesn't exist
       </Typography>
       <Lottie animationData={_404Animation} loop={true} />
       <Button variant="contained" sx={{ fontWeight: "bold" }} fullWidth={!isDesktop} onClick={() => navigate("/")}>

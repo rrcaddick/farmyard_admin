@@ -3,11 +3,13 @@ import LoadingBase from "./loading-base";
 
 export const LoadingContext = createContext({
   loading: false,
+  // error: {},
   toggleLoading: () => {},
 });
 
 const useLoading = (initState = false) => {
   const [loading, setLoading] = useState(initState);
+  // const [error, setError] = useState();
 
   useEffect(() => {
     setLoading(initState);
@@ -23,15 +25,16 @@ const useLoading = (initState = false) => {
   const value = useMemo(
     () => ({
       loading,
+      // error,
       toggleLoading,
     }),
     [loading, toggleLoading]
   );
 
   const Loading = useCallback(
-    ({ children, container, animation }) => (
+    ({ children, error, errorMessage, retry, customError, container, animation }) => (
       <LoadingContext.Provider {...{ value }}>
-        <LoadingBase {...{ ...value, children, container, animation }} />
+        <LoadingBase {...{ ...value, children, error, errorMessage, retry, customError, container, animation }} />
       </LoadingContext.Provider>
     ),
     [value]
