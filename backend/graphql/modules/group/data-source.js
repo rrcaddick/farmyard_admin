@@ -8,11 +8,15 @@ class GroupSource extends MongoDataSource {
   }
 
   async getGroup(groupId) {
-    return this.executeWithGraphqlProjection(this.model.findById(groupId));
+    return this.executeWithGraphqlProjection(
+      this.model.find({ _id: groupId, $or: [{ deleted: { $exists: false } }, { deleted: false }] })
+    );
   }
 
   async getGroups() {
-    return this.executeWithGraphqlProjection(this.model.find());
+    return this.executeWithGraphqlProjection(
+      this.model.find({ $or: [{ deleted: { $exists: false } }, { deleted: false }] })
+    );
   }
 
   async createGroup(input) {
@@ -77,8 +81,15 @@ class GroupSource extends MongoDataSource {
   }
 
   async deleteGroups(groupIds) {
-    const { acknowledged: ok, deletedCount } = await this.model.deleteMany({ _id: groupIds });
-    return { ok, deletedCount, deletedIds: groupIds };
+    try {
+      const { acknowledged: ok, modifiedCount: deletedCount } = await this.model.updateMany(
+        { _id: groupIds },
+        { deleted: true }
+      );
+      return { ok, deletedCount, deletedIds: groupIds };
+    } catch (error) {
+      return { ok: false, deletedCount: 0, deletedIds: [] };
+    }
   }
 }
 

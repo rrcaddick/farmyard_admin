@@ -19,7 +19,7 @@ const ModalBase = ({ children, close, isOpen, modalProps, containerProps, closeI
       },
       slotProps: { backdrop: { style: { position: "absolute" } } },
     }),
-    [isDesktop, theme.mixins.removeAppBarHeight]
+    [isDesktop, theme.mixins]
   );
 
   const defaultContainerProps = useMemo(

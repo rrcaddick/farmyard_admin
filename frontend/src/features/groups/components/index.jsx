@@ -2,7 +2,7 @@ import Header from "@components/display/header";
 import AddIcon from "@mui/icons-material/Add";
 import AddUpdateGroup from "@groups/components/add-update-group";
 import { useMemo } from "react";
-import { Box, Fab, IconButton } from "@mui/material";
+import { Box, Button, Fab, IconButton, useTheme } from "@mui/material";
 import { useOutletContext } from "react-router-dom";
 import ViewIcon from "@mui/icons-material/Visibility";
 import MuiDataTable from "@components/table/mui-data-table";
@@ -11,6 +11,10 @@ import useModal from "@components/modal/use-modal";
 import { GET_GROUP_BY_ID } from "@groups/graphql/queries";
 import { useApolloCache } from "@hooks/use-apollo-cache";
 import { useGroup, useGetGroups } from "@groups/hooks";
+import { useSnackbar, enqueueSnackbar } from "notistack";
+import UndoIcon from "@mui/icons-material/Undo";
+import CloseIcon from "@mui/icons-material/Close";
+import { Tooltip } from "@mui/material";
 
 const columnDefs = [
   {
@@ -67,10 +71,45 @@ const getGroupFormData = (group) => {
   };
 };
 
+const onGroupsDelete = async (deletedRows, groups, deleteGroups) => {
+  const deletedValues = deletedRows?.data.reduce((deletedValues, { index }) => {
+    return { ...deletedValues, [groups[index].id]: groups[index].name };
+  }, {});
+
+  const deletedIds = Object.keys(deletedValues);
+
+  try {
+    const { ok, deletedCount } = await deleteGroups({
+      variables: { groupIds: deletedIds },
+    });
+
+    if (!ok) {
+      throw new Error("Oops! Something went wrong");
+    }
+
+    enqueueSnackbar(`${deletedCount} group(s) archived`, {
+      variant: "undo",
+      action: () => {
+        // Run undo delete mutation
+      },
+    });
+
+    return ok;
+  } catch (error) {
+    enqueueSnackbar("Oops! Something went wrong", {
+      variant: "retry",
+      action: () => {
+        // Retry delete mutation
+        onGroupsDelete(deletedRows, groups, deleteGroups);
+      },
+    });
+    return false;
+  }
+};
+
 const Groups = () => {
   const { container } = useOutletContext();
   const { open: openAddEditGroup, Modal: AddUpdateGroupModal } = useModal();
-
   const isDesktop = useIsDesktop();
   const cache = useApolloCache();
 
@@ -86,7 +125,7 @@ const Groups = () => {
       options: {
         filter: false,
         sort: false,
-        customBodyRender: (value, tableMeta, updateValue) => {
+        customBodyRender: (value, tableMeta) => {
           return (
             <IconButton
               onClick={() => {
@@ -112,12 +151,8 @@ const Groups = () => {
     filterType: "dropdown",
     enableNestedDataAccess: ".",
     responsive: "vertical",
-    onRowsDelete: async (deletedRows, data) => {
-      const deletedIds = deletedRows?.data.map(({ index }) => groups[index].id);
-      const { ok } = await deleteGroups({
-        variables: { groupIds: deletedIds },
-      });
-      return ok;
+    onRowsDelete: async (deletedRows) => {
+      onGroupsDelete(deletedRows, groups, deleteGroups);
     },
   };
 

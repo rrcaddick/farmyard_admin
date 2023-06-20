@@ -342,6 +342,17 @@ export const themeSettings = (mode) => {
       },
     },
     mixins: {
+      transitionAppBarHeight: {
+        "@media (min-width:0px)": {
+          "@media (orientation: landscape)": {
+            transform: "translateY(48px) !important",
+          },
+        },
+        "@media (min-width:600px)": {
+          transform: "translateY(64px) !important",
+        },
+        transform: "translateY(56px) !important",
+      },
       removeAppBarHeight: {
         "@media (min-width:0px)": {
           "@media (orientation: landscape)": {
