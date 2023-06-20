@@ -91,6 +91,16 @@ class GroupSource extends MongoDataSource {
       return { ok: false, deletedCount: 0, deletedIds: [] };
     }
   }
+
+  async restoreGroups(groupIds) {
+    const { acknowledged: ok } = await this.model.updateMany({ _id: groupIds }, { deleted: false });
+    return this.executeWithGraphqlProjection(
+      this.model.find({
+        _id: groupIds,
+        $or: [{ deleted: { $exists: false } }, { deleted: false }],
+      })
+    );
+  }
 }
 
 module.exports = {

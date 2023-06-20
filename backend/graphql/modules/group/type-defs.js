@@ -10,6 +10,7 @@ const typeDefs = gql`
     createGroup(input: CreateGroupInput): Group!
     updateGroup(input: UpdateGroupInput): Group!
     deleteGroups(groupIds: [ID]): DeleteResponse
+    restoreGroups(groupIds: [ID]): [Group]!
   }
 
   type Group {

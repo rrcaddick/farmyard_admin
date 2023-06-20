@@ -7,6 +7,7 @@ const resolvers = {
     createGroup: (root, { input }, { dataSources: { groupSource } }) => groupSource.createGroup(input),
     updateGroup: (root, { input }, { dataSources: { groupSource } }) => groupSource.updateGroup(input),
     deleteGroups: (root, { groupIds }, { dataSources: { groupSource } }) => groupSource.deleteGroups(groupIds),
+    restoreGroups: (root, { groupIds }, { dataSources: { groupSource } }) => groupSource.restoreGroups(groupIds),
   },
 };
 

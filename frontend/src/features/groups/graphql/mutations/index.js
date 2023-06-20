@@ -30,4 +30,13 @@ const DELETE_GROUPS_MUTATION = gql`
   }
 `;
 
-export { CREATE_GROUP_MUTATION, UPDATE_GROUP_MUTATION, DELETE_GROUPS_MUTATION };
+const RESTORE_GROUPS_MUTATION = gql`
+  ${FULL_GROUP_FRAGMENT}
+  mutation RestoreGroups($groupIds: [ID]) {
+    restoreGroups(groupIds: $groupIds) {
+      ...FullGroup
+    }
+  }
+`;
+
+export { CREATE_GROUP_MUTATION, UPDATE_GROUP_MUTATION, DELETE_GROUPS_MUTATION, RESTORE_GROUPS_MUTATION };

@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { GET_ALL_GROUPS, GET_GROUP_BY_ID } from "../graphql/queries";
-import { CREATE_GROUP_MUTATION, DELETE_GROUPS_MUTATION } from "../graphql/mutations";
+import { CREATE_GROUP_MUTATION, DELETE_GROUPS_MUTATION, RESTORE_GROUPS_MUTATION } from "../graphql/mutations";
 
 const extractServerError = ({ graphQLErrors, networkError }) => {
   let errors = {};
@@ -20,7 +20,13 @@ const extractServerError = ({ graphQLErrors, networkError }) => {
   return { ...errors, ...networkErrors };
 };
 
-const useGroup = ({ onCreateComplete, onGetGroupsComplete, onUpdateComplete, onDeleteComplete } = {}) => {
+const useGroup = ({
+  onCreateComplete,
+  onGetGroupsComplete,
+  onUpdateComplete,
+  onDeleteComplete,
+  onRestoreComplete,
+} = {}) => {
   const [serverErrors, setServerErrors] = useState({});
   const clearServerError = useCallback((name) => {
     setServerErrors((serverErrors) => ({ ...serverErrors, [name]: undefined }));
@@ -81,6 +87,21 @@ const useGroup = ({ onCreateComplete, onGetGroupsComplete, onUpdateComplete, onD
     },
   });
 
+  const [_restoreGroups, { loading: restoreLoading }] = useMutation(RESTORE_GROUPS_MUTATION, {
+    onError: (error) => {
+      setServerErrors((serverErrors) => ({ ...serverErrors, ...extractServerError(error) }));
+    },
+    onCompleted: (data) => {
+      onRestoreComplete && onRestoreComplete(data);
+    },
+    update: (cache, { data }) => {
+      const { restoreGroups } = data;
+      cache.updateQuery({ query: GET_ALL_GROUPS }, ({ getGroups }) => ({
+        getGroups: [...getGroups, ...restoreGroups].sort((a, b) => a.id.toString() - b.id.toString()),
+      }));
+    },
+  });
+
   const createGroup = useCallback(
     (args) => {
       setServerErrors((serverErrors) => ({ ...serverErrors, network: undefined }));
@@ -115,15 +136,24 @@ const useGroup = ({ onCreateComplete, onGetGroupsComplete, onUpdateComplete, onD
     [_deleteGroups]
   );
 
+  const restoreGroups = useCallback(
+    (args) => {
+      setServerErrors((serverErrors) => ({ ...serverErrors, network: undefined }));
+      _restoreGroups(args);
+    },
+    [_restoreGroups]
+  );
+
   const loading = useMemo(() => {
-    return createLoading || getAllLoading || updateLoading || deleteLoading;
-  }, [createLoading, getAllLoading, updateLoading, deleteLoading]);
+    return createLoading || getAllLoading || updateLoading || deleteLoading || restoreLoading;
+  }, [createLoading, getAllLoading, updateLoading, deleteLoading, restoreLoading]);
 
   return {
     createGroup,
     getGroups,
     updateGroup,
     deleteGroups,
+    restoreGroups,
     loading,
     serverErrors,
     clearServerError,

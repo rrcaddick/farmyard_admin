@@ -2,7 +2,7 @@ import Header from "@components/display/header";
 import AddIcon from "@mui/icons-material/Add";
 import AddUpdateGroup from "@groups/components/add-update-group";
 import { useMemo } from "react";
-import { Box, Button, Fab, IconButton, useTheme } from "@mui/material";
+import { Box, Fab, IconButton } from "@mui/material";
 import { useOutletContext } from "react-router-dom";
 import ViewIcon from "@mui/icons-material/Visibility";
 import MuiDataTable from "@components/table/mui-data-table";
@@ -11,10 +11,7 @@ import useModal from "@components/modal/use-modal";
 import { GET_GROUP_BY_ID } from "@groups/graphql/queries";
 import { useApolloCache } from "@hooks/use-apollo-cache";
 import { useGroup, useGetGroups } from "@groups/hooks";
-import { useSnackbar, enqueueSnackbar } from "notistack";
-import UndoIcon from "@mui/icons-material/Undo";
-import CloseIcon from "@mui/icons-material/Close";
-import { Tooltip } from "@mui/material";
+import { enqueueSnackbar } from "notistack";
 
 const columnDefs = [
   {
@@ -71,7 +68,7 @@ const getGroupFormData = (group) => {
   };
 };
 
-const onGroupsDelete = async (deletedRows, groups, deleteGroups) => {
+const onGroupsDelete = async (deletedRows, groups, deleteGroups, restoreGroups) => {
   const deletedValues = deletedRows?.data.reduce((deletedValues, { index }) => {
     return { ...deletedValues, [groups[index].id]: groups[index].name };
   }, {});
@@ -90,7 +87,7 @@ const onGroupsDelete = async (deletedRows, groups, deleteGroups) => {
     enqueueSnackbar(`${deletedCount} group(s) archived`, {
       variant: "undo",
       action: () => {
-        // Run undo delete mutation
+        restoreGroups({ variables: { groupIds: deletedIds } });
       },
     });
 
@@ -113,10 +110,12 @@ const Groups = () => {
   const isDesktop = useIsDesktop();
   const cache = useApolloCache();
 
-  const { groups, loading, error } = useGetGroups();
+  const { groups, loading: getGroupsLoading, error } = useGetGroups();
 
   //TODO: Show feedback for delete errors
-  const { deleteGroups } = useGroup();
+  const { deleteGroups, restoreGroups, loading: useGroupLoading } = useGroup();
+
+  const loading = useMemo(() => getGroupsLoading || useGroupLoading, [getGroupsLoading, useGroupLoading]);
 
   const actions = useMemo(
     () => ({
@@ -151,8 +150,12 @@ const Groups = () => {
     filterType: "dropdown",
     enableNestedDataAccess: ".",
     responsive: "vertical",
+    sortOrder: {
+      name: "name",
+      direction: "asc",
+    },
     onRowsDelete: async (deletedRows) => {
-      onGroupsDelete(deletedRows, groups, deleteGroups);
+      onGroupsDelete(deletedRows, groups, deleteGroups, restoreGroups);
     },
   };
 
