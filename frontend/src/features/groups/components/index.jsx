@@ -8,10 +8,11 @@ import ViewIcon from "@mui/icons-material/Visibility";
 import MuiDataTable from "@components/table/mui-data-table";
 import { useIsDesktop } from "@hooks/use-is-desktop";
 import useModal from "@components/modal/use-modal";
-import { GET_GROUP } from "@groups/graphql/queries";
+import { READ_GROUP, READ_GROUPS } from "@groups/graphql/queries";
 import { useApolloCache } from "@hooks/use-apollo-cache";
 import { useGroup, useGetGroups } from "@groups/hooks";
 import { enqueueSnackbar } from "notistack";
+import { useApolloClient } from "@apollo/client";
 
 const columnDefs = [
   {
@@ -68,7 +69,7 @@ const getGroupFormData = (group) => {
   };
 };
 
-const onGroupsDelete = async (deletedRows, groups, deleteGroups, restoreGroups) => {
+const onGroupsDelete = async (deletedRows, groups, deleteGroups, restoreGroups, cache, client) => {
   const deletedValues = deletedRows?.data.reduce((deletedValues, { dataIndex }) => {
     return { ...deletedValues, [groups[dataIndex].id]: groups[dataIndex].name };
   }, {});
@@ -94,7 +95,12 @@ const onGroupsDelete = async (deletedRows, groups, deleteGroups, restoreGroups) 
     enqueueSnackbar(`${deletedCount} group(s) archived`, {
       variant: "undo",
       action: () => {
-        restoreGroups({ variables: { groupIds: deletedIds } });
+        restoreGroups({
+          variables: { groupIds: deletedIds },
+          optimisticResponse: {
+            restoreGroups: [...cache.read(READ_GROUPS, { groupIds: deletedIds })],
+          },
+        });
       },
     });
 
@@ -117,6 +123,8 @@ const Groups = () => {
   const isDesktop = useIsDesktop();
   const cache = useApolloCache();
 
+  const client = useApolloClient();
+
   const { groups, loading } = useGetGroups();
 
   //TODO: Show feedback for delete errors
@@ -133,7 +141,7 @@ const Groups = () => {
           return (
             <IconButton
               onClick={() => {
-                const group = cache.read(GET_GROUP, { groupId: tableMeta.rowData[0] });
+                const group = cache.read(READ_GROUP, { groupId: tableMeta.rowData[0] });
                 openAddEditGroup({
                   group: getGroupFormData(group),
                   groupName: group.name,
@@ -160,7 +168,7 @@ const Groups = () => {
       direction: "asc",
     },
     onRowsDelete: async (deletedRows) => {
-      onGroupsDelete(deletedRows, groups, deleteGroups, restoreGroups);
+      onGroupsDelete(deletedRows, groups, deleteGroups, restoreGroups, cache, client);
     },
   };
 

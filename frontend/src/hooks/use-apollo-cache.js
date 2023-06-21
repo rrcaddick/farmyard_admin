@@ -3,7 +3,6 @@ import { useMemo } from "react";
 
 const useApolloCache = () => {
   const client = useApolloClient();
-
   const cache = useMemo(
     () => ({
       write: (query, typename, data, variables = null) => {
@@ -21,7 +20,7 @@ const useApolloCache = () => {
       read: (query, variables = null) => {
         const data = client.readQuery({
           query,
-          variables: { ...variables },
+          variables,
         });
         return data ? Object.values(data)[0] : null;
       },

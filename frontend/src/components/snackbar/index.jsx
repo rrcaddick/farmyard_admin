@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import isPropValid from "@emotion/is-prop-valid";
 import { forwardRef, useMemo } from "react";
 import { useSnackbar, SnackbarContent as NotistackSnackbarContent } from "notistack";
 import { Box, Typography, Tooltip, IconButton, useTheme } from "@mui/material";
@@ -8,18 +9,21 @@ import CloseIcon from "@mui/icons-material/Close";
 import SuccessIcon from "@mui/icons-material/Check";
 import ErrorIcon from "@mui/icons-material/Error";
 
-const SnackbarContent = styled(NotistackSnackbarContent)(({ backgroundColor, color, boxShadow }) => ({
-  backgroundColor,
+const SnackbarContent = styled(NotistackSnackbarContent, {
+  shouldForwardProp: (prop) => isPropValid(prop) && !["backgroundColor", "boxShadow", "color"].includes(prop),
+})(({ backgroundColor, color, boxShadow }) => ({
   display: "flex",
   flexWrap: "nowrap",
   alignItems: "center",
   gap: "1rem",
   padding: "5px",
   borderRadius: "5px",
-  color,
-  width: "350px",
+  width: "90vw",
+  maxWidth: "350px",
   fontFamily: "Source Sans Pro",
+  backgroundColor,
   boxShadow,
+  color,
 }));
 
 const Snackbar = forwardRef(({ message, variant, action, id }, ref) => {

@@ -10,7 +10,7 @@ const createApolloClient = () => {
     typePolicies: {
       Query: {
         fields: {
-          getGroup: {
+          readGroup: {
             read(_, { args: { groupId }, toReference }) {
               return toReference({
                 __typename: "Group",
@@ -18,14 +18,24 @@ const createApolloClient = () => {
               });
             },
           },
-          // getContact: {
-          //   read(_, { args: { contactId }, toReference }) {
-          //     return toReference({
-          //       __typename: "Contact",
-          //       id: contactId,
-          //     });
-          //   },
-          // },
+          readGroups: {
+            read(_, { args: { groupIds = [] }, toReference }) {
+              return groupIds.map((groupId) =>
+                toReference({
+                  __typename: "Group",
+                  id: groupId,
+                })
+              );
+            },
+          },
+          readContact: {
+            read(_, { args: { contactId }, toReference }) {
+              return toReference({
+                __typename: "Contact",
+                id: contactId,
+              });
+            },
+          },
         },
       },
     },

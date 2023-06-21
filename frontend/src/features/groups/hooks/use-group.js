@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 import { useLazyQuery, useMutation } from "@apollo/client";
-import { GET_GROUPS, GET_GROUP } from "../graphql/queries";
+import { GET_GROUPS, READ_GROUP } from "../graphql/queries";
 import { CREATE_GROUP_MUTATION, DELETE_GROUPS_MUTATION, RESTORE_GROUPS_MUTATION } from "../graphql/mutations";
 
 const extractServerError = ({ graphQLErrors, networkError }) => {
@@ -64,7 +64,7 @@ const useGroup = ({
     },
     update: (cache, { data }) => {
       const { updateGroup } = data;
-      cache.updateQuery({ query: GET_GROUP, variables: { groupId: updateGroup.id } }, () => updateGroup);
+      cache.updateQuery({ query: READ_GROUP, variables: { groupId: updateGroup.id } }, () => updateGroup);
     },
   });
 
