@@ -1,7 +1,7 @@
 const resolvers = {
   Query: {
     getGroup: (root, { groupId }, { dataSources: { groupSource } }) => groupSource.getGroup(groupId),
-    getGroups: (root, args, { dataSources: { groupSource } }) => groupSource.getGroups(),
+    getGroups: (root, { groupIds }, { dataSources: { groupSource } }) => groupSource.getGroups(groupIds),
   },
   Mutation: {
     createGroup: (root, { input }, { dataSources: { groupSource } }) => groupSource.createGroup(input),

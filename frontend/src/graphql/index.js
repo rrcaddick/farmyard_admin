@@ -18,14 +18,14 @@ const createApolloClient = () => {
               });
             },
           },
-          getContact: {
-            read(_, { args: { contactId }, toReference }) {
-              return toReference({
-                __typename: "Contact",
-                id: contactId,
-              });
-            },
-          },
+          // getContact: {
+          //   read(_, { args: { contactId }, toReference }) {
+          //     return toReference({
+          //       __typename: "Contact",
+          //       id: contactId,
+          //     });
+          //   },
+          // },
         },
       },
     },

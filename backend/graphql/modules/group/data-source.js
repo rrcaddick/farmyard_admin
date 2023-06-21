@@ -13,9 +13,12 @@ class GroupSource extends MongoDataSource {
     );
   }
 
-  async getGroups() {
+  async getGroups(groupIds) {
     return this.executeWithGraphqlProjection(
-      this.model.find({ $or: [{ deleted: { $exists: false } }, { deleted: false }] })
+      this.model.find({
+        ...(groupIds && { _id: groupIds }),
+        $or: [{ deleted: { $exists: false } }, { deleted: false }],
+      })
     );
   }
 

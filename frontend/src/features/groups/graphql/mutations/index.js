@@ -3,7 +3,7 @@ import { FULL_GROUP_FRAGMENT } from "../fragments";
 
 const CREATE_GROUP_MUTATION = gql`
   ${FULL_GROUP_FRAGMENT}
-  mutation CreateGroup($input: CreateGroupInput) {
+  mutation CreateGroup($input: CreateGroupInput!) {
     createGroup(input: $input) {
       ...FullGroup
     }
@@ -13,7 +13,7 @@ const CREATE_GROUP_MUTATION = gql`
 const UPDATE_GROUP_MUTATION = gql`
   # TODO: Create function to dynamically create fragment based on dirty fields
   ${FULL_GROUP_FRAGMENT}
-  mutation UpdateGroup($input: UpdateGroupInput) {
+  mutation UpdateGroup($input: UpdateGroupInput!) {
     updateGroup(input: $input) {
       ...FullGroup
     }
@@ -21,7 +21,7 @@ const UPDATE_GROUP_MUTATION = gql`
 `;
 
 const DELETE_GROUPS_MUTATION = gql`
-  mutation DeleteGroups($groupIds: [ID]) {
+  mutation DeleteGroups($groupIds: [ID]!) {
     deleteGroups(groupIds: $groupIds) {
       ok
       deletedCount
@@ -32,7 +32,7 @@ const DELETE_GROUPS_MUTATION = gql`
 
 const RESTORE_GROUPS_MUTATION = gql`
   ${FULL_GROUP_FRAGMENT}
-  mutation RestoreGroups($groupIds: [ID]) {
+  mutation RestoreGroups($groupIds: [ID]!) {
     restoreGroups(groupIds: $groupIds) {
       ...FullGroup
     }

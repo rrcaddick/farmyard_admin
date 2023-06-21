@@ -8,7 +8,7 @@ import ViewIcon from "@mui/icons-material/Visibility";
 import MuiDataTable from "@components/table/mui-data-table";
 import { useIsDesktop } from "@hooks/use-is-desktop";
 import useModal from "@components/modal/use-modal";
-import { GET_GROUP_BY_ID } from "@groups/graphql/queries";
+import { GET_GROUP } from "@groups/graphql/queries";
 import { useApolloCache } from "@hooks/use-apollo-cache";
 import { useGroup, useGetGroups } from "@groups/hooks";
 import { enqueueSnackbar } from "notistack";
@@ -69,8 +69,8 @@ const getGroupFormData = (group) => {
 };
 
 const onGroupsDelete = async (deletedRows, groups, deleteGroups, restoreGroups) => {
-  const deletedValues = deletedRows?.data.reduce((deletedValues, { index }) => {
-    return { ...deletedValues, [groups[index].id]: groups[index].name };
+  const deletedValues = deletedRows?.data.reduce((deletedValues, { dataIndex }) => {
+    return { ...deletedValues, [groups[dataIndex].id]: groups[dataIndex].name };
   }, {});
 
   const deletedIds = Object.keys(deletedValues);
@@ -78,6 +78,13 @@ const onGroupsDelete = async (deletedRows, groups, deleteGroups, restoreGroups) 
   try {
     const { ok, deletedCount } = await deleteGroups({
       variables: { groupIds: deletedIds },
+      optimisticResponse: {
+        deleteGroups: {
+          ok: true,
+          deletedCount: deletedIds.length,
+          deletedIds,
+        },
+      },
     });
 
     if (!ok) {
@@ -110,12 +117,10 @@ const Groups = () => {
   const isDesktop = useIsDesktop();
   const cache = useApolloCache();
 
-  const { groups, loading: getGroupsLoading, error } = useGetGroups();
+  const { groups, loading } = useGetGroups();
 
   //TODO: Show feedback for delete errors
-  const { deleteGroups, restoreGroups, loading: useGroupLoading } = useGroup();
-
-  const loading = useMemo(() => getGroupsLoading || useGroupLoading, [getGroupsLoading, useGroupLoading]);
+  const { deleteGroups, restoreGroups } = useGroup();
 
   const actions = useMemo(
     () => ({
@@ -128,7 +133,7 @@ const Groups = () => {
           return (
             <IconButton
               onClick={() => {
-                const group = cache.read(GET_GROUP_BY_ID, { groupId: tableMeta.rowData[0] });
+                const group = cache.read(GET_GROUP, { groupId: tableMeta.rowData[0] });
                 openAddEditGroup({
                   group: getGroupFormData(group),
                   groupName: group.name,

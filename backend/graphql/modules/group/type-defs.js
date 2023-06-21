@@ -2,15 +2,15 @@ const { gql } = require("apollo-server-express");
 
 const typeDefs = gql`
   type Query {
-    getGroup(groupId: ID): Group
-    getGroups: [Group]!
+    getGroup(groupId: ID!): Group
+    getGroups(groupIds: [ID]): [Group]!
   }
 
   type Mutation {
-    createGroup(input: CreateGroupInput): Group!
-    updateGroup(input: UpdateGroupInput): Group!
-    deleteGroups(groupIds: [ID]): DeleteResponse
-    restoreGroups(groupIds: [ID]): [Group]!
+    createGroup(input: CreateGroupInput!): Group!
+    updateGroup(input: UpdateGroupInput!): Group!
+    deleteGroups(groupIds: [ID]!): DeleteResponse
+    restoreGroups(groupIds: [ID]!): [Group]!
   }
 
   type Group {

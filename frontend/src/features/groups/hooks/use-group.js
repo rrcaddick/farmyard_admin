@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 import { useLazyQuery, useMutation } from "@apollo/client";
-import { GET_ALL_GROUPS, GET_GROUP_BY_ID } from "../graphql/queries";
+import { GET_GROUPS, GET_GROUP } from "../graphql/queries";
 import { CREATE_GROUP_MUTATION, DELETE_GROUPS_MUTATION, RESTORE_GROUPS_MUTATION } from "../graphql/mutations";
 
 const extractServerError = ({ graphQLErrors, networkError }) => {
@@ -41,11 +41,11 @@ const useGroup = ({
     },
     update: (cache, { data }) => {
       const { createGroup } = data;
-      cache.updateQuery({ query: GET_ALL_GROUPS }, ({ getGroups }) => ({ getGroups: [...getGroups, createGroup] }));
+      cache.updateQuery({ query: GET_GROUPS }, ({ getGroups }) => ({ getGroups: [...getGroups, createGroup] }));
     },
   });
 
-  const [_getGroups, { loading: getAllLoading }] = useLazyQuery(GET_ALL_GROUPS, {
+  const [_getGroups, { loading: getAllLoading }] = useLazyQuery(GET_GROUPS, {
     fetchPolicy: "cache-and-network",
     onError: (error) => {
       setServerErrors((serverErrors) => ({ ...serverErrors, ...extractServerError(error) }));
@@ -64,7 +64,7 @@ const useGroup = ({
     },
     update: (cache, { data }) => {
       const { updateGroup } = data;
-      cache.updateQuery({ query: GET_GROUP_BY_ID, variables: { groupId: updateGroup.id } }, () => updateGroup);
+      cache.updateQuery({ query: GET_GROUP, variables: { groupId: updateGroup.id } }, () => updateGroup);
     },
   });
 
@@ -81,7 +81,7 @@ const useGroup = ({
       } = data;
 
       ok &&
-        cache.updateQuery({ query: GET_ALL_GROUPS }, ({ getGroups }) => ({
+        cache.updateQuery({ query: GET_GROUPS }, ({ getGroups }) => ({
           getGroups: getGroups.filter((group) => !deletedIds.includes(group.id)),
         }));
     },
@@ -96,7 +96,7 @@ const useGroup = ({
     },
     update: (cache, { data }) => {
       const { restoreGroups } = data;
-      cache.updateQuery({ query: GET_ALL_GROUPS }, ({ getGroups }) => ({
+      cache.updateQuery({ query: GET_GROUPS }, ({ getGroups }) => ({
         getGroups: [...getGroups, ...restoreGroups].sort((a, b) => a.id.toString() - b.id.toString()),
       }));
     },
