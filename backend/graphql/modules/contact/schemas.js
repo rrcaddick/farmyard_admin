@@ -27,7 +27,6 @@ const createContact = {
   ),
 };
 
-//TODO: Bug Fix: Update throw error when removing either tel or email
 const updateContact = {
   schema: object().shape(
     {

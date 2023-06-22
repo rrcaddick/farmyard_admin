@@ -32,11 +32,12 @@ const useManageDirtyValues = () => {
   );
 
   const getDirtyData = useCallback(
-    (defaultValues, submittedValues, dirtyFieldsModifier, { withId = false }) => {
+    (defaultValues, submittedValues, dirtyFieldsModifier, { withId = false, dependantFields = [] }) => {
       const _defaultValues = removeDeletedFieldArrayItems(defaultValues);
       const dirtyFields = createDirtyFields(
         _defaultValues,
-        dirtyFieldsModifier ? dirtyFieldsModifier(submittedValues) : submittedValues
+        dirtyFieldsModifier ? dirtyFieldsModifier(submittedValues) : submittedValues,
+        dependantFields
       );
       const dirtyValues = getDirtyValues(dirtyFields, submittedValues, { withId });
       return _.merge({ ...dirtyValues, id: submittedValues.id }, deletedFieldArrayItems);

@@ -107,7 +107,10 @@ const GroupForm = ({ groupTypes }) => {
           return { ...groupData, groupType: JSON.stringify(groupType) };
         };
 
-        const dirtyData = getDirtyData(group, _data, stringfySelectObjects, { withId: true });
+        const dirtyData = getDirtyData(group, _data, stringfySelectObjects, {
+          withId: true,
+          dependantFields: ["email", "tel"],
+        });
         updateGroup({
           variables: { input: getInputData(dirtyData) },
           optimisticResponse: {

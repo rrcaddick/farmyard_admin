@@ -5,7 +5,7 @@ const isObject = (objectRef) => {
   return false;
 };
 
-const createDirtyFields = (defaultValues, submittedValues) => {
+const createDirtyFields = (defaultValues, submittedValues, dependantFields = []) => {
   // Value is array
   if (Array.isArray(submittedValues)) {
     // Loop array and recursively call createDirtyFields
@@ -13,7 +13,7 @@ const createDirtyFields = (defaultValues, submittedValues) => {
     for (let i = 0; i < submittedValues.length; i++) {
       const { id } = submittedValues[i];
       const defaultArrayValue = defaultValues.find((value) => value.id === id);
-      const dirtyFieldsObject = createDirtyFields(defaultArrayValue, submittedValues[i]);
+      const dirtyFieldsObject = createDirtyFields(defaultArrayValue, submittedValues[i], dependantFields);
       if (Object.keys(dirtyFieldsObject).length > 0) arrayObjects.push({ ...dirtyFieldsObject, index: i });
     }
     return arrayObjects.length > 0 ? arrayObjects : undefined;
@@ -30,7 +30,8 @@ const createDirtyFields = (defaultValues, submittedValues) => {
     Object.keys(submittedValues).reduce((acc, key) => {
       const submitData = submittedValues[key];
       const defaultData = defaultValues?.[key] || "";
-      const value = createDirtyFields(defaultData, submitData);
+      const isDependantField = dependantFields.includes(key);
+      const value = isDependantField || createDirtyFields(defaultData, submitData, dependantFields);
       if (!value || (isObject(value) && Object.keys(value).length === 0)) return acc;
       acc.push([key, value]);
       return acc;
