@@ -3,7 +3,7 @@ import { ThemeModeContext, useThemeMode } from "./theme";
 import { ThemeProvider, CssBaseline, GlobalStyles, Paper } from "@mui/material";
 import { useRoutes } from "react-router-dom";
 import RouteMap from "@routes";
-import { globalStyles } from "@theme/global-styles";
+import { globalStyles } from "src/theme/global-styles";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { getRememberMe } from "@utils/auth";

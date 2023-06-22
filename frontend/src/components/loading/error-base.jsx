@@ -1,5 +1,4 @@
 import Lottie from "lottie-react";
-import loadError from "@animations/load-error.json";
 import ErrorAnimation from "@animations/triangle-error.json";
 import { Box, Typography, Button } from "@mui/material";
 import { useMemo } from "react";
@@ -22,10 +21,10 @@ const LoadError = ({ error, retry, customError }) => {
         <Lottie animationData={ErrorAnimation} loop={true} />
         <Box display="flex" flexDirection="column" alignItems="center">
           <Typography textAlign="center" variant="h4" color="error.main">
-            {error.header ?? "Oops!"}
+            {error?.header ?? "Oops!"}
           </Typography>
           <Typography textAlign="center" variant="h6" color="error.main">
-            {error.message ??
+            {error?.message ??
               "Something went wrong. You can retry or contact your system administrator if the issue persists"}
           </Typography>
         </Box>

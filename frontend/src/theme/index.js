@@ -215,18 +215,18 @@ export const themeSettings = (mode) => {
       },
       MUIDataTable: {
         styleOverrides: {
-          tableRoot: ({ loading }) => ({
-            ...(loading && {
+          tableRoot: ({ loading, error }) => ({
+            ...((loading || error) && {
               height: "100%",
             }),
           }),
-          root: ({ loading }) => ({
+          root: {
             flexGrow: 1,
             display: "flex",
             flexDirection: "column",
-          }),
-          responsiveBase: ({ loading }) => ({
-            ...(loading && {
+          },
+          responsiveBase: ({ loading, error }) => ({
+            ...((loading || error) && {
               height: "100% !important",
             }),
             overflow: "auto",

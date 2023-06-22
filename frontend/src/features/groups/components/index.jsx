@@ -12,7 +12,6 @@ import { READ_GROUP, READ_GROUPS } from "@groups/graphql/queries";
 import { useApolloCache } from "@hooks/use-apollo-cache";
 import { useGroup, useGetGroups } from "@groups/hooks";
 import { enqueueSnackbar } from "notistack";
-import { useApolloClient } from "@apollo/client";
 
 const columnDefs = [
   {
@@ -69,7 +68,8 @@ const getGroupFormData = (group) => {
   };
 };
 
-const onGroupsDelete = async (deletedRows, groups, deleteGroups, restoreGroups, cache, client) => {
+// TODO: Refactor to use for all table entity deletes
+const onGroupsDelete = async (deletedRows, groups, deleteGroups, restoreGroups, cache) => {
   const deletedValues = deletedRows?.data.reduce((deletedValues, { dataIndex }) => {
     return { ...deletedValues, [groups[dataIndex].id]: groups[dataIndex].name };
   }, {});
@@ -129,7 +129,7 @@ const Groups = () => {
   const isDesktop = useIsDesktop();
   const cache = useApolloCache();
 
-  const { groups, loading } = useGetGroups();
+  const { groups, loading, serverErrors, refetch } = useGetGroups();
 
   const { deleteGroups, restoreGroups } = useGroup();
 
@@ -197,6 +197,8 @@ const Groups = () => {
           columns={columns}
           options={options}
           loading={loading}
+          retry={refetch}
+          error={serverErrors?.networkError || serverErrors?.serverError}
         />
       </Box>
       <AddUpdateGroupModal modalProps={{ container: container.current }}>
