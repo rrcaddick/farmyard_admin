@@ -9,7 +9,7 @@ import useLoading from "@components/loading/use-loading";
 const AddUpdateGroup = () => {
   const theme = useTheme();
   const isDesktop = useIsDesktop();
-  const { groupTypes, loading, error, retry } = useGetAllGroupTypes();
+  const { groupTypes, loading, serverErrors, refetch } = useGetAllGroupTypes();
 
   const {
     openContext: { groupName },
@@ -18,7 +18,7 @@ const AddUpdateGroup = () => {
   const { Loading } = useLoading(loading);
 
   return (
-    <Loading {...{ error: !!error, retry }}>
+    <Loading error={serverErrors?.networkError || serverErrors?.serverError} retry={refetch}>
       <Box
         display="flex"
         flexDirection="column"
@@ -42,6 +42,7 @@ const AddUpdateGroup = () => {
           sx={{
             marginLeft: isDesktop ? "1rem" : "0.5rem",
           }}
+          {...(!isDesktop && { textAlign: "center" })}
         >
           {groupName ?? "New Group Details:"}
         </Typography>

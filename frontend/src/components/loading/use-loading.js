@@ -32,9 +32,9 @@ const useLoading = (initState = false) => {
   );
 
   const Loading = useCallback(
-    ({ children, error, errorMessage, retry, customError, container, animation }) => (
+    ({ children, error, retry, customError, container, animation }) => (
       <LoadingContext.Provider {...{ value }}>
-        <LoadingBase {...{ ...value, children, error, errorMessage, retry, customError, container, animation }} />
+        <LoadingBase {...{ ...value, children, error, retry, customError, container, animation }} />
       </LoadingContext.Provider>
     ),
     [value]

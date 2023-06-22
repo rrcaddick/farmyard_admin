@@ -1,18 +1,12 @@
 import Lottie from "lottie-react";
 import loadError from "@animations/load-error.json";
+import ErrorAnimation from "@animations/triangle-error.json";
 import { Box, Typography, Button } from "@mui/material";
 import { useMemo } from "react";
 import { useIsDesktop } from "@hooks/use-is-desktop";
 
-const LoadError = ({ errorMessage, retry, customError }) => {
+const LoadError = ({ error, retry, customError }) => {
   const isDesktop = useIsDesktop();
-
-  const defaultErrorMessage = useMemo(
-    () => `Oops! Something went wrong. You can either retry this
-  action, or contact your system administrator if the issue persists`,
-    []
-  );
-  const _errorMessage = useMemo(() => errorMessage ?? defaultErrorMessage, [errorMessage, defaultErrorMessage]);
 
   const defaultError = useMemo(
     () => (
@@ -20,30 +14,28 @@ const LoadError = ({ errorMessage, retry, customError }) => {
         display="flex"
         flexDirection="column"
         flexGrow={1}
+        gap={isDesktop ? "2rem" : "1rem"}
         alignItems="center"
-        justifyContent="space-between"
-        p={isDesktop ? "2rem" : "1rem"}
-        paddingTop="2rem"
+        justifyContent="center"
       >
-        <Typography
-          textAlign="center"
-          fontSize={isDesktop ? "1.2rem" : "0.9rem"}
-          color="error.main"
-          fontWeight="800"
-          letterSpacing="0.15rem"
-          maxWidth="800px"
-        >
-          {_errorMessage.toUpperCase()}
-        </Typography>
-        <Button variant="contained" color="secondary" onClick={() => retry()}>
-          Retry
-        </Button>
-        <Box display="flex" justifyContent="center" alignItems="center">
-          <Lottie animationData={loadError} loop={true} />
+        {/* TODO: Choose better error animation or else just img */}
+        <Lottie animationData={ErrorAnimation} loop={true} />
+        <Box display="flex" flexDirection="column" alignItems="center">
+          <Typography textAlign="center" variant="h4" color="error.main">
+            {error.header ?? "Oops!"}
+          </Typography>
+          <Typography textAlign="center" variant="h6" color="error.main">
+            {error.message ??
+              "Something went wrong. You can retry or contact your system administrator if the issue persists"}
+          </Typography>
         </Box>
+        {/* Retry mutation */}
+        <Button variant="contained" onClick={() => retry()}>
+          Try Again
+        </Button>
       </Box>
     ),
-    [_errorMessage, isDesktop, retry]
+    [isDesktop, retry, error.header, error.message]
   );
 
   return customError ?? defaultError;

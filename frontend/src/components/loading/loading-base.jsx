@@ -5,7 +5,7 @@ import { Box } from "@mui/material";
 import { cloneElement, useMemo } from "react";
 
 // TODO: Add prop for loading animation
-const LoadingBase = ({ loading, error, errorMessage, retry, customError, children, container, animation }) => {
+const LoadingBase = ({ loading, error, retry, customError, children, container, animation }) => {
   const defaultAnimation = useMemo(() => <Lottie animationData={LoadingAnimation} loop={true} />, []);
 
   const _animation = useMemo(() => (animation ? animation : defaultAnimation), [defaultAnimation, animation]);
@@ -21,7 +21,7 @@ const LoadingBase = ({ loading, error, errorMessage, retry, customError, childre
     [container, _animation]
   );
 
-  if (error) return <LoadError {...{ errorMessage, retry, customError }} />;
+  if (error && !loading) return <LoadError {...{ error, retry, customError }} />;
 
   return (
     <>
@@ -30,7 +30,7 @@ const LoadingBase = ({ loading, error, errorMessage, retry, customError, childre
           {container ? _containedAnimation : _animation}
         </Box>
       )}
-      {!loading && children}
+      {!loading && !error && children}
     </>
   );
 };

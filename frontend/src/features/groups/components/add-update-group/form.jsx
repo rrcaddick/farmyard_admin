@@ -5,7 +5,7 @@ import { useCallback, useEffect } from "react";
 import { useForm, FormProvider, useFieldArray } from "react-hook-form";
 import { useYupValidationResolver } from "@hooks/use-yup-validation-resolver";
 import { newGroupSchema } from "@groups/schemas/new-group";
-import { Box, Button, IconButton, Divider, useTheme } from "@mui/material";
+import { Box, Button, IconButton, Divider, useTheme, Typography } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { generateTempId } from "@graphql/utils/generate-temp-id";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -16,8 +16,8 @@ import { useModalContext } from "@components/modal/use-modal";
 import { useGroup } from "@groups/hooks";
 import useLoading from "@components/loading/use-loading";
 
-const createOptimisticResponse = (data) => {
-  const { address, contacts, ...group } = data;
+const createOptimisticResponse = (_data) => {
+  const { address, contacts, ...group } = _data;
 
   const groupResponse = {
     __typename: "Group",
@@ -82,11 +82,13 @@ const GroupForm = ({ groupTypes }) => {
 
   const submitHandler = useCallback(
     (data) => {
-      const getInputData = (data) => {
-        const { groupType: { __typename, price: { id } = {}, ...groupType } = {}, contacts } = data;
+      const _data = typeof data?.groupType === "string" ? { ...data, groupType: JSON.parse(data.groupType) } : data;
+
+      const getInputData = (_data) => {
+        const { groupType: { __typename, price: { id } = {}, ...groupType } = {}, contacts } = _data;
 
         return {
-          ...data,
+          ..._data,
           ...(contacts && {
             contacts: contacts.map((contact) => {
               const { id, ...contactData } = contact;
@@ -103,20 +105,20 @@ const GroupForm = ({ groupTypes }) => {
           return { ...groupData, groupType: JSON.stringify(groupType) };
         };
 
-        const dirtyData = getDirtyData(group, data, stringfySelectObjects, { withId: true });
+        const dirtyData = getDirtyData(group, _data, stringfySelectObjects, { withId: true });
         updateGroup({
           variables: { input: getInputData(dirtyData) },
           optimisticResponse: {
-            updateGroup: createOptimisticResponse(data),
+            updateGroup: createOptimisticResponse(_data),
           },
         });
       }
 
       if (!group) {
         createGroup({
-          variables: { input: getInputData(data) },
+          variables: { input: getInputData(_data) },
           optimisticResponse: {
-            createGroup: createOptimisticResponse(data),
+            createGroup: createOptimisticResponse(_data),
           },
         });
       }
@@ -131,7 +133,10 @@ const GroupForm = ({ groupTypes }) => {
   };
 
   return (
-    <Loading>
+    <Loading
+      error={!!serverErrors?.networkError || !!serverErrors?.serverError}
+      retry={() => submitHandler(getValues())}
+    >
       <FormProvider {...formMethods}>
         <Box
           component="form"

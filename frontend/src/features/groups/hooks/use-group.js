@@ -7,23 +7,7 @@ import {
   RESTORE_GROUPS_MUTATION,
   UPDATE_GROUP_MUTATION,
 } from "../graphql/mutations";
-
-const extractServerError = ({ graphQLErrors, networkError }) => {
-  let errors = {};
-  let networkErrors = {};
-
-  // TODO: Create error link for all errors. Loop all and check error type
-  if (graphQLErrors?.length > 0) {
-    const { data } = graphQLErrors[0]?.extensions || {};
-    errors = data;
-  }
-
-  if (networkError) {
-    networkErrors = { network: "Something went wrong. Please try again or contact the system administrator" };
-  }
-
-  return { ...errors, ...networkErrors };
-};
+import { extractServerError } from "@graphql/utils/extract-server-error";
 
 const useGroup = ({
   onCreateComplete,
@@ -34,7 +18,7 @@ const useGroup = ({
 } = {}) => {
   const [serverErrors, setServerErrors] = useState({});
   const clearServerError = useCallback((name) => {
-    setServerErrors((serverErrors) => ({ ...serverErrors, [name]: undefined }));
+    setServerErrors((serverErrors) => (name ? { ...serverErrors, [name]: undefined } : {}));
   }, []);
 
   const [_createGroup, { loading: createLoading }] = useMutation(CREATE_GROUP_MUTATION, {
@@ -109,10 +93,10 @@ const useGroup = ({
 
   const createGroup = useCallback(
     (args) => {
-      setServerErrors((serverErrors) => ({ ...serverErrors, network: undefined }));
+      clearServerError();
       _createGroup(args);
     },
-    [_createGroup]
+    [_createGroup, clearServerError]
   );
 
   const getGroups = async () => {
@@ -124,29 +108,29 @@ const useGroup = ({
 
   const updateGroup = useCallback(
     (args) => {
-      setServerErrors((serverErrors) => ({ ...serverErrors, network: undefined }));
+      clearServerError();
       _updateGroup(args);
     },
-    [_updateGroup]
+    [_updateGroup, clearServerError]
   );
 
   const deleteGroups = useCallback(
     async (args) => {
-      setServerErrors((serverErrors) => ({ ...serverErrors, network: undefined }));
+      clearServerError();
       const {
         data: { deleteGroups },
       } = await _deleteGroups(args);
       return deleteGroups;
     },
-    [_deleteGroups]
+    [_deleteGroups, clearServerError]
   );
 
   const restoreGroups = useCallback(
     (args) => {
-      setServerErrors((serverErrors) => ({ ...serverErrors, network: undefined }));
+      clearServerError();
       _restoreGroups(args);
     },
-    [_restoreGroups]
+    [_restoreGroups, clearServerError]
   );
 
   const loading = useMemo(() => {

@@ -3,6 +3,7 @@ import { createSafeFetch } from "@utils/fetch";
 import { onError } from "@apollo/client/link/error";
 import { persistCache, SessionStorageWrapper } from "apollo3-cache-persist";
 import { removeRememberMe } from "@utils/auth";
+import { extractServerError } from "./utils/extract-server-error";
 
 const createApolloClient = () => {
   let token;
