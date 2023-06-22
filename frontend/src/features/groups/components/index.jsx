@@ -102,6 +102,12 @@ const onGroupsDelete = async (deletedRows, groups, deleteGroups, restoreGroups, 
           },
         });
       },
+      onClose: () => {
+        // Purge cache of deletedIds
+        deletedIds.forEach((deletedId) => {
+          cache.evict(`Group:${deletedId}`);
+        });
+      },
     });
 
     return ok;
@@ -123,11 +129,8 @@ const Groups = () => {
   const isDesktop = useIsDesktop();
   const cache = useApolloCache();
 
-  const client = useApolloClient();
-
   const { groups, loading } = useGetGroups();
 
-  //TODO: Show feedback for delete errors
   const { deleteGroups, restoreGroups } = useGroup();
 
   const actions = useMemo(
@@ -168,7 +171,7 @@ const Groups = () => {
       direction: "asc",
     },
     onRowsDelete: async (deletedRows) => {
-      onGroupsDelete(deletedRows, groups, deleteGroups, restoreGroups, cache, client);
+      onGroupsDelete(deletedRows, groups, deleteGroups, restoreGroups, cache);
     },
   };
 

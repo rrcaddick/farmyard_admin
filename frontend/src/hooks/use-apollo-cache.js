@@ -32,6 +32,7 @@ const useApolloCache = () => {
 
         return data ? data : null;
       },
+      evict: (id, fieldName) => client.cache.evict({ id, ...(fieldName && { fieldName }) }),
     }),
     [client]
   );
