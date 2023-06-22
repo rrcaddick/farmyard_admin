@@ -1,7 +1,12 @@
 import { useCallback, useMemo, useState } from "react";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { GET_GROUPS, READ_GROUP } from "../graphql/queries";
-import { CREATE_GROUP_MUTATION, DELETE_GROUPS_MUTATION, RESTORE_GROUPS_MUTATION } from "../graphql/mutations";
+import {
+  CREATE_GROUP_MUTATION,
+  DELETE_GROUPS_MUTATION,
+  RESTORE_GROUPS_MUTATION,
+  UPDATE_GROUP_MUTATION,
+} from "../graphql/mutations";
 
 const extractServerError = ({ graphQLErrors, networkError }) => {
   let errors = {};
@@ -55,7 +60,7 @@ const useGroup = ({
     },
   });
 
-  const [_updateGroup, { loading: updateLoading }] = useMutation(CREATE_GROUP_MUTATION, {
+  const [_updateGroup, { loading: updateLoading }] = useMutation(UPDATE_GROUP_MUTATION, {
     onError: (error) => {
       setServerErrors((serverErrors) => ({ ...serverErrors, ...extractServerError(error) }));
     },
