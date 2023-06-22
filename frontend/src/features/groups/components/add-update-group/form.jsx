@@ -60,10 +60,12 @@ const GroupForm = ({ groupTypes }) => {
     control,
     setFocus,
     getValues,
+    trigger,
     formState: { isValid, isDirty },
   } = formMethods;
   const { fields, append, remove } = useFieldArray({ name: "contacts", control });
   const { getDirtyData, markAsDeleted, hasDeletedItems } = useManageDirtyValues();
+
   useEffect(() => {
     setFocus("name");
   }, [setFocus]);
@@ -239,6 +241,11 @@ const GroupForm = ({ groupTypes }) => {
                       placeholder="example@example.com"
                       serverError={serverErrors?.[`contacts[${index}].email`]}
                       clearServerError={clearServerError}
+                      onChange={() => {
+                        const telInput = `contacts[${index}].tel`;
+                        trigger(telInput);
+                        clearServerError(telInput);
+                      }}
                     />
                     <TextInput
                       name={`contacts[${index}].tel`}
@@ -246,6 +253,11 @@ const GroupForm = ({ groupTypes }) => {
                       placeholder="073 123 4567"
                       serverError={serverErrors?.[`contacts[${index}].tel`]}
                       clearServerError={clearServerError}
+                      onChange={() => {
+                        const emailInput = `contacts[${index}].email`;
+                        trigger(emailInput);
+                        clearServerError(emailInput);
+                      }}
                     />
 
                     {!isDesktop && (

@@ -11,9 +11,7 @@ const createContact = {
           return !tel || tel.length === 0;
         },
         then: () =>
-          string()
-            .required("A contact requires either an email or contact number")
-            .email("Please enter a valid email address"),
+          string().required("You must provide at least 1 contact method").email("Please enter a valid email address"),
         otherwise: () => string().email("Invalid email address"),
       }),
       tel: string()
@@ -22,13 +20,14 @@ const createContact = {
           is: (email) => {
             return !email || email.length === 0;
           },
-          then: () => string().required("A contact requires either an email or contact number"),
+          then: () => string().required("You must provide at least 1 contact method"),
         }),
     },
     [["email", "tel"]]
   ),
 };
 
+//TODO: Bug Fix: Update throw error when removing either tel or email
 const updateContact = {
   schema: object().shape(
     {
@@ -41,9 +40,7 @@ const updateContact = {
           return !tel || tel.length === 0;
         },
         then: () =>
-          string()
-            .required("A contact requires either an email or contact number")
-            .email("Please enter a valid email address"),
+          string().required("You must provide at least 1 contact method").email("Please enter a valid email address"),
         otherwise: () => string().email("Invalid email address"),
       }),
       tel: string()
@@ -52,7 +49,7 @@ const updateContact = {
           is: (email) => {
             return !email || email.length === 0;
           },
-          then: () => string().required("A contact requires either an email or contact number"),
+          then: () => string().required("You must provide at least 1 contact method"),
         }),
     },
     [["email", "tel"]]
