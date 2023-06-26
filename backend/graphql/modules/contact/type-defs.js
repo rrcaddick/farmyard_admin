@@ -2,8 +2,8 @@ const { gql } = require("apollo-server-express");
 
 const typeDefs = gql`
   type Query {
-    getContact(contactId: ID): Contact
-    getContacts: [Contact]!
+    getContact(contactId: ID!): Contact
+    getContacts(contactIds: [ID]): [Contact]!
   }
 
   type Mutation {

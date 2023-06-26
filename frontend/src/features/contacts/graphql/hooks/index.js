@@ -1,3 +1,3 @@
-import { useGetAllContacts } from "@contacts/graphql/hooks/use-get-all-contacts";
+import { useGetContacts } from "@contacts/graphql/hooks/use-get-contacts";
 
-export { useGetAllContacts };
+export { useGetContacts };

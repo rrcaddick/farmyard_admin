@@ -1,13 +1,13 @@
 const resolvers = {
   Query: {
-    getContact: (root, { contactId }, { dataSources: { contactSource } }) => contactSource.getContact(contactId),
-    getContacts: (root, args, { dataSources: { contactSource } }, info) => contactSource.getContacts(),
+    getContact: (_, { contactId }, { dataSources: { contactSource } }) => contactSource.getContact(contactId),
+    getContacts: (_, { contactIds }, { dataSources: { contactSource } }) => contactSource.getContacts(contactIds),
   },
   Contact: {
-    id: ({ _id }, args, context) => _id,
+    id: ({ _id }) => _id,
   },
   Mutation: {
-    createContact: (_root, { input, groupId }, { dataSources: { contactSource } }) =>
+    createContact: (_, { input, groupId }, { dataSources: { contactSource } }) =>
       contactSource.createContact(input, groupId),
   },
 };

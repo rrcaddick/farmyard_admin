@@ -1,4 +1,3 @@
-import styled from "@emotion/styled";
 import TextInput from "@components/input/text-input";
 import SelectInput from "@components/input/select-input";
 import { useCallback, useEffect, useMemo } from "react";
@@ -7,25 +6,12 @@ import { useYupValidationResolver } from "@hooks/use-yup-validation-resolver";
 import { contactSchema } from "@contacts/schemas/contact-schema";
 import { Box, Button, IconButton, Divider, useTheme } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
-import { useGetAllGroupTypes, useUpdateGroup } from "@groups/hooks";
-// import { useCreateGroup } from "@contacts /graphql/hooks/use-create-contact";
 import { generateTempId } from "@graphql/utils/generate-temp-id";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import { useIsDesktop } from "@hooks/use-is-desktop";
 import { useModalContext } from "@components/modal/use-modal";
 
-const createGroupTypeSelectOptions = (groupTypes) => {
-  return groupTypes.map((groupType) => {
-    const {
-      id,
-      type: text,
-      price: { id: price },
-    } = groupType;
-
-    return { id, text, price };
-  });
-};
 
 const createOptimisticResponse = (data) => {
   const { groupType, address, contacts, ...contact } = data;

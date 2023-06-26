@@ -18,7 +18,6 @@ const FULL_GROUP_FRAGMENT = gql`
     }
     contacts {
       id
-      type
       name
       email
       tel

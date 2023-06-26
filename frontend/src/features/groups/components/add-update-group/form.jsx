@@ -5,7 +5,7 @@ import { useCallback, useEffect } from "react";
 import { useForm, FormProvider, useFieldArray } from "react-hook-form";
 import { useYupValidationResolver } from "@hooks/use-yup-validation-resolver";
 import { newGroupSchema } from "@groups/schemas/new-group";
-import { Box, Button, IconButton, Divider, useTheme, Typography } from "@mui/material";
+import { Box, Button, IconButton, Divider, useTheme } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { generateTempId } from "@graphql/utils/generate-temp-id";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -13,7 +13,7 @@ import AddIcon from "@mui/icons-material/Add";
 import { useIsDesktop } from "@hooks/use-is-desktop";
 import { useManageDirtyValues } from "@hooks/use-manage-dirty-values";
 import { useModalContext } from "@components/modal/use-modal";
-import { useGroup } from "@groups/hooks";
+import { useGroup } from "@groups/hooks/use-group";
 import useLoading from "@components/loading/use-loading";
 
 const createOptimisticResponse = (_data) => {
@@ -107,6 +107,7 @@ const GroupForm = ({ groupTypes }) => {
           return { ...groupData, groupType: JSON.stringify(groupType) };
         };
 
+        // TODO: Refactor dependantFields to only include if one of them is submitted
         const dirtyData = getDirtyData(group, _data, stringfySelectObjects, {
           withId: true,
           dependantFields: ["email", "tel"],

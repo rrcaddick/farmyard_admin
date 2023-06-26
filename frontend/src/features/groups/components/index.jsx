@@ -8,10 +8,12 @@ import ViewIcon from "@mui/icons-material/Visibility";
 import MuiDataTable from "@components/table/mui-data-table";
 import { useIsDesktop } from "@hooks/use-is-desktop";
 import useModal from "@components/modal/use-modal";
-import { READ_GROUP, READ_GROUPS } from "@groups/graphql/queries";
+import { GET_GROUPS, READ_GROUP, READ_GROUPS } from "@groups/graphql/queries";
 import { useApolloCache } from "@hooks/use-apollo-cache";
-import { useGroup, useGetGroups } from "@groups/hooks";
+import { useGroup } from "@groups/hooks/use-group";
 import { enqueueSnackbar } from "notistack";
+import { parseGraphqlData } from "@utils/form";
+import { useApolloQuery } from "@hooks/useApolloQuery";
 
 const columnDefs = [
   {
@@ -45,28 +47,6 @@ const columnDefs = [
     label: "Post Code",
   },
 ];
-
-const getGroupFormData = (group) => {
-  const {
-    id,
-    name,
-    address: { street, suburb, postCode },
-    groupType,
-    contacts,
-  } = group;
-  return {
-    id,
-    name,
-    address: { street, suburb, postCode },
-    groupType: JSON.stringify(groupType),
-    contacts: contacts.map(({ id, name, email, tel }) => ({
-      id,
-      name,
-      email: email ?? "",
-      tel: tel ?? "",
-    })),
-  };
-};
 
 // TODO: Refactor to use for all table entity deletes
 const onGroupsDelete = async (deletedRows, groups, deleteGroups, restoreGroups, cache) => {
@@ -129,7 +109,7 @@ const Groups = () => {
   const isDesktop = useIsDesktop();
   const cache = useApolloCache();
 
-  const { groups, loading, serverErrors, refetch } = useGetGroups();
+  const { data: groups, loading, serverErrors, refetch } = useApolloQuery(GET_GROUPS);
 
   const { deleteGroups, restoreGroups } = useGroup();
 
@@ -146,7 +126,7 @@ const Groups = () => {
               onClick={() => {
                 const group = cache.read(READ_GROUP, { groupId: tableMeta.rowData[0] });
                 openAddEditGroup({
-                  group: getGroupFormData(group),
+                  group: parseGraphqlData(group, ["groupType"]),
                   groupName: group.name,
                 });
               }}

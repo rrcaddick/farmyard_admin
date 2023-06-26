@@ -1,9 +1,9 @@
 import { useQuery } from "@apollo/client";
-import { GET_ALL_GROUP_TYPES } from "../graphql/queries";
+import { getOperationName } from "@apollo/client/utilities";
 import { extractServerError } from "@graphql/utils/extract-server-error";
 import { useCallback, useState } from "react";
 
-const useGetAllGroupTypes = (onCompleted) => {
+const useApolloQuery = (query, onCompleted) => {
   const [serverErrors, setServerErrors] = useState({});
 
   const clearServerError = useCallback((name) => {
@@ -11,11 +11,11 @@ const useGetAllGroupTypes = (onCompleted) => {
   }, []);
 
   const {
-    data: { getGroupTypes } = { getGroupTypes: [] },
+    data: { [getOperationName(query)]: extractedData } = { [getOperationName(query)]: [] },
     loading,
     error,
     refetch,
-  } = useQuery(GET_ALL_GROUP_TYPES, {
+  } = useQuery(query, {
     onError: (error) => {
       setServerErrors((serverErrors) => ({ ...serverErrors, ...extractServerError(error) }));
     },
@@ -26,7 +26,7 @@ const useGetAllGroupTypes = (onCompleted) => {
     },
   });
 
-  return { groupTypes: getGroupTypes, loading, error, serverErrors, refetch };
+  return { data: extractedData, loading, error, serverErrors, refetch };
 };
 
-export { useGetAllGroupTypes };
+export { useApolloQuery };

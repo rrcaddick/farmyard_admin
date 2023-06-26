@@ -4,7 +4,7 @@ import AddUpdateContact from "@contacts/components/add-update-contact";
 import { useMemo } from "react";
 import { Box, Fab, IconButton } from "@mui/material";
 import { useOutletContext } from "react-router-dom";
-import { useGetAllContacts } from "@contacts/graphql/hooks";
+import { useGetContacts } from "@contacts/graphql/hooks";
 import ViewIcon from "@mui/icons-material/Visibility";
 import MuiDataTable from "@components/table/mui-data-table";
 import { useIsDesktop } from "@hooks/use-is-desktop";
@@ -42,12 +42,13 @@ const columnDefs = [
 ];
 
 const Contacts = () => {
-  const isDesktop = useIsDesktop();
-  const cache = useApolloCache();
   const { container } = useOutletContext();
   const { open, Modal: AddUpdateContactModal } = useModal();
+  const isDesktop = useIsDesktop();
+  const cache = useApolloCache();
 
-  const { contacts, loading } = useGetAllContacts();
+  const { contacts, loading } = useGetContacts();
+
   //TODO: Show feedback for delete errors
   // const { mutate: deleteGroups, loading: deleteGroupsLoading, errors } = useDeleteGroups();
 

@@ -2,14 +2,15 @@ import { useIsDesktop } from "@hooks/use-is-desktop";
 import { Divider, Typography, useTheme } from "@mui/material";
 import Box from "@mui/material/Box";
 import GroupForm from "./form";
-import { useGetAllGroupTypes } from "@groups/hooks";
 import { useModalContext } from "@components/modal/use-modal";
 import useLoading from "@components/loading/use-loading";
+import { GET_GROUP_TYPES } from "@groups/graphql/queries";
+import { useApolloQuery } from "@hooks/useApolloQuery";
 
 const AddUpdateGroup = () => {
   const theme = useTheme();
   const isDesktop = useIsDesktop();
-  const { groupTypes, loading, serverErrors, refetch } = useGetAllGroupTypes();
+  const { data: groupTypes, loading, serverErrors, refetch } = useApolloQuery(GET_GROUP_TYPES);
 
   const {
     openContext: { groupName },

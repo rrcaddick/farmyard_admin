@@ -94,6 +94,28 @@ const getDirtyValues = (dirtyFields, allValues, { withId = false }) => {
   );
 };
 
-const getDirtyData = () => {};
+const parseGraphqlData = (data, stringifyFields = []) => {
+  if (Array.isArray(data)) {
+    const arrayObjects = [];
+    for (let item of data) {
+      arrayObjects.push(parseGraphqlData(item, stringifyFields));
+    }
+    return arrayObjects;
+  }
 
-export { addIdToDirtyFields, getDirtyValues, createDirtyFields, getDirtyData };
+  if (!isObject(data)) {
+    return data ?? "";
+  }
+
+  return Object.fromEntries(
+    Object.keys(data).reduce((entries, key) => {
+      if (key === "__typename") return entries;
+      if (stringifyFields.includes(key)) {
+        return [...entries, [key, JSON.stringify(data[key])]];
+      }
+      return [...entries, [key, parseGraphqlData(data[key], stringifyFields)]];
+    }, [])
+  );
+};
+
+export { addIdToDirtyFields, getDirtyValues, createDirtyFields, parseGraphqlData };

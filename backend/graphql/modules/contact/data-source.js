@@ -10,8 +10,13 @@ class ContactSource extends MongoDataSource {
     return await this.findOneById(contactId);
   }
 
-  async getContacts() {
-    return await this.model.find();
+  async getContacts(contactIds) {
+    return this.executeWithGraphqlProjection(
+      this.model.find({
+        ...(contactIds && { _id: contactIds }),
+        $or: [{ deleted: { $exists: false } }, { deleted: false }],
+      })
+    );
   }
 
   async createContact(newContact, groupId = null) {
