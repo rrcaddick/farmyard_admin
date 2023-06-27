@@ -10,12 +10,13 @@ import { useApolloQuery } from "@hooks/use-apollo-query";
 const AddUpdateGroup = () => {
   const theme = useTheme();
   const isDesktop = useIsDesktop();
-  const { data: groupTypes, loading, serverErrors, refetch } = useApolloQuery(GET_GROUP_TYPES);
-
+  
   const {
     openContext: { groupName },
   } = useModalContext();
-
+  
+  const { data: groupTypes, loading, serverErrors, refetch } = useApolloQuery(GET_GROUP_TYPES);
+  
   const { Loading } = useLoading(loading);
 
   return (

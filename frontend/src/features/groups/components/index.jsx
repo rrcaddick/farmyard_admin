@@ -52,11 +52,12 @@ const Groups = () => {
   const { open: openAddEditGroup, Modal: AddUpdateGroupModal } = useModal();
   const isDesktop = useIsDesktop();
   const cache = useApolloCache();
-  const { MuiDataTable, onRowsDelete } = useMuiDataTable();
-
+  
   const { data: groups, loading, serverErrors, refetch } = useApolloQuery(GET_GROUPS);
-
+  
   const { deleteGroups, restoreGroups } = useGroup();
+  
+  const { MuiDataTable, onRowsDelete } = useMuiDataTable();
 
   const actions = useMemo(
     () => ({

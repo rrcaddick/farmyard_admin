@@ -5,6 +5,7 @@ import { useCallback, useEffect } from "react";
 import { useForm, FormProvider, useFieldArray } from "react-hook-form";
 import { useYupValidationResolver } from "@hooks/use-yup-validation-resolver";
 import { newGroupSchema } from "@groups/schemas/new-group";
+import { createResponseSchema, updateResponseSchema } from "@groups/schemas/optimistic-response";
 import { Box, Button, IconButton, Divider, useTheme } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { generateTempId } from "@graphql/utils/generate-temp-id";
@@ -15,30 +16,31 @@ import { useManageDirtyValues } from "@hooks/use-manage-dirty-values";
 import { useModalContext } from "@components/modal/use-modal";
 import { useGroup } from "@groups/hooks/use-group";
 import useLoading from "@components/loading/use-loading";
+import { createOptimisticResponse } from "@graphql/utils/create-optimistic-response";
 
-const createOptimisticResponse = (_data) => {
-  const { address, contacts, ...group } = _data;
+// const createOptimisticResponse = (_data) => {
+//   const { address, contacts, ...group } = _data;
 
-  const groupResponse = {
-    __typename: "Group",
-    id: generateTempId("Group"),
-    ...group,
-    address: {
-      __typename: "Address",
-      ...address,
-    },
-    contacts: [
-      ...contacts.map((contact) => ({
-        __typename: "Contact",
-        id: contact.id,
-        type: "Group",
-        ...contact,
-      })),
-    ],
-  };
+//   const groupResponse = {
+//     __typename: "Group",
+//     id: generateTempId("Group"),
+//     ...group,
+//     address: {
+//       __typename: "Address",
+//       ...address,
+//     },
+//     contacts: [
+//       ...contacts.map((contact) => ({
+//         __typename: "Contact",
+//         id: contact.id,
+//         type: "Group",
+//         ...contact,
+//       })),
+//     ],
+//   };
 
-  return groupResponse;
-};
+//   return groupResponse;
+// };
 
 const GroupForm = ({ groupTypes }) => {
   const theme = useTheme();
@@ -112,20 +114,17 @@ const GroupForm = ({ groupTypes }) => {
           withId: true,
           dependantFields: ["email", "tel"],
         });
+
         updateGroup({
           variables: { input: getInputData(dirtyData) },
-          optimisticResponse: {
-            updateGroup: createOptimisticResponse(_data),
-          },
+          optimisticResponse: createOptimisticResponse(updateResponseSchema, _data),
         });
       }
 
       if (!group) {
         createGroup({
           variables: { input: getInputData(_data) },
-          optimisticResponse: {
-            createGroup: createOptimisticResponse(_data),
-          },
+          optimisticResponse: createOptimisticResponse(createResponseSchema, _data),
         });
       }
     },

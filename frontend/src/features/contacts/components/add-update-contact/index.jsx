@@ -3,10 +3,10 @@ import { Divider, Typography, useTheme, Box } from "@mui/material";
 import { useModalContext } from "@components/modal/use-modal";
 import ContactForm from "@contacts/components/add-update-contact/form";
 
-//TODO: Look into adding modal that accepts children to outlet context
-const AddUpdateContact = ({ open, onClose, container, contactId }) => {
+const AddUpdateContact = () => {
   const theme = useTheme();
   const isDesktop = useIsDesktop();
+
   const {
     openContext: { contactName },
   } = useModalContext();
@@ -35,6 +35,7 @@ const AddUpdateContact = ({ open, onClose, container, contactId }) => {
         sx={{
           marginLeft: isDesktop ? "1rem" : "0.5rem",
         }}
+        {...(!isDesktop && { textAlign: "center" })}
       >
         {contactName ?? "New Contact Details:"}
       </Typography>
