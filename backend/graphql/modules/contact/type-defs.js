@@ -7,7 +7,10 @@ const typeDefs = gql`
   }
 
   type Mutation {
-    createContact(input: createContactInput!, groupId: ID): Contact
+    createContact(input: CreateContactInput!, groupId: ID): Contact
+    updateContact(input: UpdateContactInput!): Contact!
+    deleteContacts(contactIds: [ID]!): DeleteResponse
+    restoreContacts(contactIds: [ID]!, restoreInfo: RestoreInfo!): [Contact]!
   }
 
   type Contact {
@@ -18,9 +21,16 @@ const typeDefs = gql`
     tel: String
   }
 
-  input createContactInput {
+  input CreateContactInput {
     type: String
     name: String!
+    email: String
+    tel: String
+  }
+
+  input UpdateContactInput {
+    type: String
+    name: String
     email: String
     tel: String
   }

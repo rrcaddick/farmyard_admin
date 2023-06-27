@@ -1,5 +1,6 @@
 const { MongoDataSource } = require("../../data-source/mongo-data-source");
 const { Group } = require("../../../models/group");
+Group;
 const { Contact } = require("../../../models/contact");
 
 class GroupSource extends MongoDataSource {

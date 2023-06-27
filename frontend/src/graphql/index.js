@@ -3,8 +3,8 @@ import { createSafeFetch } from "@utils/fetch";
 import { onError } from "@apollo/client/link/error";
 import { persistCache, SessionStorageWrapper } from "apollo3-cache-persist";
 import { removeRememberMe } from "@utils/auth";
-import { extractServerError } from "./utils/extract-server-error";
 
+// TODO: Refactor entity type policies into their respective folders
 const createApolloClient = () => {
   let token;
   const cache = new InMemoryCache({
@@ -35,6 +35,16 @@ const createApolloClient = () => {
                 __typename: "Contact",
                 id: contactId,
               });
+            },
+          },
+          readContacts: {
+            read(_, { args: { contactIds = [] }, toReference }) {
+              return contactIds.map((contactId) =>
+                toReference({
+                  __typename: "Contact",
+                  id: contactId,
+                })
+              );
             },
           },
         },

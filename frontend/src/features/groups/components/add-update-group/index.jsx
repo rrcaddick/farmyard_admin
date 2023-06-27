@@ -5,7 +5,7 @@ import GroupForm from "./form";
 import { useModalContext } from "@components/modal/use-modal";
 import useLoading from "@components/loading/use-loading";
 import { GET_GROUP_TYPES } from "@groups/graphql/queries";
-import { useApolloQuery } from "@hooks/useApolloQuery";
+import { useApolloQuery } from "@hooks/use-apollo-query";
 
 const AddUpdateGroup = () => {
   const theme = useTheme();

@@ -1,16 +1,18 @@
 import Header from "@components/display/header";
 import AddIcon from "@mui/icons-material/Add";
 import AddUpdateContact from "@contacts/components/add-update-contact";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { Box, Fab, IconButton } from "@mui/material";
 import { useOutletContext } from "react-router-dom";
-import { useGetContacts } from "@contacts/graphql/hooks";
 import ViewIcon from "@mui/icons-material/Visibility";
-import MuiDataTable from "@components/table/mui-data-table";
 import { useIsDesktop } from "@hooks/use-is-desktop";
 import useModal from "@components/modal/use-modal";
 import { useApolloCache } from "@hooks/use-apollo-cache";
-import { GET_CONTACT_BY_ID } from "@contacts/graphql/queries";
+import { GET_CONTACTS, READ_CONTACT, READ_CONTACTS } from "@contacts/graphql/queries";
+import { useApolloQuery } from "@hooks/use-apollo-query";
+import { parseGraphqlData } from "@utils/form";
+import { useContact } from "@contacts/hooks/use-contact";
+import { useMuiDataTable } from "@components/table/mui-data-table/use-mui-data-table";
 
 const columnDefs = [
   {
@@ -43,14 +45,15 @@ const columnDefs = [
 
 const Contacts = () => {
   const { container } = useOutletContext();
-  const { open, Modal: AddUpdateContactModal } = useModal();
+  const { open: openAddEditContact, Modal: AddUpdateContactModal } = useModal();
   const isDesktop = useIsDesktop();
   const cache = useApolloCache();
 
-  const { contacts, loading } = useGetContacts();
+  const { data: contacts, loading, serverErrors, refetch } = useApolloQuery(GET_CONTACTS);
 
-  //TODO: Show feedback for delete errors
-  // const { mutate: deleteGroups, loading: deleteGroupsLoading, errors } = useDeleteGroups();
+  const { deleteContacts, restoreContacts } = useContact();
+
+  const { MuiDataTable, onRowsDelete } = useMuiDataTable();
 
   const actions = useMemo(
     () => ({
@@ -63,8 +66,11 @@ const Contacts = () => {
           return (
             <IconButton
               onClick={() => {
-                const { __typename, ...contact } = cache.read(GET_CONTACT_BY_ID, { contactId: tableMeta.rowData[0] });
-                return open({ contact, contactName: contact.name });
+                const contact = cache.read(READ_CONTACT, { contactId: tableMeta.rowData[0] });
+                openAddEditContact({
+                  contact: parseGraphqlData(contact),
+                  contactName: contact.name,
+                });
               }}
             >
               <ViewIcon />
@@ -73,26 +79,51 @@ const Contacts = () => {
         },
       },
     }),
-    [cache, open]
+    [cache, openAddEditContact]
   );
 
   const columns = useMemo(() => [...columnDefs, actions], [actions]);
+
+  const deleteAction = useCallback(
+    async (deletedIds) => {
+      return await deleteContacts({
+        variables: { contactIds: deletedIds },
+        optimisticResponse: {
+          deleteContacts: {
+            ok: true,
+            deletedCount: deletedIds.length,
+            deletedIds,
+            restoreInfo: "",
+          },
+        },
+      });
+    },
+    [deleteContacts]
+  );
+
+  const restoreAction = useCallback(
+    (contactIds, restoreInfo) => {
+      restoreContacts({
+        variables: { contactIds, restoreInfo },
+        optimisticResponse: {
+          restoreContacts: [...cache.read(READ_CONTACTS, { contactIds })],
+        },
+      });
+    },
+    [cache, restoreContacts]
+  );
 
   const options = {
     filterType: "dropdown",
     enableNestedDataAccess: ".",
     responsive: "vertical",
-    // onRowsDelete: async (deletedRows, data) => {
-    //   const deletedIds = deletedRows?.data.map(({ index }) => groups[index].id);
-    //   try {
-    //     await deleteGroups({
-    //       variables: { groupIds: deletedIds },
-    //     });
-    //     return true;
-    //   } catch (error) {
-    //     return false;
-    //   }
-    // },
+    sortOrder: {
+      name: "name",
+      direction: "asc",
+    },
+    onRowsDelete: async (deletedRows) => {
+      onRowsDelete(deletedRows, contacts, deleteAction, restoreAction);
+    },
   };
 
   return (
@@ -106,7 +137,7 @@ const Contacts = () => {
     >
       <Box display="flex" justifyContent="space-between" alignItems="center" px="10px">
         <Header title="Contacts" />
-        <Fab color="secondary" onClick={open}>
+        <Fab color="secondary" onClick={openAddEditContact}>
           <AddIcon />
         </Fab>
       </Box>
@@ -117,6 +148,8 @@ const Contacts = () => {
           columns={columns}
           options={options}
           loading={loading}
+          retry={refetch}
+          error={serverErrors?.networkError || serverErrors?.serverError}
         />
       </Box>
       <AddUpdateContactModal modalProps={{ container: container.current }}>

@@ -1,6 +1,7 @@
 const { createApplication } = require("graphql-modules");
 const { addInfoToContext } = require("./middleware/add-info-to-context");
 const { authGaurd } = require("./middleware/auth-guard");
+const { globalModule } = require("./modules/global/module");
 const { ikhokhaSaleModule } = require("./modules/ikhokha-sale/module");
 const { quicketSaleModule } = require("./modules/quicket-sale/module");
 const { userModule } = require("./modules/user/module");
@@ -20,6 +21,7 @@ const { BookingSource } = require("./modules/booking/data-source");
 
 const graphqlApplication = createApplication({
   modules: [
+    globalModule,
     ikhokhaSaleModule,
     quicketSaleModule,
     userModule,

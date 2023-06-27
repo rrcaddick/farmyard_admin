@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
 import Header from "@components/display/header";
 import { GET_GROUPS } from "@groups/graphql/queries";
-import { useApolloQuery } from "@hooks/useApolloQuery";
+import { useApolloQuery } from "@hooks/use-apollo-query";
 
 const Projects = () => {
   const clickHandler = () => {
