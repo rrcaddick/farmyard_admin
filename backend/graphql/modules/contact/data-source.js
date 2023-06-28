@@ -29,7 +29,7 @@ class ContactSource extends MongoDataSource {
 
   async updateContact(input) {
     const { id, ...contact } = input;
-    return this.executeWithGraphqlProjection(await this.model.findByIdAndUpdate(id, contact));
+    return this.executeWithGraphqlProjection(await this.model.findByIdAndUpdate(id, contact, { new: true }));
   }
 
   async deleteContacts(contactIds) {

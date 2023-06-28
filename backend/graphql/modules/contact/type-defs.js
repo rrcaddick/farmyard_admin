@@ -29,6 +29,7 @@ const typeDefs = gql`
   }
 
   input UpdateContactInput {
+    id: ID
     type: String
     name: String
     email: String

@@ -5,7 +5,7 @@ import { useCallback, useEffect } from "react";
 import { useForm, FormProvider, useFieldArray } from "react-hook-form";
 import { useYupValidationResolver } from "@hooks/use-yup-validation-resolver";
 import { newGroupSchema } from "@groups/schemas/new-group";
-import { createResponseSchema, updateResponseSchema } from "@groups/schemas/optimistic-response";
+import { createResponseSchema, updateResponseSchema } from "@groups/schemas/graphql-responses";
 import { Box, Button, IconButton, Divider, useTheme } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { generateTempId } from "@graphql/utils/generate-temp-id";
@@ -17,30 +17,6 @@ import { useModalContext } from "@components/modal/use-modal";
 import { useGroup } from "@groups/hooks/use-group";
 import useLoading from "@components/loading/use-loading";
 import { createOptimisticResponse } from "@graphql/utils/create-optimistic-response";
-
-// const createOptimisticResponse = (_data) => {
-//   const { address, contacts, ...group } = _data;
-
-//   const groupResponse = {
-//     __typename: "Group",
-//     id: generateTempId("Group"),
-//     ...group,
-//     address: {
-//       __typename: "Address",
-//       ...address,
-//     },
-//     contacts: [
-//       ...contacts.map((contact) => ({
-//         __typename: "Contact",
-//         id: contact.id,
-//         type: "Group",
-//         ...contact,
-//       })),
-//     ],
-//   };
-
-//   return groupResponse;
-// };
 
 const GroupForm = ({ groupTypes }) => {
   const theme = useTheme();
@@ -56,6 +32,7 @@ const GroupForm = ({ groupTypes }) => {
     mode: "all",
     defaultValues: group,
   });
+
   const {
     handleSubmit,
     reset,
@@ -110,7 +87,8 @@ const GroupForm = ({ groupTypes }) => {
         };
 
         // TODO: Refactor dependantFields to only include if one of them is submitted
-        const dirtyData = getDirtyData(group, _data, stringfySelectObjects, {
+        const dirtyData = getDirtyData(group, _data, {
+          dirtyFieldsModifier: stringfySelectObjects,
           withId: true,
           dependantFields: ["email", "tel"],
         });

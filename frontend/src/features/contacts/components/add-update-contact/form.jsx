@@ -11,36 +11,13 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import { useIsDesktop } from "@hooks/use-is-desktop";
 import { useModalContext } from "@components/modal/use-modal";
+import { useContact } from "@contacts/hooks/use-contact";
+import { useManageDirtyValues } from "@hooks/use-manage-dirty-values";
+import { createOptimisticResponse } from "@graphql/utils/create-optimistic-response";
+import { createResponseSchema, updateResponseSchema } from "@contacts/schemas/graphql-responses";
+import useLoading from "@components/loading/use-loading";
 
-
-const createOptimisticResponse = (data) => {
-  const { groupType, address, contacts, ...contact } = data;
-  const groupResponse = {
-    __typename: "Contact",
-    id: generateTempId("Contact"),
-    ...contact,
-    groupType: {
-      __typename: "GroupType",
-      ...{ ...groupType, price: { id: groupType.price } },
-    },
-    address: {
-      __typename: "Address",
-      ...address,
-    },
-    contacts: [
-      ...contacts.map((contact) => ({
-        __typename: "Contact",
-        id: contact.id ?? generateTempId("Contact"),
-        type: "Contact",
-        ...contact,
-      })),
-    ],
-  };
-
-  return groupResponse;
-};
-
-const ContactForm = () => {
+const ContactForm = ({ groups }) => {
   const theme = useTheme();
   const isDesktop = useIsDesktop();
 
@@ -49,18 +26,8 @@ const ContactForm = () => {
     openContext: { contact },
   } = useModalContext();
 
-  // const { mutate: createGroup, loading: createGroupLoading, serverErrors, clearServerError } = useCreateGroup();
-  // const {
-  //   mutate: updateGroup,
-  //   loading: updateGroupLoading,
-  //   serverErrors: updateServerErrors,
-  //   clearServerError: clearUpdateErrors,
-  // } = useUpdateGroup();
-
-  const resolver = useYupValidationResolver(contactSchema);
-
   const formMethods = useForm({
-    resolver,
+    resolver: useYupValidationResolver(contactSchema),
     mode: "all",
     values: contact,
   });
@@ -68,45 +35,58 @@ const ContactForm = () => {
   const {
     handleSubmit,
     reset,
-    control,
     setFocus,
+    getValues,
+    trigger,
     formState: { isValid, isDirty },
   } = formMethods;
-  const { fields, append, remove } = useFieldArray({ name: "contacts", control });
 
   useEffect(() => {
     setFocus("name");
   }, [setFocus]);
 
-  const submitHandler = useCallback(
-    // ({ groupType: groupTypeId, address, contacts, ...data }) => {
-    //   if (contact) {
-    //     updateGroup({
-    //       variables: { input: groupData },
-    //       optimisticResponse: {
-    //         updateGroup: createOptimisticResponse(groupData),
-    //       },
-    //     });
-    //   } else {
-    //     createGroup({
-    //       variables: { input: groupData },
-    //       optimisticResponse: {
-    //         createGroup: createOptimisticResponse(groupData),
-    //       },
-    //     });
-    //   }
+  const onComplete = useCallback(() => {
+    reset();
+    close();
+  }, [reset, close]);
 
-    //   reset();
-    //   onClose();
-    // },
-    () => {},
-    []
+  const { createContact, updateContact, loading, serverErrors, clearServerError } = useContact({
+    onCreateComplete: onComplete,
+    onUpdateComplete: onComplete,
+  });
+
+  const { Loading } = useLoading(loading);
+
+  const { getDirtyData } = useManageDirtyValues();
+
+  const submitHandler = useCallback(
+    (data) => {
+      // Update contact
+      if (contact) {
+        const dirtyData = getDirtyData(contact, data, {
+          withId: true,
+          dependantFields: ["email", "tel"],
+        });
+
+        return updateContact({
+          variables: { input: dirtyData },
+          optimisticResponse: createOptimisticResponse(updateResponseSchema, data),
+        });
+      }
+      // Create contact
+      createContact({
+        variables: { input: data },
+        optimisticResponse: createOptimisticResponse(createResponseSchema, data),
+      });
+    },
+    [getDirtyData, contact, updateContact, createContact]
   );
 
-  //TODO: Intercept next button on mobile and add select to next order
-
   return (
-    <>
+    <Loading
+      error={!!serverErrors?.networkError || !!serverErrors?.serverError}
+      retry={() => submitHandler(getValues())}
+    >
       <FormProvider {...formMethods}>
         <Box
           component="form"
@@ -119,55 +99,37 @@ const ContactForm = () => {
           gap="2rem"
           paddingTop="10px"
         >
-          <Box display="flex" flexGrow={1}>
-            <Box flex={1}>Search groups here</Box>
-            <Box flex={1} display="flex" flexDirection="column">
-              <TextInput
-                variant="standard"
-                name="name"
-                label="Contact Name"
-                placeholder="Eg: John Doe"
-                fullWidth
-                InputProps={{ inputProps: { tabIndex: 1 } }}
-                // serverError={serverErrors?.name}
-                // //TODO: Think of way to add this to the TextInput component
-                // {...(serverErrors?.name && {
-                //   onChange: ({ target }) => {
-                //     clearServerError(target?.name);
-                //   },
-                // })}
-              />
-              <TextInput
-                variant="standard"
-                name="email"
-                label="Email Address"
-                placeholder="Eg: example@example.com"
-                fullWidth
-                InputProps={{ inputProps: { tabIndex: 1 } }}
-                // serverError={serverErrors?.name}
-                // //TODO: Think of way to add this to the TextInput component
-                // {...(serverErrors?.name && {
-                //   onChange: ({ target }) => {
-                //     clearServerError(target?.name);
-                //   },
-                // })}
-              />
-              <TextInput
-                variant="standard"
-                name="tel"
-                label="Contact Number"
-                placeholder="Eg: 076 363 5909"
-                fullWidth
-                InputProps={{ inputProps: { tabIndex: 1 } }}
-                // serverError={serverErrors?.name}
-                // //TODO: Think of way to add this to the TextInput component
-                // {...(serverErrors?.name && {
-                //   onChange: ({ target }) => {
-                //     clearServerError(target?.name);
-                //   },
-                // })}
-              />
-            </Box>
+          <Box flex={1} display="flex" flexDirection="column">
+            <TextInput
+              name="name"
+              label="Contact Name"
+              placeholder="John Doe"
+              serverError={serverErrors?.name}
+              clearServerError={clearServerError}
+            />
+            <TextInput
+              name="email"
+              label="Email Address"
+              placeholder="example@example.com"
+              serverError={serverErrors?.email}
+              clearServerError={clearServerError}
+              onChange={() => {
+                trigger("tel");
+                clearServerError("tel");
+              }}
+            />
+
+            <TextInput
+              name="tel"
+              label="Contact Number"
+              placeholder="Eg: 076 363 5909"
+              serverError={serverErrors?.tel}
+              clearServerError={clearServerError}
+              onChange={() => {
+                trigger("email");
+                clearServerError("email");
+              }}
+            />
           </Box>
           <Divider
             light
@@ -191,7 +153,7 @@ const ContactForm = () => {
           </Box>
         </Box>
       </FormProvider>
-    </>
+    </Loading>
   );
 };
 

@@ -15,7 +15,6 @@ const UPDATE_CONTACT = gql`
   ${FULL_CONTACT_FRAGMENT}
   mutation updateContact($input: UpdateContactInput!) {
     updateContact(input: $input) {
-      UpdateGroupInput
       ...FullContact
     }
   }
