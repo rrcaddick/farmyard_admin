@@ -150,7 +150,7 @@ const GroupForm = ({ groupTypes }) => {
                 label="Group Type"
                 placeholder="Select group type..."
                 selectItems={groupTypes}
-                setSelectValue={(item) => item}
+                setSelectValue={(item) => JSON.stringify(item)}
                 setDisplayText={(item) => item.type}
                 serverError={serverErrors?.groupType}
                 clearServerError={clearServerError}

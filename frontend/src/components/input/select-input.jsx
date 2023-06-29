@@ -62,8 +62,8 @@ const SelectInput = ({
               onChangeRHF(e);
             }}
           >
-            {selectItems.map((item) => (
-              <MenuItem value={JSON.stringify(setSelectValue(item))} key={item.id}>
+            {selectItems.map((item, index) => (
+              <MenuItem value={setSelectValue(item)} key={item?.id ?? index}>
                 {setDisplayText(item)}
               </MenuItem>
             ))}

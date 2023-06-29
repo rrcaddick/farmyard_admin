@@ -1,10 +1,11 @@
+import styled from "@emotion/styled";
 import TextInput from "@components/input/text-input";
 import SelectInput from "@components/input/select-input";
 import { useCallback, useEffect, useMemo } from "react";
 import { useForm, FormProvider, useFieldArray } from "react-hook-form";
 import { useYupValidationResolver } from "@hooks/use-yup-validation-resolver";
 import { contactSchema } from "@contacts/schemas/contact-schema";
-import { Box, Button, IconButton, Divider, useTheme } from "@mui/material";
+import { Box, Button, IconButton, Divider, useTheme, Autocomplete, TextField } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { generateTempId } from "@graphql/utils/generate-temp-id";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -16,6 +17,13 @@ import { useManageDirtyValues } from "@hooks/use-manage-dirty-values";
 import { createOptimisticResponse } from "@graphql/utils/create-optimistic-response";
 import { createResponseSchema, updateResponseSchema } from "@contacts/schemas/graphql-responses";
 import useLoading from "@components/loading/use-loading";
+import AutoCompleteInput from "@components/input/auto-complete-input";
+
+const Image = styled.img`
+  width: 100%;
+  height: auto;
+  flex-shrink: 1;
+`;
 
 const ContactForm = ({ groups }) => {
   const theme = useTheme();
@@ -29,7 +37,7 @@ const ContactForm = ({ groups }) => {
   const formMethods = useForm({
     resolver: useYupValidationResolver(contactSchema),
     mode: "all",
-    values: contact,
+    defaultValues: contact,
   });
 
   const {
@@ -37,6 +45,7 @@ const ContactForm = ({ groups }) => {
     reset,
     setFocus,
     getValues,
+    watch,
     trigger,
     formState: { isValid, isDirty },
   } = formMethods;
@@ -99,7 +108,34 @@ const ContactForm = ({ groups }) => {
           gap="2rem"
           paddingTop="10px"
         >
-          <Box flex={1} display="flex" flexDirection="column">
+          <Box
+            flex={4}
+            display="flex"
+            flexDirection="column"
+            gap="1.5rem"
+            sx={{ overflowY: "scroll", paddingRight: "10px" }}
+          >
+            <SelectInput
+              name="type"
+              label="Contact Type"
+              placeholder="Select group type..."
+              selectItems={["Group", "Online", "Facebook"]}
+              setSelectValue={(item) => {
+                return item;
+              }}
+              setDisplayText={(item) => item}
+              serverError={serverErrors?.groupType}
+              clearServerError={clearServerError}
+            />
+            {watch("type") === "Group" && (
+              <AutoCompleteInput
+                name="groupId"
+                label="Group"
+                options={groups}
+                getOptionLabel={({ name }) => name ?? ""}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
+              />
+            )}
             <TextInput
               name="name"
               label="Contact Name"
@@ -131,20 +167,25 @@ const ContactForm = ({ groups }) => {
               }}
             />
           </Box>
+          {/* TODO: Add an image to the right for desktop views */}
+          {/* <Box flexGrow={1} display="flex">
+            {isDesktop && (
+              <Box flex={2} display="flex" justifyContent="center" alignItems="center">
+                <Image src="https://media.istockphoto.com/id/1250363870/vector/contacts-notebook-phone-book-vector-icon.jpg?s=612x612&w=0&k=20&c=d_XuJuyihx9U1LdK0HPTqTWWqPVHvFkJP4uhKHz46p4=" />
+              </Box>
+            )}
+          </Box> */}
+
           <Divider
             light
             sx={{
               borderWidth: "1px",
               borderColor: "primary.dark",
-              marginLeft: "0.5rem",
-              [theme.breakpoints.up("sm")]: {
-                marginLeft: "1rem",
-              },
               marginTop: "auto",
             }}
           />
           <Box display="flex" justifyContent="space-between">
-            <Button type="submit" color="secondary" onClick={close}>
+            <Button type="submit" color="secondary" variant="outlined" onClick={close}>
               Back
             </Button>
             <Button type="submit" variant="contained" color="secondary" disabled={!isValid || !isDirty}>
