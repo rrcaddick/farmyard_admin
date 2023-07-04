@@ -17,6 +17,7 @@ import { useModalContext } from "@components/modal/use-modal";
 import { useGroup } from "@groups/hooks/use-group";
 import useLoading from "@components/loading/use-loading";
 import { createOptimisticResponse } from "@graphql/utils/create-optimistic-response";
+import PhoneNumberInputMask from "@components/input/phone-number-input-mask";
 
 const GroupForm = ({ groupTypes }) => {
   const theme = useTheme();
@@ -231,11 +232,16 @@ const GroupForm = ({ groupTypes }) => {
                     <TextInput
                       name={`contacts[${index}].tel`}
                       label="Tel"
-                      placeholder="073 123 4567"
+                      placeholder="73 123 4567"
                       serverError={serverErrors?.[`contacts[${index}].tel`]}
                       clearServerError={clearServerError}
                       InputProps={{
-                        startAdornment: <InputAdornment position="start">+27</InputAdornment>,
+                        startAdornment: (
+                          <InputAdornment sx={{ marginBottom: "2px" }} position="start">
+                            +27 (0)
+                          </InputAdornment>
+                        ),
+                        inputComponent: PhoneNumberInputMask,
                       }}
                       onChange={() => {
                         const emailInput = `contacts[${index}].email`;

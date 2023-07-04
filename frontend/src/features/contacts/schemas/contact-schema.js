@@ -19,7 +19,7 @@ const contactSchema = object().shape({
   }),
   tel: lazy((value) => {
     if (!!value) {
-      const number = value.slice(0, 3) === "+27" ? value : `+27${value}`;
+      const number = value.slice(0, 3) === ("+27" || "27") ? value : `+27${value}`;
       return !!isValidPhoneNumber(number)
         ? string().transform(() => {
             const phoneNumber = parsePhoneNumber(number);

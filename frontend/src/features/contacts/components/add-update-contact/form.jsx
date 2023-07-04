@@ -145,7 +145,11 @@ const ContactForm = ({ groups, contactTypes }) => {
               serverError={serverErrors?.tel}
               clearServerError={clearServerError}
               InputProps={{
-                startAdornment: <InputAdornment position="start">+27</InputAdornment>,
+                startAdornment: (
+                  <InputAdornment sx={{ marginBottom: "1px" }} position="start">
+                    +27(0)
+                  </InputAdornment>
+                ),
                 inputComponent: PhoneNumberInputMask,
               }}
               onChange={async () => {
