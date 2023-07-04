@@ -64,7 +64,10 @@ const GroupForm = ({ groupTypes }) => {
 
   const submitHandler = useCallback(
     (data) => {
-      const _data = typeof data?.groupType === "string" ? { ...data, groupType: JSON.parse(data.groupType) } : data;
+      const _data =
+        typeof data?.groupType === "string" && data?.groupType !== ""
+          ? { ...data, groupType: JSON.parse(data.groupType) }
+          : data;
 
       const getInputData = (_data) => {
         const { groupType: { __typename, price: { id } = {}, ...groupType } = {}, contacts } = _data;

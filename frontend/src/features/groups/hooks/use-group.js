@@ -30,7 +30,7 @@ const useGroup = ({
     },
     update: (cache, { data }) => {
       const { createGroup } = data;
-      cache.updateQuery({ query: GET_GROUPS }, ({ getGroups }) => ({ getGroups: [...getGroups, createGroup] }));
+      cache.updateQuery({ query: GET_GROUPS }, ({ groups }) => ({ groups: [...groups, createGroup] }));
     },
   });
 
