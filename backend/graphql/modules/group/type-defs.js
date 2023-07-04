@@ -2,8 +2,14 @@ const { gql } = require("apollo-server-express");
 
 const typeDefs = gql`
   type Query {
-    getGroup(groupId: ID!): Group
-    getGroups(groupIds: [ID]): [Group]!
+    group(groupId: ID!): Group
+    groups(groupIds: [ID]): [Group]!
+    # group(groupId: ID, filter: FilterInput): Group
+  }
+
+  input FilterInput {
+    field: String
+    value: String
   }
 
   type Mutation {

@@ -1,16 +1,10 @@
-import styled from "@emotion/styled";
 import TextInput from "@components/input/text-input";
 import SelectInput from "@components/input/select-input";
-import { useCallback, useEffect, useMemo } from "react";
-import { useForm, FormProvider, useFieldArray } from "react-hook-form";
+import { useCallback } from "react";
+import { useForm, FormProvider } from "react-hook-form";
 import { useYupValidationResolver } from "@hooks/use-yup-validation-resolver";
 import { contactSchema } from "@contacts/schemas/contact-schema";
-import { Box, Button, IconButton, Divider, useTheme, Autocomplete, TextField } from "@mui/material";
-import Grid from "@mui/material/Unstable_Grid2";
-import { generateTempId } from "@graphql/utils/generate-temp-id";
-import DeleteIcon from "@mui/icons-material/Delete";
-import AddIcon from "@mui/icons-material/Add";
-import { useIsDesktop } from "@hooks/use-is-desktop";
+import { Box, Button, Divider, InputAdornment } from "@mui/material";
 import { useModalContext } from "@components/modal/use-modal";
 import { useContact } from "@contacts/hooks/use-contact";
 import { useManageDirtyValues } from "@hooks/use-manage-dirty-values";
@@ -18,17 +12,9 @@ import { createOptimisticResponse } from "@graphql/utils/create-optimistic-respo
 import { createResponseSchema, updateResponseSchema } from "@contacts/schemas/graphql-responses";
 import useLoading from "@components/loading/use-loading";
 import AutoCompleteInput from "@components/input/auto-complete-input";
+import PhoneNumberInputMask from "@components/input/phone-number-input-mask";
 
-const Image = styled.img`
-  width: 100%;
-  height: auto;
-  flex-shrink: 1;
-`;
-
-const ContactForm = ({ groups }) => {
-  const theme = useTheme();
-  const isDesktop = useIsDesktop();
-
+const ContactForm = ({ groups, contactTypes }) => {
   const {
     close,
     openContext: { contact },
@@ -43,16 +29,11 @@ const ContactForm = ({ groups }) => {
   const {
     handleSubmit,
     reset,
-    setFocus,
     getValues,
     watch,
     trigger,
     formState: { isValid, isDirty },
   } = formMethods;
-
-  useEffect(() => {
-    setFocus("name");
-  }, [setFocus]);
 
   const onComplete = useCallback(() => {
     reset();
@@ -74,6 +55,7 @@ const ContactForm = ({ groups }) => {
       if (contact) {
         const dirtyData = getDirtyData(contact, data, {
           withId: true,
+          // TODO: Change to dirtyFieldsOveride object {email: 1, tel: 1}
           dependantFields: ["email", "tel"],
         });
 
@@ -119,7 +101,7 @@ const ContactForm = ({ groups }) => {
               name="type"
               label="Contact Type"
               placeholder="Select group type..."
-              selectItems={["Group", "Online", "Facebook"]}
+              selectItems={contactTypes}
               setSelectValue={(item) => {
                 return item;
               }}
@@ -133,6 +115,7 @@ const ContactForm = ({ groups }) => {
                 label="Group"
                 options={groups}
                 getOptionLabel={({ name }) => name ?? ""}
+                getOptionValue={(options, value) => options.find((x) => x.id === value) ?? ""}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
               />
             )}
@@ -158,23 +141,19 @@ const ContactForm = ({ groups }) => {
             <TextInput
               name="tel"
               label="Contact Number"
-              placeholder="Eg: 076 363 5909"
+              placeholder="071 234 5678"
               serverError={serverErrors?.tel}
               clearServerError={clearServerError}
-              onChange={() => {
+              InputProps={{
+                startAdornment: <InputAdornment position="start">+27</InputAdornment>,
+                inputComponent: PhoneNumberInputMask,
+              }}
+              onChange={async () => {
                 trigger("email");
                 clearServerError("email");
               }}
             />
           </Box>
-          {/* TODO: Add an image to the right for desktop views */}
-          {/* <Box flexGrow={1} display="flex">
-            {isDesktop && (
-              <Box flex={2} display="flex" justifyContent="center" alignItems="center">
-                <Image src="https://media.istockphoto.com/id/1250363870/vector/contacts-notebook-phone-book-vector-icon.jpg?s=612x612&w=0&k=20&c=d_XuJuyihx9U1LdK0HPTqTWWqPVHvFkJP4uhKHz46p4=" />
-              </Box>
-            )}
-          </Box> */}
 
           <Divider
             light

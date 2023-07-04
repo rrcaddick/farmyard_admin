@@ -3,8 +3,8 @@ import { FULL_CONTACT_FRAGMENT } from "../fragments";
 
 const CREATE_CONTACT = gql`
   ${FULL_CONTACT_FRAGMENT}
-  mutation createContact($input: CreateContactInput!, $groupId: ID) {
-    createContact(input: $input, groupId: $groupId) {
+  mutation createContact($input: CreateContactInput!) {
+    createContact(input: $input) {
       ...FullContact
     }
   }

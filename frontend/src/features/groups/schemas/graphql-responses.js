@@ -31,7 +31,7 @@ const createResponseSchema = {
 
 const updateResponseSchema = {
   updateGroup: {
-    ...groupResponseSchema,
+    ...{ ...groupResponseSchema, id: 1 },
   },
 };
 

@@ -2,11 +2,12 @@ const { generateTempId } = require("@graphql/utils/generate-temp-id");
 
 const contactResponseSchema = {
   __typename: "Contact",
-  id: () => generateTempId("Group"),
+  id: () => generateTempId("Contact"),
   type: "Group",
   name: 1,
   email: 1,
   tel: 1,
+  groupId: 1,
 };
 
 const createResponseSchema = {
@@ -17,7 +18,7 @@ const createResponseSchema = {
 
 const updateResponseSchema = {
   updateContact: {
-    ...contactResponseSchema,
+    ...{ ...contactResponseSchema, id: 1 },
   },
 };
 

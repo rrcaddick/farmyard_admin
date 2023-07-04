@@ -7,6 +7,7 @@ const FULL_CONTACT_FRAGMENT = gql`
     name
     email
     tel
+    groupId
   }
 `;
 

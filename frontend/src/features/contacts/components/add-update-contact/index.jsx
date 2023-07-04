@@ -1,20 +1,23 @@
 import { useIsDesktop } from "@hooks/use-is-desktop";
-import { Divider, Typography, useTheme, Box } from "@mui/material";
+import { Divider, Typography, Box } from "@mui/material";
 import { useModalContext } from "@components/modal/use-modal";
 import ContactForm from "@contacts/components/add-update-contact/form";
-import { useApolloQuery } from "@hooks/use-apollo-query";
-import { GET_GROUPS } from "@groups/graphql/queries";
 import useLoading from "@components/loading/use-loading";
+import useGetContactFormData from "@contacts/hooks/use-get-form-data";
 
 const AddUpdateContact = () => {
-  const theme = useTheme();
   const isDesktop = useIsDesktop();
 
   const {
     openContext: { contactName },
   } = useModalContext();
 
-  const { data: groups, loading, serverErrors, refetch } = useApolloQuery(GET_GROUPS);
+  const {
+    data: { groups, contactTypes },
+    loading,
+    serverErrors,
+    refetch,
+  } = useGetContactFormData();
 
   const { Loading } = useLoading(loading);
 
@@ -39,7 +42,7 @@ const AddUpdateContact = () => {
             borderColor: "primary.dark",
           }}
         />
-        <ContactForm {...{ groups }} />
+        <ContactForm {...{ groups, contactTypes }} />
       </Box>
     </Loading>
   );

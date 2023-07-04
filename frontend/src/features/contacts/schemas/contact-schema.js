@@ -1,25 +1,47 @@
-import { object, string } from "yup";
+import { object, string, lazy } from "yup";
+import { isValidPhoneNumber, parsePhoneNumber } from "libphonenumber-js";
+import { isValidObjectId } from "@utils/mongodb";
 
-const contactSchema = object().shape(
-  {
-    name: string().required("Contact name is required"),
-    email: string().when("tel", {
+const contactSchema = object().shape({
+  type: string(),
+  name: string().required("Contact name is required"),
+  email: lazy((value) => {
+    if (!!value) {
+      return string().email("Invalid email address");
+    }
+
+    return string().when("tel", {
       is: (tel) => {
         return !tel || tel.length === 0;
       },
-      then: () => string().required("At least 1 contact method is required").email("Invalid email address"),
-      otherwise: () => string().email("Invalid email address"),
-    }),
-    tel: string().when("email", {
+      then: () => string().required("At least 1 contact method is required"),
+    });
+  }),
+  tel: lazy((value) => {
+    if (!!value) {
+      const number = value.slice(0, 3) === "+27" ? value : `+27${value}`;
+      return !!isValidPhoneNumber(number)
+        ? string().transform(() => {
+            const phoneNumber = parsePhoneNumber(number);
+            return phoneNumber.nationalNumber;
+          })
+        : string().test("PhoneNumber", "Invalid phone number", () => false);
+    }
+
+    return string().when("email", {
       is: (email) => {
-        const test = !email || email.length === 0;
-        return test;
+        return !email || email.length === 0;
       },
       then: () => string().required("At least 1 contact method is required"),
-      otherwise: () => string(),
-    }),
-  },
-  [["email", "tel"]]
-);
+    });
+  }),
+  groupId: string().when("type", {
+    is: (value) => value === "Group",
+    then: () =>
+      string()
+        .required("Group is required")
+        .test("ObjectId", "Invalid Group", (value) => isValidObjectId(value)),
+  }),
+});
 
 export { contactSchema };

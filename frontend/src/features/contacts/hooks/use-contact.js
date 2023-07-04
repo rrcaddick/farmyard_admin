@@ -3,8 +3,15 @@ import { useLazyQuery, useMutation } from "@apollo/client";
 import { GET_CONTACTS, READ_CONTACT } from "@contacts/graphql/queries";
 import { CREATE_CONTACT, UPDATE_CONTACT, DELETE_CONTACTS, RESTORE_CONTACTS } from "@contacts/graphql/mutations";
 import { extractServerError } from "@graphql/utils/extract-server-error";
+import { READ_GROUP, READ_GROUP_BY_CONTACT } from "@groups/graphql/queries";
 
-const useContact = ({ onCreateComplete, onReadComplete, onUpdateComplete, onDeleteComplete, onRestoreComplete } = {}) => {
+const useContact = ({
+  onCreateComplete,
+  onReadComplete,
+  onUpdateComplete,
+  onDeleteComplete,
+  onRestoreComplete,
+} = {}) => {
   const [serverErrors, setServerErrors] = useState({});
   const clearServerError = useCallback((name) => {
     setServerErrors((serverErrors) => (name ? { ...serverErrors, [name]: undefined } : {}));
@@ -19,8 +26,8 @@ const useContact = ({ onCreateComplete, onReadComplete, onUpdateComplete, onDele
     },
     update: (cache, { data }) => {
       const { createContact } = data;
-      cache.updateQuery({ query: GET_CONTACTS }, ({ getContacts }) => ({
-        getContacts: [...getContacts, createContact],
+      cache.updateQuery({ query: GET_CONTACTS }, ({ contacts }) => ({
+        contacts: [...contacts, createContact],
       }));
     },
   });
@@ -36,6 +43,8 @@ const useContact = ({ onCreateComplete, onReadComplete, onUpdateComplete, onDele
   });
 
   const [_updateContact, { loading: updateLoading }] = useMutation(UPDATE_CONTACT, {
+    // Disables auto-update of single entites
+    fetchPolicy: "no-cache",
     onError: (error) => {
       setServerErrors((serverErrors) => ({ ...serverErrors, ...extractServerError(error) }));
     },
@@ -44,7 +53,52 @@ const useContact = ({ onCreateComplete, onReadComplete, onUpdateComplete, onDele
     },
     update: (cache, { data }) => {
       const { updateContact } = data;
-      cache.updateQuery({ query: READ_CONTACT, variables: { contactId: updateContact.id } }, () => updateContact);
+
+      const { id: contactId, groupId } = updateContact;
+
+      cache.updateQuery({ query: READ_CONTACT, variables: { contactId } }, (data) => updateContact);
+
+      // Update contact
+      const { readContact: contact } = cache.readQuery({
+        query: READ_CONTACT,
+        variables: { contactId },
+      });
+
+      if (contact.groupId !== groupId) {
+        // Remove contact from previous group
+        const { groupByContact: previousGroup } = cache.readQuery({
+          query: READ_GROUP_BY_CONTACT,
+          variables: { contactId },
+        });
+
+        cache.modify({
+          id: cache.identify(previousGroup),
+          fields: {
+            contacts(contacts, { readField }) {
+              return contacts.filter((contact) => readField("id", contact) !== contactId);
+            },
+          },
+        });
+
+        // Add contact to new group
+        const { readGroup: newGroup } = cache.readQuery({
+          query: READ_GROUP,
+          variables: { groupId },
+        });
+
+        cache.modify({
+          id: cache.identify(newGroup),
+          fields: {
+            contacts(contacts, { readField, toReference }) {
+              const newContact = toReference({
+                __typename: "Contact",
+                id: contactId,
+              });
+              return [...contacts, newContact];
+            },
+          },
+        });
+      }
     },
   });
 
@@ -61,8 +115,8 @@ const useContact = ({ onCreateComplete, onReadComplete, onUpdateComplete, onDele
       } = data;
 
       ok &&
-        cache.updateQuery({ query: GET_CONTACTS }, ({ getContacts }) => ({
-          getContacts: getContacts.filter((contact) => !deletedIds.includes(contact.id)),
+        cache.updateQuery({ query: GET_CONTACTS }, ({ contacts }) => ({
+          contacts: contacts.filter((contact) => !deletedIds.includes(contact.id)),
         }));
     },
   });
@@ -76,8 +130,8 @@ const useContact = ({ onCreateComplete, onReadComplete, onUpdateComplete, onDele
     },
     update: (cache, { data }) => {
       const { restoreContacts } = data;
-      cache.updateQuery({ query: GET_CONTACTS }, ({ getContacts }) => ({
-        getContacts: [...getContacts, ...restoreContacts].sort((a, b) => a.id.toString() - b.id.toString()),
+      cache.updateQuery({ query: GET_CONTACTS }, ({ contacts }) => ({
+        contacts: [...contacts, ...restoreContacts].sort((a, b) => a.id.toString() - b.id.toString()),
       }));
     },
   });
@@ -92,9 +146,9 @@ const useContact = ({ onCreateComplete, onReadComplete, onUpdateComplete, onDele
 
   const getContacts = async () => {
     const {
-      data: { getContacts },
+      data: { contacts },
     } = await _getContacts();
-    return getContacts;
+    return contacts;
   };
 
   const updateContact = useCallback(

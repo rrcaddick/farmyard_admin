@@ -22,14 +22,21 @@ class ContactSource extends MongoDataSource {
     );
   }
 
-  async createContact(input, groupId) {
-    const [contact] = await this.model.create([input], { ...(groupId && { groupId }) });
-    return this.executeWithGraphqlProjection(contact);
+  getContactTypes() {
+    return this.model.schema.path("type").enumValues;
+  }
+
+  async createContact(contact) {
+    return this.executeWithGraphqlProjection(await this.model.create(contact));
   }
 
   async updateContact(input) {
     const { id, ...contact } = input;
-    return this.executeWithGraphqlProjection(await this.model.findByIdAndUpdate(id, contact, { new: true }));
+
+    const { groupId: previousGroupId } = await this.model.findById(id);
+    return this.executeWithGraphqlProjection(
+      await this.model.findByIdAndUpdate(id, contact, { new: true, previousGroupId })
+    );
   }
 
   async deleteContacts(contactIds) {

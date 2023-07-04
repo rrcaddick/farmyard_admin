@@ -11,6 +11,7 @@ const AutoCompleteInput = ({
   options = [],
   renderInput,
   getOptionLabel,
+  getOptionValue,
   isOptionEqualToValue,
   ...props
 }) => {
@@ -28,10 +29,11 @@ const AutoCompleteInput = ({
               getOptionLabel,
               isOptionEqualToValue,
               onBlur,
-              renderOption: (props, option) => {
+              value: getOptionValue ? getOptionValue(options, value) : value,
+              renderOption: (props, option, { index }) => {
                 return (
-                  <li {...props} key={option.id ?? "1"}>
-                    {option.name}
+                  <li {...props} key={option?.id ?? index}>
+                    {option?.name ?? option}
                   </li>
                 );
               },

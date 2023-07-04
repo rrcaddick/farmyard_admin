@@ -3,6 +3,7 @@ import { createSafeFetch } from "@utils/fetch";
 import { onError } from "@apollo/client/link/error";
 import { persistCache, SessionStorageWrapper } from "apollo3-cache-persist";
 import { removeRememberMe } from "@utils/auth";
+import { GET_GROUPS } from "@groups/graphql/queries";
 
 // TODO: Refactor entity type policies into their respective folders
 const createApolloClient = () => {
@@ -20,7 +21,9 @@ const createApolloClient = () => {
             },
           },
           readGroups: {
-            read(_, { args: { groupIds = [] }, toReference }) {
+            read(_, { args: { groupIds }, toReference, readField }) {
+              if (!groupIds) return readField({ fieldName: "groups", args: {} });
+
               return groupIds.map((groupId) =>
                 toReference({
                   __typename: "Group",
@@ -30,7 +33,7 @@ const createApolloClient = () => {
             },
           },
           readContact: {
-            read(_, { args: { contactId }, toReference }) {
+            read(_, { args: { contactId }, toReference, readField }) {
               return toReference({
                 __typename: "Contact",
                 id: contactId,
@@ -45,6 +48,24 @@ const createApolloClient = () => {
                   id: contactId,
                 })
               );
+            },
+          },
+          groupByContact: {
+            read(_, { args: { contactId }, toReference, readField }) {
+              const groups = readField({ fieldName: "groups", args: {} }) || [];
+
+              const contact = toReference({
+                __typename: "Contact",
+                id: contactId,
+              });
+
+              for (let groupRef of groups) {
+                const contacts = readField("contacts", groupRef);
+                const hasContact = contacts?.some(({ __ref }) => __ref === contact.__ref);
+                if (hasContact) {
+                  return groupRef;
+                }
+              }
             },
           },
         },

@@ -3,7 +3,7 @@ import Header from "@components/display/header";
 import { FormProvider, useForm } from "react-hook-form";
 import AutoCompleteInput from "@components/input/auto-complete-input";
 import { useApolloQuery } from "@hooks/use-apollo-query";
-import { GET_GROUPS } from "@groups/graphql/queries";
+import { GET_CONTACT_FORM_OPTIONS } from "@contacts/graphql/queries";
 
 const Projects = () => {
   const submitHandler = (formData) => {
@@ -12,7 +12,8 @@ const Projects = () => {
   const formMethods = useForm();
   const { handleSubmit } = formMethods;
 
-  const { data: groups } = useApolloQuery(GET_GROUPS);
+  const { data: { groups, contactTypes } = { groups: [], contactTypes: [] } } =
+    useApolloQuery(GET_CONTACT_FORM_OPTIONS);
 
   return (
     <Box flexGrow={1} display="flex" flexDirection="column" gap="1rem" overflow="hidden">
@@ -33,6 +34,13 @@ const Projects = () => {
             options={groups}
             getOptionLabel={({ name }) => name ?? ""}
             isOptionEqualToValue={(option, value) => option.id === value.id}
+          />
+          <AutoCompleteInput
+            name="contactTypes"
+            label="Contact Types"
+            options={contactTypes}
+            getOptionLabel={(type) => type ?? ""}
+            isOptionEqualToValue={(option, value) => option === value}
           />
           <Button type="submit" variant="contained">
             Submit

@@ -2,23 +2,25 @@ const { gql } = require("apollo-server-express");
 
 const typeDefs = gql`
   type Query {
-    getContact(contactId: ID!): Contact
-    getContacts(contactIds: [ID]): [Contact]!
+    contact(contactId: ID!): Contact
+    contacts(contactIds: [ID]): [Contact]!
+    contactTypes: [String]!
   }
 
   type Mutation {
-    createContact(input: CreateContactInput!, groupId: ID): Contact
+    createContact(input: CreateContactInput!): Contact
     updateContact(input: UpdateContactInput!): Contact!
     deleteContacts(contactIds: [ID]!): DeleteResponse
     restoreContacts(contactIds: [ID]!, restoreInfo: RestoreInfo!): [Contact]!
   }
 
   type Contact {
-    id: ID
-    type: String!
+    id: ID!
+    type: String
     name: String!
     email: String
     tel: String
+    groupId: ID
   }
 
   input CreateContactInput {
@@ -26,6 +28,7 @@ const typeDefs = gql`
     name: String!
     email: String
     tel: String
+    groupId: ID
   }
 
   input UpdateContactInput {
@@ -34,6 +37,7 @@ const typeDefs = gql`
     name: String
     email: String
     tel: String
+    groupId: ID
   }
 `;
 

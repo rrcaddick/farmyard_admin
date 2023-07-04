@@ -3,8 +3,8 @@ import { FULL_GROUP_FRAGMENT } from "@groups/graphql/fragments";
 
 const GET_GROUPS = gql`
   ${FULL_GROUP_FRAGMENT}
-  query getGroups($groupIds: [ID]) {
-    getGroups(groupIds: $groupIds) {
+  query groups($groupIds: [ID]) {
+    groups(groupIds: $groupIds) {
       ...FullGroup
     }
   }
@@ -37,6 +37,15 @@ const READ_GROUP = gql`
   }
 `;
 
+const READ_GROUP_BY_CONTACT = gql`
+  ${FULL_GROUP_FRAGMENT}
+  query ReadGroupByContact($contactId: ID!) @client {
+    groupByContact(contactId: $contactId) {
+      ...FullGroup
+    }
+  }
+`;
+
 const GET_GROUP_TYPES = gql`
   query getGroupTypes {
     getGroupTypes {
@@ -49,4 +58,4 @@ const GET_GROUP_TYPES = gql`
   }
 `;
 
-export { GET_GROUPS, READ_GROUPS, GET_GROUP, READ_GROUP, GET_GROUP_TYPES };
+export { GET_GROUPS, READ_GROUPS, GET_GROUP, READ_GROUP, GET_GROUP_TYPES, READ_GROUP_BY_CONTACT };

@@ -6,7 +6,7 @@ import { useForm, FormProvider, useFieldArray } from "react-hook-form";
 import { useYupValidationResolver } from "@hooks/use-yup-validation-resolver";
 import { newGroupSchema } from "@groups/schemas/new-group";
 import { createResponseSchema, updateResponseSchema } from "@groups/schemas/graphql-responses";
-import { Box, Button, IconButton, Divider, useTheme } from "@mui/material";
+import { Box, Button, IconButton, Divider, useTheme, InputAdornment } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { generateTempId } from "@graphql/utils/generate-temp-id";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -234,6 +234,9 @@ const GroupForm = ({ groupTypes }) => {
                       placeholder="073 123 4567"
                       serverError={serverErrors?.[`contacts[${index}].tel`]}
                       clearServerError={clearServerError}
+                      InputProps={{
+                        startAdornment: <InputAdornment position="start">+27</InputAdornment>,
+                      }}
                       onChange={() => {
                         const emailInput = `contacts[${index}].email`;
                         trigger(emailInput);

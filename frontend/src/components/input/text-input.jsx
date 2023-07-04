@@ -19,6 +19,7 @@ const TextInput = ({
   tabIndex,
   serverError,
   clearServerError,
+  formatValue,
   ...props
 }) => {
   const { control } = useFormContext();
@@ -41,7 +42,7 @@ const TextInput = ({
             {...{
               name,
               onBlur,
-              value,
+              value: formatValue ? formatValue(value) : value,
               type,
               placeholder,
               label,
