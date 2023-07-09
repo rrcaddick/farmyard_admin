@@ -106,7 +106,7 @@ const ContactForm = ({ groups, contactTypes }) => {
                 return item;
               }}
               setDisplayText={(item) => item}
-              serverError={serverErrors?.groupType}
+              serverError={serverErrors?.type}
               clearServerError={clearServerError}
             />
             {watch("type") === "Group" && (
@@ -117,6 +117,8 @@ const ContactForm = ({ groups, contactTypes }) => {
                 getOptionLabel={({ name }) => name ?? ""}
                 getOptionValue={(options, value) => options.find((x) => x.id === value) ?? ""}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
+                serverError={serverErrors?.groupId}
+                clearServerError={clearServerError}
               />
             )}
             <TextInput
@@ -145,14 +147,9 @@ const ContactForm = ({ groups, contactTypes }) => {
               serverError={serverErrors?.tel}
               clearServerError={clearServerError}
               InputProps={{
-                startAdornment: (
-                  <InputAdornment sx={{ marginBottom: "1px" }} position="start">
-                    +27(0)
-                  </InputAdornment>
-                ),
                 inputComponent: PhoneNumberInputMask,
               }}
-              onChange={async () => {
+              onChange={() => {
                 trigger("email");
                 clearServerError("email");
               }}

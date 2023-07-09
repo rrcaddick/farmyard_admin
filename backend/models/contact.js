@@ -21,11 +21,12 @@ contactSchema.post("save", async function ({ groupId, _id }) {
 contactSchema.post("findOneAndUpdate", async function ({ groupId, _id }) {
   const { previousGroupId } = this.options;
   if (groupId) {
-    await Group.findByIdAndUpdate(
-      previousGroupId,
-      { $pull: { contacts: _id } },
-      { safe: true, upsert: true, new: true }
-    );
+    previousGroupId &&
+      (await Group.findByIdAndUpdate(
+        previousGroupId,
+        { $pull: { contacts: _id } },
+        { safe: true, upsert: true, new: true }
+      ));
     await Group.findByIdAndUpdate(groupId, { $push: { contacts: _id } }, { safe: true, upsert: true, new: true });
   }
 });

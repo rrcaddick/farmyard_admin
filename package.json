@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node backend/server.js",
     "dev": "nodemon --inspect backend/server.js",
-    "debug": "concurrently \"nodemon --inspect backend/server.js\" \" npm start --prefix=frontend \""
+    "debug": "concurrently \"nodemon --inspect backend/server.js\" \" npm start --prefix=frontend\""
   },
   "author": "Ray Caddick",
   "license": "ISC",
@@ -29,6 +29,7 @@
     "graphql-parse-resolve-info": "^4.13.0",
     "graphql-type-json": "^0.3.2",
     "jsonwebtoken": "^9.0.0",
+    "libphonenumber-js": "^1.10.37",
     "lodash": "^4.17.21",
     "mongoose": "^6.8.4",
     "ms": "^2.1.3",

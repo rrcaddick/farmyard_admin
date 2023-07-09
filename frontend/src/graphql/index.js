@@ -3,7 +3,6 @@ import { createSafeFetch } from "@utils/fetch";
 import { onError } from "@apollo/client/link/error";
 import { persistCache, SessionStorageWrapper } from "apollo3-cache-persist";
 import { removeRememberMe } from "@utils/auth";
-import { GET_GROUPS } from "@groups/graphql/queries";
 
 // TODO: Refactor entity type policies into their respective folders
 const createApolloClient = () => {

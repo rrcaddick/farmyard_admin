@@ -40,8 +40,8 @@ const AutoCompleteInput = ({
               renderInput: (params) => (
                 <TextField
                   label={label}
-                  error={!!error}
-                  helperText={error?.message}
+                  error={!!error || !!serverError}
+                  helperText={error?.message || serverError}
                   variant="standard"
                   inputRef={ref}
                   {...params}
@@ -50,6 +50,7 @@ const AutoCompleteInput = ({
               onChange: (e, data) => {
                 const { id } = data || {};
                 onChange && onChange(e, data);
+                serverError && clearServerError(e.target.name);
                 onChangeRHF(id);
               },
               ...props,

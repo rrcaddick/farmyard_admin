@@ -8,8 +8,8 @@ const useMuiDataTable = () => {
   const { enqueueSnackbar } = useSnackbar();
 
   const MuiDataTable = useCallback(
-    ({ title, data, columns, options, loading, error }) => (
-      <MUIDataTable {...{ title, data, columns, options, loading, error }} />
+    ({ title, data, columns, options, loading, error, retry }) => (
+      <MUIDataTable {...{ title, data, columns, options, loading, error, retry }} />
     ),
     []
   );

@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
-import { useLazyQuery, useMutation } from "@apollo/client";
-import { GET_CONTACTS, READ_CONTACT } from "@contacts/graphql/queries";
+import { gql, useApolloClient, useLazyQuery, useMutation } from "@apollo/client";
+import { GET_CONTACT, GET_CONTACTS, READ_CONTACT } from "@contacts/graphql/queries";
 import { CREATE_CONTACT, UPDATE_CONTACT, DELETE_CONTACTS, RESTORE_CONTACTS } from "@contacts/graphql/mutations";
 import { extractServerError } from "@graphql/utils/extract-server-error";
 import { READ_GROUP, READ_GROUP_BY_CONTACT } from "@groups/graphql/queries";
@@ -56,20 +56,32 @@ const useContact = ({
 
       const { id: contactId, groupId } = updateContact;
 
-      cache.updateQuery({ query: READ_CONTACT, variables: { contactId } }, (data) => updateContact);
-
       // Update contact
-      const { readContact: contact } = cache.readQuery({
-        query: READ_CONTACT,
-        variables: { contactId },
+      const { readContact: contact } =
+        cache.readQuery({
+          query: READ_CONTACT,
+          variables: { contactId },
+        }) || {};
+
+      cache.writeQuery({
+        query: GET_CONTACT,
+        data: {
+          contact: {
+            ...updateContact,
+          },
+        },
+        variables: {
+          id: contactId,
+        },
       });
 
-      if (contact.groupId !== groupId) {
+      if (contact?.groupId !== groupId) {
         // Remove contact from previous group
-        const { groupByContact: previousGroup } = cache.readQuery({
-          query: READ_GROUP_BY_CONTACT,
-          variables: { contactId },
-        });
+        const { groupByContact: previousGroup } =
+          cache.readQuery({
+            query: READ_GROUP_BY_CONTACT,
+            variables: { contactId },
+          }) || {};
 
         cache.modify({
           id: cache.identify(previousGroup),
@@ -78,6 +90,7 @@ const useContact = ({
               return contacts.filter((contact) => readField("id", contact) !== contactId);
             },
           },
+          broadcast: true,
         });
 
         // Add contact to new group
@@ -97,6 +110,7 @@ const useContact = ({
               return [...contacts, newContact];
             },
           },
+          broadcast: true,
         });
       }
     },

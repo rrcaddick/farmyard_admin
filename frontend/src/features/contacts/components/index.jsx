@@ -13,6 +13,7 @@ import { useApolloQuery } from "@hooks/use-apollo-query";
 import { parseGraphqlData } from "@utils/form";
 import { useContact } from "@contacts/hooks/use-contact";
 import { useMuiDataTable } from "@components/table/mui-data-table/use-mui-data-table";
+import parsePhoneNumber from "libphonenumber-js";
 
 const columnDefs = [
   {
@@ -40,6 +41,12 @@ const columnDefs = [
   {
     name: "tel",
     label: "Contact Number",
+    options: {
+      customBodyRender: (value) => {
+        const phoneNumber = parsePhoneNumber(value, "ZA");
+        return phoneNumber?.formatNational() ?? "";
+      },
+    },
   },
 ];
 
