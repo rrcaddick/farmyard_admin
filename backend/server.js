@@ -11,6 +11,7 @@ const { ikhokhaService } = require("./services/ikhokha");
 const { quicketService } = require("./services/quicket");
 const { createCronSchedules } = require("./schedule");
 const PORT = process.env.port || 5000;
+const { User } = require("./models/user");
 
 // Express app and middleware
 const app = express();
@@ -27,7 +28,7 @@ const apolloServer = new ApolloServer({
   schema,
   context,
   dataSources,
-  // formatError,
+  formatError,
   executor,
 });
 

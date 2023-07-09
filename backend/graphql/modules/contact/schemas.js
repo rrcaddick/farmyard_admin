@@ -2,7 +2,6 @@ const { isValidObjectId } = require("mongoose");
 const { object, string, lazy } = require("yup");
 const parsePhoneNumber = require("libphonenumber-js");
 
-//TODO: Make email and tel unique - Requires db to be dropped to create proper indexes
 const createContactSchema = object().shape({
   type: string().required("Contact type is required"),
   name: string().required("Contact name is required"),

@@ -6,6 +6,7 @@ const connectMongoDb = async () => {
   try {
     isDevelopment && mongoose.set("debug", true);
     mongoose.set("strictQuery", true);
+    mongoose.set("autoIndex", true);
 
     const { connection } = await mongoose.connect(MONGO_URI);
     console.log(`MongoDb connected on ${connection.host}`.bgGreen.black);

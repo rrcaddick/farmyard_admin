@@ -2,12 +2,17 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const { hashPassword } = require("../utils/auth");
 
+const uniqueErrors = {
+  email: "User already exist with this email address",
+  mobile: "User already exist with this mobile number",
+};
+
 const userSchema = new mongoose.Schema(
   {
     email: {
       type: String,
       required: "Email is required",
-      unique: "Email already exists",
+      unique: true,
     },
     name: {
       type: String,
@@ -20,7 +25,7 @@ const userSchema = new mongoose.Schema(
     mobile: {
       type: String,
       required: "Mobile number is required",
-      unique: "Mobile number already exists",
+      unique: true,
     },
     password: {
       type: String,
@@ -62,6 +67,14 @@ userSchema.pre("findOneAndUpdate", async function (next) {
   const hash = await hashPassword(user._update.password);
   user._update.password = hash;
   next();
+});
+
+userSchema.post("save", function (error, doc, next) {
+  if (error.code === 11000) {
+    throwUniqueGrpahqlError(error, uniqueErrors);
+  } else {
+    next(error);
+  }
 });
 
 userSchema.methods.validatePassword = function (password) {

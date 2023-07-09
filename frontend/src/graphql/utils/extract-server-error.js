@@ -6,7 +6,7 @@ const extractServerError = ({ graphQLErrors, networkError: _networkError }) => {
   // TODO: Create error link for all errors. Loop all and check error type
   if (Array.isArray(graphQLErrors)) {
     for (let error of graphQLErrors) {
-      const { code, data } = error.extensions;
+      const { code, data } = error;
       if (code !== "BAD_USER_INPUT") {
         serverError = {
           header: "Oops!",
