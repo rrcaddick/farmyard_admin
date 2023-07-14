@@ -14,7 +14,7 @@ const groupSchema = new Schema(
       postCode: { type: Number, required: true },
     },
     contacts: { type: [{ type: Schema.Types.ObjectId, ref: "Contact" }], shouldPopulate: true },
-    deleted: Boolean,
+    isDeleted: { type: Boolean, index: true },
   },
   { timestamps: true }
 );

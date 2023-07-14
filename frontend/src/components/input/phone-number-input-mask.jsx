@@ -25,7 +25,7 @@ const PhoneNumberInputMask = forwardRef((props, ref) => {
         },
       ]}
       onAccept={(value, ref, event) => {
-        !!event && onChange({ target: { name: props.name, value } });
+        !!event && onChange({ target: { name: props.name, value: value ?? undefined } });
       }}
       unmask="typed"
       dispatch={(appended, dynamicMasked) => {

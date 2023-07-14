@@ -34,27 +34,25 @@ const useManageDirtyValues = () => {
   const getDirtyData = useCallback(
     (defaultValues, submittedValues, { dirtyFieldsModifier, withId = false, dependantFields = [] }) => {
       const _defaultValues = removeDeletedFieldArrayItems(defaultValues);
+
       const dirtyFields = createDirtyFields(
         _defaultValues,
         dirtyFieldsModifier ? dirtyFieldsModifier(submittedValues) : submittedValues,
         dependantFields
       );
+
       const dirtyValues = getDirtyValues(dirtyFields, submittedValues, { withId });
+
       return _.merge({ ...dirtyValues, id: submittedValues.id }, deletedFieldArrayItems);
     },
     [removeDeletedFieldArrayItems, deletedFieldArrayItems]
   );
 
-  const hookValue = useMemo(
-    () => ({
-      markAsDeleted,
-      getDirtyData,
-      hasDeletedItems,
-    }),
-    [markAsDeleted, getDirtyData, hasDeletedItems]
-  );
-
-  return hookValue;
+  return {
+    markAsDeleted,
+    getDirtyData,
+    hasDeletedItems,
+  };
 };
 
 export { useManageDirtyValues };

@@ -5,7 +5,13 @@ const isObject = (objectRef) => {
   return false;
 };
 
-const createDirtyFields = (defaultValues, submittedValues, dependantFields = []) => {
+const createDependantObject = (value, dependantFields) => {
+  const keys = Object.keys(value);
+  const hasDependantField = keys.some((key) => dependantFields.includes(key));
+  return hasDependantField ? { ...value, ...Object.fromEntries(dependantFields.map((x) => [x, true])) } : value;
+};
+
+const createDirtyFields = (defaultValues, submittedValues, dependantFields) => {
   // Value is array
   if (Array.isArray(submittedValues)) {
     // Loop array and recursively call createDirtyFields
@@ -26,17 +32,33 @@ const createDirtyFields = (defaultValues, submittedValues, dependantFields = [])
   }
 
   // Recursively call createDirtyFields
-  return Object.fromEntries(
+  let dirtyFields = Object.fromEntries(
     Object.keys(submittedValues).reduce((acc, key) => {
       const submitData = submittedValues[key];
       const defaultData = defaultValues?.[key] || "";
-      const isDependantField = dependantFields.includes(key);
-      const value = isDependantField || createDirtyFields(defaultData, submitData, dependantFields);
+      const dependantField = dependantFields?.[key];
+      let value = createDirtyFields(defaultData, submitData, dependantFields?.[key]);
+
+      if (Array.isArray(dependantField) && value) {
+        value = Array.isArray(value)
+          ? value.map((x) => {
+              const test = createDependantObject(x, dependantField);
+              return test;
+            })
+          : createDependantObject(value, dependantField);
+      }
+
       if (!value || (isObject(value) && Object.keys(value).length === 0)) return acc;
       acc.push([key, value]);
       return acc;
     }, [])
   );
+
+  if (dependantFields?.root) {
+    dirtyFields = createDependantObject(dirtyFields, dependantFields?.root);
+  }
+
+  return dirtyFields;
 };
 
 const addIdToDirtyFields = (dirtyFields) => {
@@ -73,10 +95,10 @@ const getDirtyValues = (dirtyFields, allValues, { withId = false }) => {
 
   if (Array.isArray(dirtyFields)) {
     const arrayObjects = [];
-    for (let i = 0; i < dirtyFields.length; i++) {
-      if (!dirtyFields[i]) continue;
-      const { index, ...dirtyFieldsObject } = dirtyFields[i];
-      arrayObjects.push({ ...getDirtyValues(dirtyFieldsObject, allValues[index], { withId }) });
+    for (let i = 0; i < allValues.length; i++) {
+      const dirtyField = dirtyFields.find((x) => x.index === i);
+      const { index, ...dirtyFieldsObject } = dirtyField || {};
+      arrayObjects.push(dirtyField ? { ...getDirtyValues(dirtyFieldsObject, allValues[index], { withId }) } : null);
     }
     return arrayObjects;
   }

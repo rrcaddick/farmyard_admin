@@ -76,8 +76,15 @@ const GroupForm = ({ groupTypes }) => {
           ..._data,
           ...(contacts && {
             contacts: contacts.map((contact) => {
-              const { id, ...contactData } = contact;
-              return id?.includes("Temp") ? contactData : contact;
+              // Untouched contact used to keep index
+              if (!contact) return null;
+
+              const { id, tel, ...contactData } = contact;
+
+              // Stupid bug fix because yup won't transform tel the same as email
+              return id?.includes("Temp")
+                ? { ...contactData, ...(tel && { tel: tel ?? undefined }) }
+                : { ...contact, ...(tel && { tel: tel ?? undefined }) };
             }),
           }),
           ...(!_.isEmpty(groupType) && { groupType: { ...groupType, price: id } }),
@@ -90,11 +97,12 @@ const GroupForm = ({ groupTypes }) => {
           return { ...groupData, groupType: JSON.stringify(groupType) };
         };
 
-        // TODO: Refactor dependantFields to only include if one of them is submitted
         const dirtyData = getDirtyData(group, _data, {
           dirtyFieldsModifier: stringfySelectObjects,
           withId: true,
-          dependantFields: ["email", "tel"],
+          dependantFields: {
+            contacts: ["email", "tel"],
+          },
         });
 
         updateGroup({
@@ -119,10 +127,15 @@ const GroupForm = ({ groupTypes }) => {
     remove(contactIndex);
   };
 
+  const parseFormValues = useCallback((values) => {
+    const { postCode } = values?.address || {};
+    return postCode ? { ...values, address: { ...values.address, postCode: Number(postCode) } } : values;
+  }, []);
+
   return (
     <Loading
       error={!!serverErrors?.networkError || !!serverErrors?.serverError}
-      retry={() => submitHandler(getValues())}
+      retry={() => submitHandler(parseFormValues(getValues()))}
     >
       <FormProvider {...formMethods}>
         <Box
@@ -198,7 +211,7 @@ const GroupForm = ({ groupTypes }) => {
                 color="secondary"
                 onClick={() =>
                   append(
-                    { id: generateTempId("Contact"), name: "", email: "", tel: "" },
+                    { id: generateTempId("Contact") },
                     { shouldFocus: true, focusName: `contacts[${fields.length}].name` }
                   )
                 }
@@ -239,11 +252,6 @@ const GroupForm = ({ groupTypes }) => {
                       serverError={serverErrors?.[`contacts[${index}].tel`]}
                       clearServerError={clearServerError}
                       InputProps={{
-                        startAdornment: (
-                          <InputAdornment sx={{ marginBottom: "2px" }} position="start">
-                            +27 (0)
-                          </InputAdornment>
-                        ),
                         inputComponent: PhoneNumberInputMask,
                       }}
                       onChange={() => {

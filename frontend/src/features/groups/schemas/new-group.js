@@ -5,7 +5,9 @@ const addressSchema = object().shape({
   street: string().required("Street address is required"),
   suburb: string().required("Suburb is required"),
   postCode: number()
-    .transform((value) => (isNaN(value) ? undefined : value))
+    .transform((value) => {
+      return isNaN(value) ? undefined : Number(value);
+    })
     .nullable()
     .required("Post code is required"),
 });

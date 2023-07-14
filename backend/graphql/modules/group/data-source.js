@@ -1,7 +1,8 @@
 const { MongoDataSource } = require("../../data-source/mongo-data-source");
 const { Group } = require("../../../models/group");
-Group;
-const { Contact } = require("../../../models/contact");
+const { Contact, uniqueErrors } = require("../../../models/contact");
+const { startSession } = require("mongoose");
+const { createDocumentArray } = require("../../../mongodb/utils/transactions");
 
 class GroupSource extends MongoDataSource {
   constructor() {
@@ -34,18 +35,42 @@ class GroupSource extends MongoDataSource {
   }
 
   async createGroup(input) {
+    // Get group without contacts
     const { contacts, ...group } = input;
 
-    const hasContacts = !!contacts?.length > 0;
-    const contactIds = hasContacts ? (await Contact.insertMany(contacts)).map(({ _id }) => _id) : null;
+    // Create group without contacts and return
+    if (!contacts?.length > 0) return this.executeWithGraphqlProjection(await this.model.create({ ...group }));
+
+    // If group has contacts start session
+    const session = await startSession();
 
     try {
-      return this.executeWithGraphqlProjection(
-        await this.model.create({ ...group, ...(hasContacts && { contacts: contactIds }) })
+      session.startTransaction();
+      const [{ _id: groupId }] = await this.model.create([{ ...group }], { session: session });
+
+      // Create contacts or throw duplicate error
+      const contactsWithId = contacts.map((contact) => ({ ...contact, groupId }));
+      const newContacts = await createDocumentArray(contactsWithId, "contacts", Contact, uniqueErrors, session);
+
+      // Update the group contacts array
+      const newGroup = await this.executeWithGraphqlProjection(
+        await this.model.findByIdAndUpdate(
+          groupId,
+          { contacts: newContacts.map(({ _id }) => _id) },
+          { new: true, session }
+        )
       );
+
+      // 4. Commit the changes
+      await session.commitTransaction();
+      // Return new group
+      return newGroup;
     } catch (error) {
-      await Contact.deleteMany({ _id: contactIds });
+      // Transaction failed
+      await session.abortTransaction();
       throw error;
+    } finally {
+      await session.endSession();
     }
   }
 
@@ -55,24 +80,30 @@ class GroupSource extends MongoDataSource {
 
     if (contacts && contacts.length > 0) {
       for (let contact of contacts) {
+        if (!contact) continue;
+
         const { id, shouldDelete } = contact;
         // Contact to delete
         if (id && shouldDelete) {
           // Delete contact
-          await Contact.findByIdAndDelete(id);
+          await Contact.findByIdAndUpdate(id, { isDeleted: true });
           // Remove id from array
           await this.model.findByIdAndUpdate(id, { $pull: { contacts: id } }, { new: true });
         }
 
-        // Existing contact to update
-        if (id) {
-          await Contact.findByIdAndUpdate(contact.id, contact, { new: true });
-        }
+        try {
+          // Existing contact to update
+          if (id) {
+            await Contact.findByIdAndUpdate(contact.id, contact, { new: true });
+          }
 
-        // New contact to create
-        if (!id) {
-          const { _id } = await Contact.create(contact);
-          newContactIds.push(_id);
+          // New contact to create
+          if (!id) {
+            const { _id } = await Contact.create(contact);
+            newContactIds.push(_id);
+          }
+        } catch (error) {
+          console.log(error);
         }
       }
     }

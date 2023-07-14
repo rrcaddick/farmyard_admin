@@ -61,6 +61,7 @@ const typeDefs = gql`
   }
 
   input GroupContactInput {
+    type: String
     name: String!
     email: String
     tel: String
@@ -71,6 +72,7 @@ const typeDefs = gql`
     name: String
     email: String
     tel: String
+    index: Int
     shouldDelete: Boolean
   }
 `;

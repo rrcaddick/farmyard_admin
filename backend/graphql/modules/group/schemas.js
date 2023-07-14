@@ -1,5 +1,5 @@
 const { object, string, number, array } = require("yup");
-const { createContactSchema, updateContactSchema } = require("../contact/schemas");
+const { createGroupContactSchema, updateContactSchema } = require("../contact/schemas");
 
 const createGroupSchema = object().shape({
   name: string()
@@ -12,15 +12,11 @@ const createGroupSchema = object().shape({
     return true;
   }),
   address: object().shape({
-    street: string()
-      .required("You must provide a street address")
-      .test(function (value) {
-        return true;
-      }),
+    street: string().required("You must provide a street address"),
     suburb: string().required("You must provide a suburb"),
     postCode: number().required("You must provide a postal code"),
   }),
-  contacts: array().of(createContactSchema),
+  contacts: array().of(createGroupContactSchema),
 });
 
 const updateGroupSchema = object().shape({
@@ -46,11 +42,10 @@ const updateGroupSchema = object().shape({
       then: () => string().required("You must provide a street address"),
     }),
     suburb: string().when({ is: (exists) => !!exists, then: () => string().required("You must provide a suburb") }),
-    postCode: number()
-      .transform((value) => (isNaN(value) ? undefined : value))
-      .nullable()
-      .when({ is: (exists) => !!exists, then: () => string().number("You must provide a postal code") })
-      .typeError("Street should be of type number"),
+    postCode: number().when({
+      is: (exists) => !!exists,
+      then: () => number().required("You must provide a postal code").typeError("Street should be of type number"),
+    }),
   }),
   contacts: array().of(updateContactSchema),
 });

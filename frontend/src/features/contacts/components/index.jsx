@@ -43,7 +43,7 @@ const columnDefs = [
     label: "Contact Number",
     options: {
       customBodyRender: (value) => {
-        const phoneNumber = parsePhoneNumber(value, "ZA");
+        const phoneNumber = parsePhoneNumber(value ?? "", "ZA");
         return phoneNumber?.formatNational() ?? "";
       },
     },

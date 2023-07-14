@@ -73,7 +73,7 @@ const bookingSchema = new Schema(
         },
       },
     ],
-    deleted: { type: Boolean, default: false, required: true, index: true },
+    isDeleted: { type: Boolean, default: false, index: true },
   },
   { timestamps: true }
 );

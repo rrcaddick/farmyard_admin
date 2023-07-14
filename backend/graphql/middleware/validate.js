@@ -14,7 +14,8 @@ const validate =
       await schema.validate(validationObject, { abortEarly: false, context: { userId } });
       return next();
     } catch (error) {
-      throw new UserInputError("Validation Failed", { data: formatYupError(error) });
+      const data = formatYupError(error)
+      throw new UserInputError("Validation Failed", { data });
     }
   };
 
