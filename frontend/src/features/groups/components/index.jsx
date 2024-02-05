@@ -52,11 +52,11 @@ const Groups = () => {
   const { open: openAddEditGroup, Modal: AddUpdateGroupModal } = useModal();
   const isDesktop = useIsDesktop();
   const cache = useApolloCache();
-  
+
   const { data: groups, loading, serverErrors, refetch } = useApolloQuery(GET_GROUPS);
-  
+
   const { deleteGroups, restoreGroups } = useGroup();
-  
+
   const { MuiDataTable, onRowsDelete } = useMuiDataTable();
 
   const actions = useMemo(
@@ -71,8 +71,9 @@ const Groups = () => {
             <IconButton
               onClick={() => {
                 const group = cache.read(READ_GROUP, { groupId: tableMeta.rowData[0] });
+                const { price: { id } = {}, ...groupType } = group.groupType;
                 openAddEditGroup({
-                  group: parseGraphqlData(group, ["groupType"]),
+                  group: parseGraphqlData({ ...group, groupType: { ...groupType, price: id } }, ["groupType"]),
                   groupName: group.name,
                 });
               }}

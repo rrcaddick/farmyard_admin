@@ -14,7 +14,7 @@ const typeDefs = gql`
 
   type Mutation {
     createGroup(input: CreateGroupInput!): Group!
-    updateGroup(input: UpdateGroupInput!): Group!
+    updateGroup(input: UpdateGroupInput!, deletedContacts: [ID]): Group!
     deleteGroups(groupIds: [ID]!): DeleteResponse
     restoreGroups(groupIds: [ID]!): [Group]!
   }
@@ -25,6 +25,7 @@ const typeDefs = gql`
     groupType: GroupType
     address: Address
     contacts: [Contact]
+    # deletedContacts - Maybe
   }
 
   type Address {
@@ -72,8 +73,9 @@ const typeDefs = gql`
     name: String
     email: String
     tel: String
-    index: Int
     shouldDelete: Boolean
+    type: String
+    groupId: ID
   }
 `;
 

@@ -19,9 +19,7 @@ const groupTypeSchema = object()
   .shape({
     id: string().required("GroupType.id is required"),
     type: string().required("GroupType.type is required"),
-    price: object().shape({
-      id: string().required("GroupType.price.id is required"),
-    }),
+    price: string().required("GroupType.price.id is required"),
   })
   .typeError("Please select a group Type");
 

@@ -38,6 +38,7 @@ const apolloServer = new ApolloServer({
 
   // Start Ikhokha service
   // await ikhokhaService.start();
+  // await ikhokhaService.recreateData(new Date("2021-01-01"));
 
   // Start Quicket Service
   // await quicketService.start();
@@ -52,7 +53,7 @@ const apolloServer = new ApolloServer({
   await apolloServer.start();
   apolloServer.applyMiddleware({ app, path: "/graphql" });
 
-  // Start express server
+  // // Start express server
   app.listen(PORT, () => {
     console.log(`HTTP Server started on port ${PORT}`.bgYellow.black);
   });

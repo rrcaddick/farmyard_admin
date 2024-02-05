@@ -4,10 +4,10 @@ import { useCallback } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { useYupValidationResolver } from "@hooks/use-yup-validation-resolver";
 import { contactSchema } from "@contacts/schemas/contact-schema";
-import { Box, Button, Divider, InputAdornment } from "@mui/material";
+import { Box, Button, Divider } from "@mui/material";
 import { useModalContext } from "@components/modal/use-modal";
 import { useContact } from "@contacts/hooks/use-contact";
-import { useManageDirtyValues } from "@hooks/use-manage-dirty-values";
+import { useGetDirtyFields } from "@hooks/use-get-dirty-values";
 import { createOptimisticResponse } from "@graphql/utils/create-optimistic-response";
 import { createResponseSchema, updateResponseSchema } from "@contacts/schemas/graphql-responses";
 import useLoading from "@components/loading/use-loading";
@@ -47,20 +47,14 @@ const ContactForm = ({ groups, contactTypes }) => {
 
   const { Loading } = useLoading(loading);
 
-  const { getDirtyData } = useManageDirtyValues();
+  const { getDirtyValues } = useGetDirtyFields();
 
   const submitHandler = useCallback(
     (data) => {
       // Update contact
       if (contact) {
-        const dirtyData = getDirtyData(contact, data, {
-          withId: true,
-          // TODO: Change to dirtyFieldsOveride object {email: 1, tel: 1}
-          dependantFields: ["email", "tel"],
-        });
-
         return updateContact({
-          variables: { input: dirtyData },
+          variables: { input: getDirtyValues(contact, data) },
           optimisticResponse: createOptimisticResponse(updateResponseSchema, data),
         });
       }
@@ -70,7 +64,7 @@ const ContactForm = ({ groups, contactTypes }) => {
         optimisticResponse: createOptimisticResponse(createResponseSchema, data),
       });
     },
-    [getDirtyData, contact, updateContact, createContact]
+    [getDirtyValues, contact, updateContact, createContact]
   );
 
   return (

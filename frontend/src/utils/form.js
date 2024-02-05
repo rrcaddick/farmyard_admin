@@ -1,3 +1,5 @@
+import { removeProperty, stringifyPath } from "@utils/common";
+
 const isObject = (objectRef) => {
   if (typeof objectRef === "object" && !Array.isArray(objectRef) && objectRef !== null) {
     return true;
@@ -116,28 +118,14 @@ const getDirtyValues = (dirtyFields, allValues, { withId = false }) => {
   );
 };
 
-const parseGraphqlData = (data, stringifyFields = []) => {
-  if (Array.isArray(data)) {
-    const arrayObjects = [];
-    for (let item of data) {
-      arrayObjects.push(parseGraphqlData(item, stringifyFields));
-    }
-    return arrayObjects;
-  }
+const parseGraphqlData = (data, stringifyPaths = []) => {
+  const resultObj = removeProperty(data, "__typename");
 
-  if (!isObject(data)) {
-    return data ?? "";
-  }
+  stringifyPaths.forEach((path) => {
+    stringifyPath(path, resultObj);
+  });
 
-  return Object.fromEntries(
-    Object.keys(data).reduce((entries, key) => {
-      if (key === "__typename") return entries;
-      if (stringifyFields.includes(key)) {
-        return [...entries, [key, JSON.stringify(data[key])]];
-      }
-      return [...entries, [key, parseGraphqlData(data[key], stringifyFields)]];
-    }, [])
-  );
+  return resultObj;
 };
 
 export { addIdToDirtyFields, getDirtyValues, createDirtyFields, parseGraphqlData };

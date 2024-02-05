@@ -1,4 +1,3 @@
-import _ from "lodash";
 import TextInput from "@components/input/text-input";
 import SelectInput from "@components/input/select-input";
 import { useCallback, useEffect } from "react";
@@ -6,17 +5,16 @@ import { useForm, FormProvider, useFieldArray } from "react-hook-form";
 import { useYupValidationResolver } from "@hooks/use-yup-validation-resolver";
 import { newGroupSchema } from "@groups/schemas/new-group";
 import { createResponseSchema, updateResponseSchema } from "@groups/schemas/graphql-responses";
-import { Box, Button, IconButton, Divider, useTheme, InputAdornment } from "@mui/material";
+import { createOptimisticResponse } from "@graphql/utils/create-optimistic-response";
+import { Box, Button, IconButton, Divider, useTheme } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
-import { generateTempId } from "@graphql/utils/generate-temp-id";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import { useIsDesktop } from "@hooks/use-is-desktop";
-import { useManageDirtyValues } from "@hooks/use-manage-dirty-values";
+import { useGetDirtyFields } from "@hooks/use-get-dirty-values";
 import { useModalContext } from "@components/modal/use-modal";
 import { useGroup } from "@groups/hooks/use-group";
 import useLoading from "@components/loading/use-loading";
-import { createOptimisticResponse } from "@graphql/utils/create-optimistic-response";
 import PhoneNumberInputMask from "@components/input/phone-number-input-mask";
 
 const GroupForm = ({ groupTypes }) => {
@@ -44,7 +42,8 @@ const GroupForm = ({ groupTypes }) => {
     formState: { isValid, isDirty },
   } = formMethods;
   const { fields, append, remove } = useFieldArray({ name: "contacts", control });
-  const { getDirtyData, markAsDeleted, hasDeletedItems } = useManageDirtyValues();
+
+  const { getDirtyValues, hasDeletedItems, markAsDeleted, deletedFieldArrayItems } = useGetDirtyFields();
 
   useEffect(() => {
     setFocus("name");
@@ -64,82 +63,44 @@ const GroupForm = ({ groupTypes }) => {
 
   const submitHandler = useCallback(
     (data) => {
-      const _data =
-        typeof data?.groupType === "string" && data?.groupType !== ""
-          ? { ...data, groupType: JSON.parse(data.groupType) }
-          : data;
-
-      const getInputData = (_data) => {
-        const { groupType: { __typename, price: { id } = {}, ...groupType } = {}, contacts } = _data;
-
-        return {
-          ..._data,
-          ...(contacts && {
-            contacts: contacts.map((contact) => {
-              // Untouched contact used to keep index
-              if (!contact) return null;
-
-              const { id, tel, ...contactData } = contact;
-
-              // Stupid bug fix because yup won't transform tel the same as email
-              return id?.includes("Temp")
-                ? { ...contactData, ...(tel && { tel: tel ?? undefined }) }
-                : { ...contact, ...(tel && { tel: tel ?? undefined }) };
-            }),
-          }),
-          ...(!_.isEmpty(groupType) && { groupType: { ...groupType, price: id } }),
-        };
-      };
-
+      // Update Group
       if (group) {
-        const stringfySelectObjects = (submittedData) => {
-          const { groupType, ...groupData } = submittedData;
-          return { ...groupData, groupType: JSON.stringify(groupType) };
-        };
-
-        const dirtyData = getDirtyData(group, _data, {
-          dirtyFieldsModifier: stringfySelectObjects,
-          withId: true,
-          dependantFields: {
-            contacts: ["email", "tel"],
-          },
-        });
-
+        const deletedContacts = deletedFieldArrayItems?.contacts || [];
         updateGroup({
-          variables: { input: getInputData(dirtyData) },
-          optimisticResponse: createOptimisticResponse(updateResponseSchema, _data),
+          variables: {
+            input: getDirtyValues(group, data, ["groupType"]),
+            deletedContacts,
+          },
+          optimisticResponse: createOptimisticResponse(updateResponseSchema, data),
         });
       }
 
+      // Create Group
       if (!group) {
         createGroup({
-          variables: { input: getInputData(_data) },
-          optimisticResponse: createOptimisticResponse(createResponseSchema, _data),
+          variables: { input: data },
+          optimisticResponse: createOptimisticResponse(createResponseSchema, data),
         });
       }
     },
-    [group, createGroup, updateGroup, getDirtyData]
+    [group, createGroup, updateGroup, getDirtyValues, deletedFieldArrayItems]
   );
 
   const removeContactHandler = (contactIndex) => {
-    const deletedContact = { ...getValues(`contacts[${contactIndex}]`), shouldDelete: true };
-    markAsDeleted("contacts", deletedContact);
+    const deletedContact = getValues(`contacts[${contactIndex}]`);
+    markAsDeleted("contacts", deletedContact.id);
     remove(contactIndex);
   };
-
-  const parseFormValues = useCallback((values) => {
-    const { postCode } = values?.address || {};
-    return postCode ? { ...values, address: { ...values.address, postCode: Number(postCode) } } : values;
-  }, []);
 
   return (
     <Loading
       error={!!serverErrors?.networkError || !!serverErrors?.serverError}
-      retry={() => submitHandler(parseFormValues(getValues()))}
+      retry={() => {
+        handleSubmit(submitHandler)();
+      }}
     >
       <FormProvider {...formMethods}>
         <Box
-          component="form"
           onSubmit={handleSubmit(submitHandler)}
           noValidate
           display="flex"
@@ -148,6 +109,7 @@ const GroupForm = ({ groupTypes }) => {
           overflow="hidden"
           gap="2rem"
           paddingTop="10px"
+          component="form"
         >
           {/* Form Grid */}
           <Grid container spacing={{ xs: 2, md: 4 }} sx={{ overflowY: "scroll", margin: 0 }}>
@@ -166,7 +128,10 @@ const GroupForm = ({ groupTypes }) => {
                 name="groupType"
                 label="Group Type"
                 placeholder="Select group type..."
-                selectItems={groupTypes}
+                selectItems={groupTypes.map((groupType) => {
+                  const { __typename, price: { id } = {}, ..._groupType } = groupType;
+                  return { ..._groupType, price: id };
+                })}
                 setSelectValue={(item) => JSON.stringify(item)}
                 setDisplayText={(item) => item.type}
                 serverError={serverErrors?.groupType}
@@ -211,7 +176,7 @@ const GroupForm = ({ groupTypes }) => {
                 color="secondary"
                 onClick={() =>
                   append(
-                    { id: generateTempId("Contact") },
+                    { name: "", email: "", tel: "" },
                     { shouldFocus: true, focusName: `contacts[${fields.length}].name` }
                   )
                 }
@@ -248,7 +213,7 @@ const GroupForm = ({ groupTypes }) => {
                     <TextInput
                       name={`contacts[${index}].tel`}
                       label="Tel"
-                      placeholder="73 123 4567"
+                      placeholder="073 123 4567"
                       serverError={serverErrors?.[`contacts[${index}].tel`]}
                       clearServerError={clearServerError}
                       InputProps={{
@@ -262,7 +227,7 @@ const GroupForm = ({ groupTypes }) => {
                     />
 
                     {!isDesktop && (
-                      <Button type="button" onClick={removeContactHandler.bind(this, index, field.id)}>
+                      <Button type="button" onClick={() => removeContactHandler(index, field.id)}>
                         <DeleteIcon /> Remove Contact
                       </Button>
                     )}
@@ -270,7 +235,7 @@ const GroupForm = ({ groupTypes }) => {
                     {isDesktop && (
                       <IconButton
                         type="button"
-                        onClick={removeContactHandler.bind(this, index, field.id)}
+                        onClick={() => removeContactHandler(index, field.id)}
                         sx={{ alignSelf: "flex-start", marginTop: "18px", color: "error.light" }}
                       >
                         <DeleteIcon />

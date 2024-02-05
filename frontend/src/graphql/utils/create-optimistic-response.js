@@ -8,10 +8,15 @@ const isString = (stringTest) => {
 
 const createOptimisticResponse = (schema, data, isMutationWrapper = true) => {
   // Get required data
-  if (schema === 1) return data ?? null;
+  if (schema === 1) {
+    return data ?? "";
+  }
 
-  // Runs custom data function
-  if (isFunction(schema)) return data ?? schema();
+  // Runs custom data functiontrivial pursuit
+  if (isFunction(schema)) {
+    const customData = schema(data);
+    return customData ?? data;
+  }
 
   // Returns static data like __typename
   if (isString(schema)) return schema;

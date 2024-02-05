@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { gql, useApolloClient, useLazyQuery, useMutation } from "@apollo/client";
+import { useLazyQuery, useMutation } from "@apollo/client";
 import { GET_CONTACT, GET_CONTACTS, READ_CONTACT } from "@contacts/graphql/queries";
 import { CREATE_CONTACT, UPDATE_CONTACT, DELETE_CONTACTS, RESTORE_CONTACTS } from "@contacts/graphql/mutations";
 import { extractServerError } from "@graphql/utils/extract-server-error";
@@ -92,6 +92,9 @@ const useContact = ({
           },
           broadcast: true,
         });
+
+        // Contact type changed. GroupId null
+        if (!groupId) return;
 
         // Add contact to new group
         const { readGroup: newGroup } = cache.readQuery({

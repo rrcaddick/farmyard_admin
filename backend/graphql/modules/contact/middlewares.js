@@ -1,10 +1,10 @@
 const { validate } = require("../../middleware/validate");
-const { createContactSchema, updateContactSchema } = require("./schemas");
+const { createSchema } = require("./schemas");
 
 const middlewares = {
   Mutation: {
-    createContact: [validate(createContactSchema)],
-    updateContact: [validate(updateContactSchema)],
+    createContact: [validate(createSchema("Create"))],
+    updateContact: [validate(createSchema("Update"))],
   },
 };
 

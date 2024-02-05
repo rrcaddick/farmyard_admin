@@ -7,7 +7,8 @@ const resolvers = {
   },
   Mutation: {
     createGroup: (_, { input }, { dataSources: { groupSource } }) => groupSource.createGroup(input),
-    updateGroup: (_, { input }, { dataSources: { groupSource } }) => groupSource.updateGroup(input),
+    updateGroup: (_, { input, deletedContacts }, { dataSources: { groupSource } }) =>
+      groupSource.updateGroup(input, deletedContacts),
     deleteGroups: (_, { groupIds }, { dataSources: { groupSource } }) => groupSource.deleteGroups(groupIds),
     restoreGroups: (_, { groupIds }, { dataSources: { groupSource } }) => groupSource.restoreGroups(groupIds),
   },

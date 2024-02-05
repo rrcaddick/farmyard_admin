@@ -13,8 +13,8 @@ const CREATE_GROUP_MUTATION = gql`
 const UPDATE_GROUP_MUTATION = gql`
   # TODO: Create function to dynamically create fragment based on dirty fields
   ${FULL_GROUP_FRAGMENT}
-  mutation UpdateGroup($input: UpdateGroupInput!) {
-    updateGroup(input: $input) {
+  mutation UpdateGroup($input: UpdateGroupInput!, $deletedContacts: [ID]) {
+    updateGroup(input: $input, deletedContacts: $deletedContacts) {
       ...FullGroup
     }
   }

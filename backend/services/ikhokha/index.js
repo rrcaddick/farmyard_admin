@@ -1,6 +1,7 @@
 const { firefox } = require("playwright");
 const { createIkhokhaDate, formatIkhokhaData } = require("../../utils/ikhokha");
 const { IkhokhaSale } = require("../../models/ikhokha-sale");
+const dayjs = require("dayjs");
 
 const ikhokhaService = {
   running: false,
@@ -68,6 +69,24 @@ ikhokhaService.writeDailyData = async () => {
       },
     }))
   );
+};
+
+ikhokhaService.recreateData = async (date) => {
+  const salesData = await ikhokhaService.getDailyData(date);
+
+  await IkhokhaSale.bulkWrite(
+    salesData.map((sale) => ({
+      updateOne: {
+        filter: { ref: sale.ref },
+        update: sale,
+        upsert: true,
+      },
+    }))
+  );
+
+  if (!dayjs().isSame(dayjs(date), "date")) {
+    ikhokhaService.recreateData(dayjs(date).add(1, "day"));
+  }
 };
 
 module.exports = {

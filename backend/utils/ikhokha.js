@@ -1,5 +1,4 @@
 const createIkhokhaDate = (date) => {
-  const test = new Date(date);
   return new Date(date)
     .toLocaleString("en-ZA", {
       month: "2-digit",

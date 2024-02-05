@@ -1,7 +1,4 @@
-const { UserInputError } = require("apollo-server-express");
 const { Schema, model } = require("mongoose");
-const { throwUniqueGrpahqlError } = require("../utils/mongo-db");
-const { Group } = require("./group");
 
 const uniqueErrors = {
   email: "Contact already exist with this email address",
@@ -12,49 +9,35 @@ const contactSchema = new Schema(
   {
     type: { type: String, enum: ["Group", "Online", "Other"], default: "Group", required: true },
     name: { type: String, required: true },
-    email: { type: String, unique: true },
-    tel: { type: String, unique: true },
+    email: { type: String },
+    tel: { type: String },
     groupId: { type: Schema.Types.ObjectId, ref: "Group" },
-    isDeleted: { type: Boolean, index: true },
+    isDeleted: { type: Boolean, index: true, default: false },
   },
   { timestamps: true }
 );
 
-// contactSchema.post("save", function (error, doc, next) {
-//   if (error.code === 11000) {
-//     throw new Error("Maybe this will swallow error");
-//   } else {
-//     next(error);
-//   }
-// });
+contactSchema.index(
+  { email: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      isDeleted: false,
+      email: { $exists: true, $gt: "", $type: "string" },
+    },
+  }
+);
 
-// contactSchema.post("save", async function ({ groupId, _id }) {
-//   if (groupId)
-//     await Group.findByIdAndUpdate(groupId, { $push: { contacts: _id } }, { safe: true, upsert: true, new: true });
-// });
-
-// contactSchema.post("save", function (error, doc, next) {
-//   if (error.code === 11000) {
-//     throwUniqueGrpahqlError(error, uniqueErrors);
-//   } else {
-//     next(error);
-//   }
-// });
-
-// contactSchema.post("findOneAndUpdate", async function ({ _id }) {
-//   const { previousGroupId, groupId } = this.options;
-//   if (groupId) {
-//     previousGroupId &&
-//       (await Group.findByIdAndUpdate({}, { $pull: { contacts: _id } }, { safe: true, upsert: true, multi: true }));
-//     await Group.findByIdAndUpdate(groupId, { $push: { contacts: _id } }, { safe: true, upsert: true, new: true });
-//   }
-// });
-
-// contactSchema.post("updateMany", async function (doc) {
-//   const { contactIds } = this.options;
-//   if (contactIds || contactIds.length > 0)
-//     await Group.updateMany({ contacts: { $in: contactIds } }, { $pull: { contacts: { $in: contactIds } } });
-// });
+contactSchema.index(
+  { tel: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      isDeleted: false,
+      tel: { $exists: true, $gt: "", $type: "string" },
+    },
+  }
+);
 
 const Contact = model("Contact", contactSchema);
 

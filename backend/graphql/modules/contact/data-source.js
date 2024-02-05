@@ -1,6 +1,7 @@
 const { MongoDataSource } = require("../../data-source/mongo-data-source");
-const { Contact } = require("../../../models/contact");
+const { Contact, uniqueErrors } = require("../../../models/contact");
 const { Group } = require("../../../models/group");
+const { startSession } = require("mongoose");
 
 class ContactSource extends MongoDataSource {
   constructor() {
@@ -17,7 +18,7 @@ class ContactSource extends MongoDataSource {
     return this.executeWithGraphqlProjection(
       this.model.find({
         ...(contactIds && { _id: contactIds }),
-        $or: [{ deleted: { $exists: false } }, { deleted: false }],
+        $or: [{ isDeleted: { $exists: false } }, { isDeleted: false }],
       })
     );
   }
@@ -27,16 +28,72 @@ class ContactSource extends MongoDataSource {
   }
 
   async createContact(contact) {
-    return this.executeWithGraphqlProjection(await this.model.create(contact));
+    let session;
+    try {
+      // No group, so no transaction required
+      if (!contact?.groupId) return this.executeWithGraphqlProjection(await this.model.create(contact));
+
+      // Start session and transaction
+      session = await startSession();
+      session.startTransaction();
+
+      // Create contact
+      const [newContact] = await this.executeWithGraphqlProjection(await this.model.create([contact], { session }));
+
+      // Update group with new contact
+      await Group.findByIdAndUpdate(contact.groupId, { $push: { contacts: newContact._id } }, { session });
+
+      // Commit change and return contact
+      await session.commitTransaction();
+      return newContact;
+      // Update group
+    } catch (error) {
+      session && (await session.abortTransaction());
+      if (error.code === 11000) this.throwUniqueViolationGraphqlError(error, uniqueErrors);
+      else throw error;
+    } finally {
+      session && (await session.endSession());
+    }
   }
 
-  async updateContact(input) {
-    const { id, ...contact } = input;
+  async updateContact(contact) {
+    const { id, groupId, type } = contact;
+    const shouldRemoveGroupId = type && type !== "Group";
+    let session;
 
-    const { groupId: previousGroupId } = await this.model.findById(id);
-    return this.executeWithGraphqlProjection(
-      await this.model.findByIdAndUpdate(id, contact, { new: true, previousGroupId })
-    );
+    try {
+      // Start session and transaction
+      session = await startSession();
+      session.startTransaction();
+
+      // Get previous groupId
+      const { groupId: previousGroupId } = await this.model.findById(id).session(session);
+
+      // Pull contactId from previous groupId
+      await Group.findByIdAndUpdate(previousGroupId, { $pull: { contacts: id } }, { session });
+
+      // Push contactId to new group
+      await Group.findByIdAndUpdate(groupId, { $push: { contacts: id } }, { session });
+
+      // Update contact and return
+      const newContact = await this.executeWithGraphqlProjection(
+        await this.model.findByIdAndUpdate(
+          id,
+          { $set: { ...contact }, ...(shouldRemoveGroupId && { $unset: { groupId: true } }) },
+          { new: true, session }
+        )
+      );
+
+      // Commit transaction and return contact
+      await session.commitTransaction();
+      return newContact;
+    } catch (error) {
+      session && (await session.abortTransaction());
+      if (error.code === 11000) this.throwUniqueViolationGraphqlError(error, uniqueErrors);
+      else throw error;
+    } finally {
+      session && (await session.endSession());
+    }
   }
 
   async deleteContacts(contactIds) {
@@ -59,7 +116,7 @@ class ContactSource extends MongoDataSource {
 
       const { acknowledged: ok, modifiedCount: deletedCount } = await this.model.updateMany(
         { _id: { $in: contactIds } },
-        { deleted: true },
+        { isDeleted: true },
         { contactIds }
       );
       return { ok, deletedCount, deletedIds: contactIds, restoreInfo: JSON.stringify(restoreInfo) };

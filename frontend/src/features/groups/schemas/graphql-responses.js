@@ -4,7 +4,11 @@ const groupResponseSchema = {
   __typename: "Group",
   id: () => generateTempId("Group"),
   name: 1,
-  groupType: 1,
+  groupType: (groupType) => {
+    const parsedGroupType = typeof groupType === "string" ? JSON.parse(groupType) : groupType;
+    const { price, ..._groupType } = parsedGroupType;
+    return { ..._groupType, price: { id: price } };
+  },
   address: {
     __typename: "Address",
     street: 1,
@@ -14,11 +18,12 @@ const groupResponseSchema = {
   contacts: [
     {
       __typename: "Contact",
-      id: () => generateTempId("Contact"),
+      id: (id) => id || generateTempId("Contact"),
       type: "Group",
       name: 1,
       email: 1,
       tel: 1,
+      groupId: 1,
     },
   ],
 };

@@ -1,5 +1,5 @@
 const { object, string, number, array } = require("yup");
-const { createGroupContactSchema, updateContactSchema } = require("../contact/schemas");
+const { createGroupContactSchema, updateContactSchema, createSchema } = require("../contact/schemas");
 
 const createGroupSchema = object().shape({
   name: string()
@@ -16,7 +16,7 @@ const createGroupSchema = object().shape({
     suburb: string().required("You must provide a suburb"),
     postCode: number().required("You must provide a postal code"),
   }),
-  contacts: array().of(createGroupContactSchema),
+  contacts: array().of(createSchema("Create", "createGroup")),
 });
 
 const updateGroupSchema = object().shape({
@@ -47,7 +47,7 @@ const updateGroupSchema = object().shape({
       then: () => number().required("You must provide a postal code").typeError("Street should be of type number"),
     }),
   }),
-  contacts: array().of(updateContactSchema),
+  contacts: array().of(createSchema("Update")),
 });
 
 module.exports = {

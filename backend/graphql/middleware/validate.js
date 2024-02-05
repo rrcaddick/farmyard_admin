@@ -3,7 +3,7 @@ const { formatYupError } = require("../utils/yup");
 
 const validate =
   (schema) =>
-  async ({ root, args, context: { userId } }, next) => {
+  async ({ args, context }, next) => {
     let validationObject = args;
 
     if (typeof args[Object.keys(args)[0] === "object"]) {
@@ -11,10 +11,10 @@ const validate =
     }
 
     try {
-      await schema.validate(validationObject, { abortEarly: false, context: { userId } });
+      await schema.validate(validationObject, { abortEarly: false, context });
       return next();
     } catch (error) {
-      const data = formatYupError(error)
+      const data = formatYupError(error);
       throw new UserInputError("Validation Failed", { data });
     }
   };

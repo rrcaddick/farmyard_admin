@@ -8,6 +8,7 @@ import {
   UPDATE_GROUP_MUTATION,
 } from "../graphql/mutations";
 import { extractServerError } from "@graphql/utils/extract-server-error";
+import { GET_CONTACTS } from "@contacts/graphql/queries";
 
 const useGroup = ({
   onCreateComplete,
@@ -31,6 +32,15 @@ const useGroup = ({
     update: (cache, { data }) => {
       const { createGroup } = data;
       cache.updateQuery({ query: GET_GROUPS }, ({ groups }) => ({ groups: [...groups, createGroup] }));
+      cache.updateQuery({ query: GET_CONTACTS }, (data) => {
+        const { contacts = [] } = data || {};
+        // Filter out contacts that already exist in the cache
+        const newContacts =
+          createGroup?.contacts?.filter((contact) => {
+            return !contacts.some((existingContact) => existingContact.id === contact.id);
+          }) || [];
+        return { contacts: [...contacts, ...newContacts].sort((a, b) => a.id.toString() - b.id.toString()) };
+      });
     },
   });
 
@@ -51,9 +61,23 @@ const useGroup = ({
     onCompleted: (data) => {
       onUpdateComplete && onUpdateComplete(data);
     },
-    update: (cache, { data }) => {
+    update: (cache, { data }, { variables }) => {
       const { updateGroup } = data;
+      const { deletedContacts } = variables;
       cache.updateQuery({ query: READ_GROUP, variables: { groupId: updateGroup.id } }, () => updateGroup);
+      cache.updateQuery({ query: GET_CONTACTS }, (data) => {
+        const { contacts = [] } = data || {};
+        // Filter out contacts that already exist in the cache
+        const newContacts =
+          updateGroup?.contacts?.filter((contact) => {
+            return !contacts.some((existingContact) => existingContact.id === contact.id);
+          }) || [];
+        return {
+          contacts: [...contacts.filter((contact) => !deletedContacts.includes(contact.id)), ...newContacts].sort(
+            (a, b) => a.id.toString() - b.id.toString()
+          ),
+        };
+      });
     },
   });
 
@@ -70,8 +94,8 @@ const useGroup = ({
       } = data;
 
       ok &&
-        cache.updateQuery({ query: GET_GROUPS }, ({ getGroups }) => ({
-          getGroups: getGroups.filter((group) => !deletedIds.includes(group.id)),
+        cache.updateQuery({ query: GET_GROUPS }, ({ groups }) => ({
+          groups: groups.filter((group) => !deletedIds.includes(group.id)),
         }));
     },
   });

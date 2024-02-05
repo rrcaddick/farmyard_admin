@@ -51,11 +51,11 @@ const columnDefs = [
 ];
 
 const Contacts = () => {
-  const { container } = useOutletContext();
-  const { open: openAddEditContact, Modal: AddUpdateContactModal } = useModal();
   const isDesktop = useIsDesktop();
   const cache = useApolloCache();
-
+  const { container } = useOutletContext();
+  
+  const { open: openAddEditContact, Modal: AddUpdateContactModal } = useModal();
   const { data: contacts, loading, serverErrors, refetch } = useApolloQuery(GET_CONTACTS);
 
   const { deleteContacts, restoreContacts } = useContact();
