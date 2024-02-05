@@ -48,8 +48,8 @@ const getCookieOptions = (rememberMe) => {
   const refreshExpiry = ms(process.env.JWT_REFRESH_EXPIRY);
 
   return developer
-    ? { ...(rememberMe && { maxAge: refreshExpiry }), httpOnly: true, sameSite: true }
-    : { ...(rememberMe && { maxAge: refreshExpiry }), httpOnly: true, sameSite: true, secure: true };
+    ? { ...(rememberMe && { maxAge: refreshExpiry }), httpOnly: true, sameSite: "Strict" }
+    : { ...(rememberMe && { maxAge: refreshExpiry }), httpOnly: true, sameSite: "Strict", secure: true };
 };
 
 module.exports = {

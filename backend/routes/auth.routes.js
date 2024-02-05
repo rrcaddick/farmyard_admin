@@ -4,7 +4,6 @@ const { loginSchema, resetPasswordSchema } = require("../validators/auth.validat
 const {
   loginController,
   logoutController,
-  refreshTokenController,
   forgotPasswordController,
   resetPasswordController,
 } = require("../controllers/auth.controller");

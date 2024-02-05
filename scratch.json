@@ -1,0 +1,12 @@
+{
+  "User:63ea0ccee113ee6f85fbf989": {
+    "__typename": "User",
+    "id": "63ea0ccee113ee6f85fbf989",
+    "email": "rrcaddick@gmail.com",
+    "name": "Ray Caddick",
+    "mobile": "+27763635909",
+    "position": "CTO",
+    "roles": ["ADMIN", "DIRECTOR"]
+  },
+  "ROOT_QUERY": { "__typename": "Query", "me": { "__ref": "User:63ea0ccee113ee6f85fbf989" } }
+}

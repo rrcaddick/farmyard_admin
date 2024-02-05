@@ -26,6 +26,7 @@ const useFetch = () => {
   }, []);
 
   const sendRequest = useCallback(
+    // TODO: Remove shouldRetry and only look at retries > 0
     async (url, fetchOptions = {}, { shouldRetry = false, retries = 0 }) => {
       startRequestState();
       try {

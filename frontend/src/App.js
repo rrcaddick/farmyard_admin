@@ -24,7 +24,7 @@ const App = () => {
   useEffect(() => {
     if (rememberMe && !hasApolloCache()) {
       (async () => {
-        await login(undefined, pathname);
+        await login({ rememberMe }, pathname);
         toggleLoading(false);
       })();
     }
