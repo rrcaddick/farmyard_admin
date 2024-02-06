@@ -4,7 +4,7 @@ import useFetch from "@hooks/use-fetch";
 import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useApolloCache } from "@hooks/use-apollo-cache";
-import { getMe } from "@auth/graphql/queries";
+import { GET_ME } from "@auth/graphql/queries";
 
 const useAuthenticate = () => {
   const client = useApolloClient();
@@ -22,7 +22,7 @@ const useAuthenticate = () => {
       );
 
       if (data) {
-        cache.write(getMe, "User", data);
+        cache.write(GET_ME, "User", data);
         navigate(pathname);
       }
 

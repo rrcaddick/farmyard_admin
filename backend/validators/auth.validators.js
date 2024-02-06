@@ -2,18 +2,9 @@ const yup = require("yup");
 const { User } = require("../models/user");
 const jwt = require("jsonwebtoken");
 
+// TODO: Add structure validation to body
 const loginSchema = yup.object().shape({
   body: yup.object().test("login-valid", "Invalid email or password", async function () {
-    const { email, password } = this.originalValue;
-    const req = this.parent;
-    const { userId } = req;
-
-    if (!userId && (!email || !password)) return false;
-
-    const user = await User.findOne(userId ? { id: userId } : { email });
-    if (!user || (!userId && !(await user.validatePassword(password)))) return false;
-
-    req.user = user;
     return true;
   }),
 });
@@ -28,6 +19,7 @@ const resetPasswordSchema = yup.object().shape({
 
       return true;
     })
+    // TODO: Move to controller
     .test("token-valid", "Your password link is expired or invalid", async function () {
       const { userId, token, newPassword, confirmPassword } = this.originalValue;
       const req = this.parent;

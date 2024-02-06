@@ -4,6 +4,7 @@ const { json } = require("express");
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const { authenticate } = require("./middleware/authenticate");
+const { redisClient } = require("./middleware/redis");
 const { connectMongoDb } = require("./config/mongo-db");
 const { ApolloServer } = require("apollo-server-express");
 const { graphqlApplication, executor, schema, context, dataSources, formatError, injector } = require("./graphql");
@@ -15,7 +16,8 @@ const { User } = require("./models/user");
 
 // Express app and middleware
 const app = express();
-app.use(express.urlencoded({ extended: false }), express.json(), cookieParser(), authenticate);
+
+app.use(express.urlencoded({ extended: false }), express.json(), cookieParser(), redisClient, authenticate);
 
 // Auth Routes
 app.use(require("./routes/auth.routes"));

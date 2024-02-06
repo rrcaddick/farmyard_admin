@@ -45,7 +45,6 @@ const userSchema = new mongoose.Schema(
       ],
       default: ["EMPLOYEE"],
     },
-    refreshToken: String,
     resetToken: String,
     isDeleted: { type: Boolean, index: true },
   },
@@ -80,21 +79,6 @@ userSchema.post("save", function (error, doc, next) {
 
 userSchema.methods.validatePassword = function (password) {
   return bcrypt.compareSync(password, this.password);
-};
-
-userSchema.methods.rotateRefreshToken = async function (refreshToken) {
-  this.refreshToken = refreshToken;
-  await this.save();
-};
-
-userSchema.methods.clearRefreshToken = async function () {
-  this.refreshToken = undefined;
-  await this.save();
-};
-
-userSchema.statics.revokeRefreshToken = async function (userId) {
-  const user = await this.findById(userId);
-  await user.clearRefreshToken();
 };
 
 const User = mongoose.model("User", userSchema);

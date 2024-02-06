@@ -15,15 +15,44 @@ const generateAccessToken = (userId) => {
   return jwt.sign({ userId }, accessSecret, { expiresIn: accessExpiry });
 };
 
-const generateRefreshToken = async (user) => {
+const generateRefreshToken = async (userId, redisClient, rememberMe) => {
   const refreshSecret = process.env.JWT_REFRESH_SECRET;
   const refreshExpiry = process.env.JWT_REFRESH_EXPIRY;
+  const cacheExpiry = ms(refreshExpiry);
 
-  const newRefreshToken = jwt.sign({ userId: user._id }, refreshSecret, { expiresIn: refreshExpiry });
+  const refreshToken = jwt.sign({ userId }, refreshSecret, { expiresIn: refreshExpiry });
 
-  await user.rotateRefreshToken(newRefreshToken);
+  const cacheKey = `RefreshTokens:${userId}:${refreshToken}`;
 
-  return newRefreshToken;
+  const cacheValue = JSON.stringify({ token: refreshToken, rememberMe });
+
+  await redisClient.set(cacheKey, cacheValue, "EX", cacheExpiry);
+
+  return { refreshToken, rememberMe };
+};
+
+const rotateRefreshToken = async (userId, redisClient, oldToken) => {
+  const oldKey = `RefreshTokens:${userId}:${oldToken}`;
+
+  const cachedValue = await redisClient.get(oldKey);
+
+  const { rememberMe } = JSON.parse(cachedValue);
+
+  await redisClient.del(oldKey);
+
+  return await generateRefreshToken(userId, redisClient, rememberMe);
+};
+
+const blackListAccessToken = async (redisClient, token) => {
+  const key = `AccessBlacklist:${token}`;
+
+  return await redisClient.set(key, "true");
+};
+
+const revokeRefreshToken = async (userId, redisClient, revokedToken) => {
+  const key = `RefreshTokens:${userId}:${revokedToken}`;
+
+  await redisClient.del(key);
 };
 
 const generateResetToken = (email) => {
@@ -52,11 +81,28 @@ const getCookieOptions = (rememberMe) => {
     : { ...(rememberMe && { maxAge: refreshExpiry }), httpOnly: true, sameSite: "Strict", secure: true };
 };
 
+const shouldBlacklist = async (token, redisClient) => {
+  const key = `AccessBlacklist:${token}`;
+
+  return await redisClient.exists(key);
+};
+
+const getRefreshTokenStatus = async (userId, redisClient, refreshToken) => {
+  const key = `RefreshTokens:${userId}:${refreshToken}`;
+
+  return (await redisClient.exists(key)) === 1;
+};
+
 module.exports = {
   hashPassword,
   generateAccessToken,
   generateRefreshToken,
+  rotateRefreshToken,
   generateResetToken,
   verifyToken,
   getCookieOptions,
+  shouldBlacklist,
+  getRefreshTokenStatus,
+  blackListAccessToken,
+  revokeRefreshToken,
 };

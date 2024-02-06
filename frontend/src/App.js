@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { ThemeModeContext, useThemeMode } from "./theme";
 import { ThemeProvider, CssBaseline, GlobalStyles, Paper } from "@mui/material";
 import { useRoutes } from "react-router-dom";
@@ -8,30 +7,21 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { getRememberMe } from "@utils/auth";
 import useLoading from "@components/loading/use-loading";
-import { useAuthenticate } from "@auth/hooks/use-authenticate";
-import { hasApolloCache } from "@utils/apollo-cache";
-import { useLocation } from "react-router-dom";
+import { useLazyQuery, useQuery } from "@apollo/client";
+import { GET_ME } from "@auth/graphql/queries";
 
 const rememberMe = getRememberMe();
 
 const App = () => {
   const [theme, themeMode] = useThemeMode();
   const routes = useRoutes(RouteMap);
-  const { login } = useAuthenticate();
-  const { Loading, toggleLoading } = useLoading(rememberMe);
-  const { pathname } = useLocation();
 
-  useEffect(() => {
-    if (rememberMe && !hasApolloCache()) {
-      (async () => {
-        await login({ rememberMe }, pathname);
-        toggleLoading(false);
-      })();
-    }
-    if (hasApolloCache()) {
-      toggleLoading(false);
-    }
-  }, []);
+  const { loading } = useQuery(GET_ME, {
+    fetchPolicy: "network-only",
+    skip: !rememberMe, // Skips the query if rememberMe is false
+  });
+
+  const { Loading } = useLoading(loading);
 
   return (
     <ThemeModeContext.Provider value={themeMode}>
