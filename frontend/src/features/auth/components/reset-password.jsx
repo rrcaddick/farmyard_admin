@@ -2,15 +2,12 @@ import { useCallback, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { FormProvider, useForm } from "react-hook-form";
 import { Button, IconButton, Alert } from "@mui/material";
-
 import { useShowPassword } from "@auth/hooks";
 import { useYupValidationResolver } from "@hooks/use-yup-validation-resolver";
 import { resetPasswordSchema } from "@auth/schemas/reset-password";
 import useFetch from "@hooks/use-fetch";
-
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-
 import ResetPasswordForm from "@auth/components/auth-form";
 import TextInput from "@components/input/text-input";
 
@@ -26,7 +23,7 @@ const ResetPassword = () => {
 
   const { userId, token } = useParams();
 
-  const { sendRequest, loading, serverError, success } = useFetch();
+  const { sendRequest, loading, serverError, error, success } = useFetch();
 
   const navigate = useNavigate();
 
@@ -48,13 +45,13 @@ const ResetPassword = () => {
     if (success) {
       navigate("/login", { state: { passwordReset: true } });
     }
-  }, [success, navigate]);
+  }, [success, error, navigate]);
 
   return (
     <>
-      {serverError && (
+      {error && (
         <Alert severity="error" sx={{ borderRadius: "8px" }}>
-          {serverError}
+          {error}
         </Alert>
       )}
       <FormProvider {...formMethods}>
@@ -83,6 +80,9 @@ const ResetPassword = () => {
             disabled={!isValid || loading}
           >
             {loading ? "Loading" : "Reset Password"}
+          </Button>
+          <Button variant="text" onClick={() => navigate("/")}>
+            Back to Login
           </Button>
         </ResetPasswordForm>
       </FormProvider>

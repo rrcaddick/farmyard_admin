@@ -7,6 +7,9 @@ const {
   getCookieOptions,
   revokeRefreshToken,
   blackListAccessToken,
+  verifyToken,
+  getResetTokenStatus,
+  clearResetToken,
 } = require("../utils/auth");
 const { User } = require("../models/user");
 const { createMailerTransporter } = require("../utils/node-mailer");
@@ -59,11 +62,12 @@ const logoutController = asyncHandler(async (req, res) => {
 
 const forgotPasswordController = asyncHandler(async (req, res) => {
   const { email } = req.body;
+  const { redisClient } = req;
 
   const mailTransport = createMailerTransporter();
-  const user = await User.findOne({ email });
+  const { id } = await User.findOne({ email });
 
-  if (!user) {
+  if (!id) {
     mailTransport.sendMail({
       to: [{ email }],
       from: { name: "Farmyard Admin", email: "reset-password@farmyard-admin.co.za" },
@@ -71,15 +75,13 @@ const forgotPasswordController = asyncHandler(async (req, res) => {
       html: noUserEmail,
     });
   } else {
-    const token = generateResetToken(email);
-    user.resetToken = token;
-    await user.save();
+    const resetToken = await generateResetToken(id, redisClient);
 
     mailTransport.sendMail({
       to: [{ email }],
       from: { name: "Farmyard Admin", email: "reset-password@farmyard-admin.co.za" },
       subject: "Password Reset",
-      html: resetEmail`${user._id.toString()}${token}`,
+      html: resetEmail`${id.toString()}${resetToken}`,
     });
   }
 
@@ -89,18 +91,36 @@ const forgotPasswordController = asyncHandler(async (req, res) => {
 });
 
 const resetPasswordController = asyncHandler(async (req, res) => {
-  const {
-    user,
-    body: { newPassword },
-  } = req;
+  const { redisClient } = req;
+  const { userId, token, newPassword } = req.body;
 
-  user.password = newPassword;
-  user.resetToken = undefined;
-  await user.save();
+  try {
+    // 1. Validate token and get user
+    const { userId: tokenUserId } = verifyToken(token, process.env.JWT_RESET_SECRET);
+    if (userId !== tokenUserId) throw new Error("Invalid token");
 
-  res.status(200).json({
-    message: "Password reset successfully",
-  });
+    // 2. Check redis for token
+    const isValidToken = await getResetTokenStatus(userId, redisClient, token);
+
+    // 3. If fail return throw error and return failed
+    if (!isValidToken) throw new Error("Password reset token expired");
+
+    // 4. Find user and update password
+    await User.findByIdAndUpdate(userId, { password: newPassword });
+
+    try {
+      await clearResetToken(userId, redisClient, token);
+    } catch (error) {
+      console.log(error);
+    }
+
+    res.status(200).json({
+      message: "Password reset successfully",
+    });
+  } catch (error) {
+    res.status(401);
+    throw new Error("Password reset failed");
+  }
 });
 
 module.exports = {

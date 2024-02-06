@@ -52,11 +52,12 @@ const authenticate = asyncHandler(async (req, res, next) => {
     req.userId = refreshTokenUserId;
     res.setHeader("x-access-token", generateAccessToken(refreshTokenUserId));
 
-    const { refreshToken: newRefreshToken, rememberMe } = await rotateRefreshToken(
+    const { refreshToken: newRefreshToken, rememberMe: tokenRememberMe } = await rotateRefreshToken(
       refreshTokenUserId,
       redisClient,
       refreshToken
     );
+
     res
       .clearCookie("refreshToken", getCookieOptions(rememberMe))
       .cookie("refreshToken", newRefreshToken, getCookieOptions(rememberMe));
@@ -67,7 +68,7 @@ const authenticate = asyncHandler(async (req, res, next) => {
   }
 
   // Invalid Refresh token - Clear refresh token and move on
-  res.clearCookie("refreshToken", getCookieOptions(rememberMe));
+  res.clearCookie("refreshToken", getCookieOptions(false));
   return next();
 });
 

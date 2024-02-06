@@ -53,6 +53,9 @@ const ForgotPassword = () => {
           <Button variant="contained" type="submit" sx={{ mt: "1rem" }} disabled={!isValid || loading}>
             {loading ? "Loading" : "Send Password Reset"}
           </Button>
+          <Button variant="text" onClick={() => navigate("/")}>
+            Back
+          </Button>
         </ForgotPasswordForm>
       </FormProvider>
     </>

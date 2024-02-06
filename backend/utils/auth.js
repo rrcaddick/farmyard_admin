@@ -18,7 +18,6 @@ const generateAccessToken = (userId) => {
 const generateRefreshToken = async (userId, redisClient, rememberMe) => {
   const refreshSecret = process.env.JWT_REFRESH_SECRET;
   const refreshExpiry = process.env.JWT_REFRESH_EXPIRY;
-  const cacheExpiry = ms(refreshExpiry);
 
   const refreshToken = jwt.sign({ userId }, refreshSecret, { expiresIn: refreshExpiry });
 
@@ -26,7 +25,7 @@ const generateRefreshToken = async (userId, redisClient, rememberMe) => {
 
   const cacheValue = JSON.stringify({ token: refreshToken, rememberMe });
 
-  await redisClient.set(cacheKey, cacheValue, "EX", cacheExpiry);
+  await redisClient.set(cacheKey, cacheValue, "EX", ms(refreshExpiry));
 
   return { refreshToken, rememberMe };
 };
@@ -55,20 +54,25 @@ const revokeRefreshToken = async (userId, redisClient, revokedToken) => {
   await redisClient.del(key);
 };
 
-const generateResetToken = (email) => {
+const generateResetToken = async (userId, redisClient) => {
   const resetSecret = process.env.JWT_RESET_SECRET;
   const resetExpiry = process.env.JWT_RESET_EXPIRY;
-  return jwt.sign({ email }, resetSecret, { expiresIn: resetExpiry });
+  const resetToken = jwt.sign({ userId }, resetSecret, { expiresIn: resetExpiry });
+
+  const cacheKey = `ResetTokens:${userId}:${resetToken}`;
+  const cacheValue = JSON.stringify({ token: resetToken });
+
+  await redisClient.set(cacheKey, cacheValue, "EX", ms(resetExpiry));
+
+  return resetToken;
 };
 
 const verifyToken = (token, secret) => {
-  let payload = {};
-
   // Swallows verify error and returns null for bad token
   try {
-    payload = jwt.verify(token, secret);
-  } finally {
-    return payload;
+    return jwt.verify(token, secret);
+  } catch (error) {
+    return {};
   }
 };
 
@@ -84,13 +88,25 @@ const getCookieOptions = (rememberMe) => {
 const shouldBlacklist = async (token, redisClient) => {
   const key = `AccessBlacklist:${token}`;
 
-  return await redisClient.exists(key);
+  return (await redisClient.exists(key)) === 1;
 };
 
 const getRefreshTokenStatus = async (userId, redisClient, refreshToken) => {
   const key = `RefreshTokens:${userId}:${refreshToken}`;
 
   return (await redisClient.exists(key)) === 1;
+};
+
+const getResetTokenStatus = async (userId, redisClient, resetToken) => {
+  const key = `ResetTokens:${userId}:${resetToken}`;
+
+  return (await redisClient.exists(key)) === 1;
+};
+
+const clearResetToken = async (userId, redisClient, resetToken) => {
+  const key = `ResetTokens:${userId}:${resetToken}`;
+
+  await redisClient.del(key);
 };
 
 module.exports = {
@@ -105,4 +121,6 @@ module.exports = {
   getRefreshTokenStatus,
   blackListAccessToken,
   revokeRefreshToken,
+  getResetTokenStatus,
+  clearResetToken,
 };

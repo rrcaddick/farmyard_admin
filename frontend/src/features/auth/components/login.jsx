@@ -39,7 +39,6 @@ const Login = () => {
 
   return (
     <>
-      {/* TODO: Don't show login error for failed refresh on start */}
       {!!navigateState?.loginError && (
         <Alert severity="error" sx={{ borderRadius: "8px" }}>
           {navigateState?.loginError}

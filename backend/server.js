@@ -19,6 +19,7 @@ const app = express();
 
 app.use(express.urlencoded({ extended: false }), express.json(), cookieParser(), redisClient, authenticate);
 
+// TODO: Implement rate limiting for auth routes
 // Auth Routes
 app.use(require("./routes/auth.routes"));
 

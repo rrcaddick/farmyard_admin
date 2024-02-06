@@ -7,8 +7,10 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { getRememberMe } from "@utils/auth";
 import useLoading from "@components/loading/use-loading";
-import { useLazyQuery, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import { GET_ME } from "@auth/graphql/queries";
+import { useEffect } from "react";
+import { hasApolloCache } from "@utils/apollo-cache";
 
 const rememberMe = getRememberMe();
 
@@ -18,7 +20,12 @@ const App = () => {
 
   const { loading } = useQuery(GET_ME, {
     fetchPolicy: "network-only",
-    skip: !rememberMe, // Skips the query if rememberMe is false
+    skip: hasApolloCache() || !rememberMe, // Skips the query cache is available or rememberMe is false
+  });
+
+  useEffect(() => {
+    if (hasApolloCache()) {
+    }
   });
 
   const { Loading } = useLoading(loading);

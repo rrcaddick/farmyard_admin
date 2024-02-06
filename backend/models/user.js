@@ -45,7 +45,6 @@ const userSchema = new mongoose.Schema(
       ],
       default: ["EMPLOYEE"],
     },
-    resetToken: String,
     isDeleted: { type: Boolean, index: true },
   },
   { timestamps: true }
@@ -61,11 +60,13 @@ userSchema.pre("save", async function (next) {
 });
 
 userSchema.pre("findOneAndUpdate", async function (next) {
-  //TODO: Either pass option or use this.getUpdate(), to avoid private method
-  const user = this;
-  if (!user._update.password) return next();
-  const hash = await hashPassword(user._update.password);
-  user._update.password = hash;
+  const update = this.getUpdate();
+
+  if (!update.password) return next();
+
+  const hash = await hashPassword(update.password);
+  update.password = hash;
+
   next();
 });
 

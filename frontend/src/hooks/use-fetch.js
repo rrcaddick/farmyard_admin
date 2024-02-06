@@ -19,6 +19,7 @@ const isClientCode = (statusCode) => {
 const useFetch = () => {
   const [loading, setLoading] = useState();
   const [error, setError] = useState();
+  const [success, setSuccess] = useState();
 
   const startRequestState = useCallback(() => {
     setError(null);
@@ -26,8 +27,7 @@ const useFetch = () => {
   }, []);
 
   const sendRequest = useCallback(
-    // TODO: Remove shouldRetry and only look at retries > 0
-    async (url, fetchOptions = {}, { shouldRetry = false, retries = 0 }) => {
+    async (url, { retries = 0, ...fetchOptions } = {}) => {
       startRequestState();
       try {
         const { body, ...options } = fetchOptions;
@@ -39,16 +39,18 @@ const useFetch = () => {
 
         if (response.ok) {
           const responseData = await response.json();
+          setSuccess(true);
           return { data: responseData, success: true };
         }
 
-        if (isRetryCode(response.status) && shouldRetry && retries > 0) {
-          return sendRequest(url, options, retries - 1);
+        if (isRetryCode(response.status) && retries > 0) {
+          return sendRequest(url, options, { ...fetchOptions, retries: retries - 1 });
         }
 
         if (isClientCode(response.status)) {
           const { message } = await response.json();
           setError(message);
+          setSuccess(false);
           return { message, success: false };
         }
 
@@ -65,7 +67,7 @@ const useFetch = () => {
     [startRequestState]
   );
 
-  return { sendRequest, loading, error };
+  return { sendRequest, loading, error, success };
 };
 
 export default useFetch;

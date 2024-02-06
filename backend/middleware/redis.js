@@ -9,4 +9,4 @@ const redisClient = (req, res, next) => {
   return next();
 };
 
-module.exports = { redisClient };
+module.exports = { redisClient, client };

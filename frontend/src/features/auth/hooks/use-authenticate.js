@@ -15,11 +15,7 @@ const useAuthenticate = () => {
 
   const login = useCallback(
     async (loginData, pathname = "/") => {
-      const { data, message } = await sendRequest(
-        "/login",
-        { method: "POST", body: loginData },
-        { shouldRetry: true, retries: 2 }
-      );
+      const { data, message } = await sendRequest("/login", { method: "POST", body: loginData, retries: 2 });
 
       if (data) {
         cache.write(GET_ME, "User", data);
@@ -35,7 +31,7 @@ const useAuthenticate = () => {
   );
 
   const logout = useCallback(async () => {
-    const { message } = await sendRequest("/logout", { method: "GET" }, { shouldRetry: true, retries: 2 });
+    const { message } = await sendRequest("/logout", { method: "GET", retries: 2 });
 
     await client.clearPersistedCache();
 
