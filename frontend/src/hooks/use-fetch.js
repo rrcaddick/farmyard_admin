@@ -1,5 +1,6 @@
 import _ from "lodash";
 import { useCallback, useState } from "react";
+import { useApolloClient } from "@apollo/client";
 
 const defaultOptions = {
   headers: {
@@ -26,13 +27,16 @@ const useFetch = () => {
     setLoading(true);
   }, []);
 
+  const client = useApolloClient();
+  const locaFetch = client.getFetch();
+
   const sendRequest = useCallback(
     async (url, { retries = 0, ...fetchOptions } = {}) => {
       startRequestState();
       try {
         const { body, ...options } = fetchOptions;
 
-        const response = await fetch(
+        const response = await locaFetch(
           url,
           _.merge({}, defaultOptions, { ...options, ...(body && { body: JSON.stringify(body) }) })
         );

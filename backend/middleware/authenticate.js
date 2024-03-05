@@ -8,6 +8,7 @@ const {
   shouldBlacklist,
   getRefreshTokenStatus,
   rotateRefreshToken,
+  getToken,
 } = require("../utils/auth");
 
 const authenticate = asyncHandler(async (req, res, next) => {
@@ -15,10 +16,7 @@ const authenticate = asyncHandler(async (req, res, next) => {
   const { redisClient } = req;
   const { refreshToken } = req?.cookies;
 
-  const token =
-    req.headers?.authorization &&
-    req.headers?.authorization.startsWith("Bearer") &&
-    req.headers?.authorization.split(" ")[1];
+  const token = getToken(req);
 
   // No Access token or Refresh token - Public route or first login
   if (!refreshToken && !token) return next();
@@ -52,7 +50,7 @@ const authenticate = asyncHandler(async (req, res, next) => {
     req.userId = refreshTokenUserId;
     res.setHeader("x-access-token", generateAccessToken(refreshTokenUserId));
 
-    const { refreshToken: newRefreshToken, rememberMe: tokenRememberMe } = await rotateRefreshToken(
+    const { refreshToken: newRefreshToken, rememberMe } = await rotateRefreshToken(
       refreshTokenUserId,
       redisClient,
       refreshToken

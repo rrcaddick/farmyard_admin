@@ -45,7 +45,10 @@ const rotateRefreshToken = async (userId, redisClient, oldToken) => {
 const blackListAccessToken = async (redisClient, token) => {
   const key = `AccessBlacklist:${token}`;
 
-  return await redisClient.set(key, "true");
+  const tokenExpiry = jwt.decode(token).exp;
+  const expiresIn = Math.floor(tokenExpiry - Date.now() / 1000);
+
+  return await redisClient.set(key, "true", "EX", expiresIn);
 };
 
 const revokeRefreshToken = async (userId, redisClient, revokedToken) => {
@@ -109,6 +112,11 @@ const clearResetToken = async (userId, redisClient, resetToken) => {
   await redisClient.del(key);
 };
 
+const getToken = (req) =>
+  req.headers?.["x-access-token"] &&
+  req.headers?.["x-access-token"].startsWith("Bearer") &&
+  req.headers?.["x-access-token"].split(" ")[1];
+
 module.exports = {
   hashPassword,
   generateAccessToken,
@@ -123,4 +131,5 @@ module.exports = {
   revokeRefreshToken,
   getResetTokenStatus,
   clearResetToken,
+  getToken,
 };

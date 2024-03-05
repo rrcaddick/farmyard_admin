@@ -10,6 +10,7 @@ const {
   verifyToken,
   getResetTokenStatus,
   clearResetToken,
+  getToken,
 } = require("../utils/auth");
 const { User } = require("../models/user");
 const { createMailerTransporter } = require("../utils/node-mailer");
@@ -43,13 +44,14 @@ const loginController = asyncHandler(async (req, res) => {
 });
 
 const logoutController = asyncHandler(async (req, res) => {
-  const { userId, token, redisClient } = req;
+  const { userId, redisClient, token } = req;
   const { refreshToken } = req?.cookies;
 
   try {
-    // TODO: Add Access token to redis blacklist
+    // Blacklist accces token for future login attempts
     await blackListAccessToken(redisClient, token);
-    // TODO: Remove Refresh token from Redis store
+
+    // Remove refresh token from cache
     if (userId && refreshToken) await revokeRefreshToken(userId, redisClient, refreshToken);
     res.status(200).clearCookie("refreshToken", getCookieOptions(false)).json({
       message: "Succesfully logged out",

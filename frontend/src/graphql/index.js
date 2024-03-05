@@ -83,8 +83,25 @@ const createApolloClient = () => {
     token = newToken;
   };
 
-  // Stops fetch overriding to expose token
-  const safeFetch = createSafeFetch(setToken);
+  const safeFetch = async (url, options = {}) => {
+    const headers = {
+      ...options.headers,
+      ...(token && { "x-access-token": `Bearer ${token}` }),
+    };
+
+    const response = await window.fetch(url, {
+      ...options,
+      headers,
+    });
+
+    const accessToken = response.headers.get("x-access-token");
+
+    if (accessToken) {
+      setToken(accessToken);
+    }
+
+    return response;
+  };
 
   const httpLink = createHttpLink({
     uri: "/graphql",
@@ -107,7 +124,9 @@ const createApolloClient = () => {
 
       const accessToken = headers.get("x-access-token");
 
-      if (accessToken) setToken(accessToken);
+      if (accessToken) {
+        setToken(accessToken);
+      }
 
       return response;
     });
