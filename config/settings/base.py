@@ -86,6 +86,7 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     "farmyard_admin.users",
+    "farmyard_admin.dashboard",
     "farmyard_admin.bookings",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -105,10 +106,11 @@ AUTHENTICATION_BACKENDS = [
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth-user-model
 AUTH_USER_MODEL = "users.User"
-# https://docs.djangoproject.com/en/dev/ref/settings/#login-redirect-url
-LOGIN_REDIRECT_URL = "users:redirect"
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-url
 LOGIN_URL = "account_login"
+# https://docs.djangoproject.com/en/dev/ref/settings/#login-redirect-url
+LOGIN_REDIRECT_URL = "dashboard:home"
+ACCOUNT_LOGOUT_REDIRECT_URL = "account_login"
 
 # PASSWORDS
 # ------------------------------------------------------------------------------
@@ -191,6 +193,7 @@ TEMPLATES = [
                 "django.template.context_processors.tz",
                 "django.contrib.messages.context_processors.messages",
                 "farmyard_admin.users.context_processors.allauth_settings",
+                "farmyard_admin.users.context_processors.base_template",
             ],
         },
     },

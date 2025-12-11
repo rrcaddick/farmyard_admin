@@ -13,6 +13,7 @@ services:
     depends_on:
       - postgres
       - redis
+    user: "${UID:-1000}:${GID:-1000}"
     volumes:
       - /app/.venv
       - .:/app:z
@@ -20,7 +21,7 @@ services:
       - ./.envs/.local/.django
       - ./.envs/.local/.postgres
     ports:
-      - '8000:8000'
+      - "8000:8000"
     command: /start
 
   postgres:
@@ -66,5 +67,5 @@ services:
     image: farmyard_admin_local_flower
     container_name: farmyard_admin_local_flower
     ports:
-      - '5555:5555'
+      - "5555:5555"
     command: /start-flower
